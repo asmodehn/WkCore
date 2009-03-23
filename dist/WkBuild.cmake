@@ -36,12 +36,9 @@ endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 include ( CMake/WkCompilerSetup.cmake )
 
 macro(WKProject project_name_arg)
-	#stores the name of the project in the cache scope, to be used in others WkMacro calls.
-	#for safety reasons, cannot be changed interactively.
-	set(PROJECT_NAME ${project_name_arg} CACHE STRING "The name of the project and the main target alltogether" FORCE )
-	mark_as_advanced(PROJECT_NAME)
-	project(${PROJECT_NAME} ${ARGN})
+	project(${project_name_arg} ${ARGN})
 	WkCompilerSetup( )
+	#TODO : fix problem on recursive project announcements... ( source dependencies for example )
 endmacro(WKProject PROJECT_NAME)
 
 MACRO(MERGE ALIST BLIST OUTPUT)
@@ -114,10 +111,16 @@ macro (WkBuild project_type )
 		endif(CHECK_MEM_LEAKS)
 	endif (CMAKE_BUILD_TYPE STREQUAL Release)
 	
-		#Building dependencies recursively.
-		file(GLOB ${PROJECT_NAME}_source_depends RELATIVE ${PROJECT_SOURCE_DIR} ext/* )
-				
-		message ( STATUS " Dependencies detected : ${${PROJECT_NAME}_source_depends}" )
+		#Building dependencies recursively ( not looking into hidden directories (beginning with '.' or '..')
+		
+		file(GLOB ${PROJECT_NAME}_sourcedir_depends RELATIVE ${PROJECT_SOURCE_DIR} ext/[^.]* )
+		#to get rid of the ext/ prefix
+		set(${PROJECT_NAME}_source_depends)
+		foreach ( looparg ${${PROJECT_NAME}_sourcedir_depends} )
+			get_filename_component( dependency_project ${looparg} NAME)
+			list( APPEND ${PROJECT_NAME}_source_depends ${dependency_project} )
+		endforeach ( looparg )
+		message ( STATUS "Dependencies detected : ${${PROJECT_NAME}_source_depends}" )
 		
 		if ( ${PROJECT_NAME}_source_depends )
 			set(${PROJECT_NAME}_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
@@ -133,9 +136,7 @@ macro (WkBuild project_type )
 			endforeach ( looparg )
 			#MESSAGE ( STATUS "Back to configuring ${PROJECT_NAME} build" )
 			set( BUILD_SHARED_LIBS ${${PROJECT_NAME}_BUILD_SHARED_LIBS} )
-		endif ( ${PROJECT_NAME}_source_depends )
-#	ENDIF(${project_type} STREQUAL "EXECUTABLE")
-	
+		endif ( ${PROJECT_NAME}_source_depends )	
 				
 	#Defining target
 	
@@ -149,14 +150,10 @@ macro (WkBuild project_type )
 	#	-source for the unmodified ones, 
 	#	-and in source/src for internal ones)
 	INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/CMake ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
- 
-   #Including dependencies' headers
-   #
-        #IF ( ${ARGC} GREATER 2 )
-    #            FOREACH ( looparg ${ARGN} )
-    #                    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ext/${looparg}/include)
-    #            ENDFOREACH ( looparg )
-    #    ENDIF ( ${ARGC} GREATER 2  )
+	foreach ( looparg ${${PROJECT_NAME}_source_depends} )
+		include_directories( ext/${looparg}_build/include )
+		message ( "include_directories( ext/${looparg}_build/include ) " )
+	endforeach ( looparg)
 
 	#TODO : find a simpler way than this complex merge...
 	MERGE("${HEADERS}" "${SOURCES}" SOURCES)
@@ -183,9 +180,11 @@ macro (WkBuild project_type )
 	#
 	
 	IF ( ${PROJECT_NAME}_source_depends )
-		FOREACH ( looparg ${project_source_depends} )
+		FOREACH ( looparg ${${PROJECT_NAME}_source_depends} )
 			IF(${project_type} STREQUAL "LIBRARY")
 				# CMake doesnt support convenience lib right now
+				TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${looparg})
+				ADD_DEPENDENCIES(${PROJECT_NAME} ${looparg})
 			ENDIF(${project_type} STREQUAL "LIBRARY")
 			IF(${project_type} STREQUAL "EXECUTABLE")
 				TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${looparg})
