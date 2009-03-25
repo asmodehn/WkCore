@@ -28,9 +28,9 @@
  * 
  */
 
-#include "header.hh"
+#include "ProjectA/header.hh"
 
 int main ( int argc, char* argv[] )
 {
-	return displayXX("test");
+	return A_display("test A");
 }
