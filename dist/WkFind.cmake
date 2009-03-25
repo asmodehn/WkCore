@@ -27,12 +27,19 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
+	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
+endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
+
 
 macro ( WkGenFind )
 
 	#
 	# First copy LibFindMacro there, to the module can actually work...
 	#
+	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E make_directory ${PROJECT_BINARY_DIR}/CMake/
+													COMMENT "Creating ${PROJECT_BINARY_DIR}/CMake/" )
+	
 	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/CMake/ext/LibFindMacros.cmake ${PROJECT_BINARY_DIR}/CMake/
 													COMMENT "Copying ${PROJECT_SOURCE_DIR}/CMake/ext/LibFindMacros.cmake to ${PROJECT_BINARY_DIR}/CMake/" )
 	
