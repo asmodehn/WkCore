@@ -89,13 +89,8 @@ MACRO(WkTestBuild )
 				#needed for each run library dependency as well
 				#message ( STATUS "Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
 				foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
-					message ( "	ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
-														COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
-							")
-				
 					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
 														COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
-				
 				endforeach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
 			ENDIF (testsource)
 		endforeach ( test_name ${ARGN})
