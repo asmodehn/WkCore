@@ -70,25 +70,33 @@ MACRO(WkTestBuild )
 				
 				#We need to move project libraries and dependencies to the test target location after build.
 				#We need to do that everytime to make sure we have the latest version
-				#TODO : only when lib dynamic ( and module )
-				#TODO : dependencies
-				GET_TARGET_PROPERTY(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
+				
 				GET_TARGET_PROPERTY(${test_name}_LOCATION ${test_name} LOCATION)
 				get_filename_component(${test_name}_PATH ${${test_name}_LOCATION} PATH)
-				ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
-														COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
+
+				if ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
+					GET_TARGET_PROPERTY(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
+					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
+															COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
+				endif ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
 				#needed for each source dependency
 				foreach ( looparg ${${PROJECT_NAME}_source_depends} )
-					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${looparg}_LOCATION} ${${test_name}_PATH}
-														COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
-				
+					if ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")
+						ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${looparg}_LOCATION} ${${test_name}_PATH}
+																COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
+					endif ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")				
 				endforeach ( looparg ${${PROJECT_NAME}_source_depends} )
-				#needed for each imported binary dependency as well
-				foreach ( looparg ${${PROJECT_NAME}_bin_depends} )
-					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${looparg}_BIN_LOCATION} ${${test_name}_PATH}
-														COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
+				#needed for each run library dependency as well
+				#message ( STATUS "Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
+				foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
+					message ( "	ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
+														COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
+							")
 				
-				endforeach ( looparg ${${PROJECT_NAME}_bin_depends} )
+					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
+														COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
+				
+				endforeach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
 			ENDIF (testsource)
 		endforeach ( test_name ${ARGN})
 	ENDIF(${PROJECT_NAME}_ENABLE_TESTS)

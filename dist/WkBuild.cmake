@@ -83,21 +83,30 @@ macro ( WkGenConfig )
 ### First section : Main target ###
 	
 get_filename_component(SELF_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
-#all required target should be defined there... no need to specify ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
+#all required target should be defined there... no need to specify all targets in ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
 include(\${SELF_DIR}/${PROJECT_NAME}Export.cmake)
 get_filename_component(${PROJECT_NAME}_INCLUDE_DIR "\${SELF_DIR}/include/" ABSOLUTE)
 set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIR})
 	")
 	
-	get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
-	
 	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-
-#however we still want to have ${PROJECT_NAME}_LIBRARIES to be able to move them around if needed
+#however we still want to have ${PROJECT_NAME}_LIBRARIES available
 set(${PROJECT_NAME}_LIBRARY ${PROJECT_NAME})
 set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARY})
-	
 	" )
+	
+	get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
+	get_target_property(${PROJECT_NAME}_TYPE ${PROJECT_NAME} TYPE)
+	if ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
+		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
+set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${PROJECT_NAME}_LOCATION})
+		")
+	endif ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
+	
+	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+set(${PROJECT_NAME}_FOUND TRUE)
+	")	
 	
 	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 ### Second Section : Source dependencies ###
@@ -106,19 +115,27 @@ set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARY})
 	foreach( looparg ${${PROJECT_NAME}_source_depends} )
 		# TODO better : linked ot the include copy in the binary dir...
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-		get_filename_component(${looparg}_INCLUDE_DIR \"\${SELF_DIR}/ext/${looparg}/include\" ABSOLUTE)
-		set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \${${looparg}_INCLUDE_DIR})
+get_filename_component(${looparg}_INCLUDE_DIR \"\${SELF_DIR}/ext/${looparg}/include\" ABSOLUTE)
+set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \${${looparg}_INCLUDE_DIR})
 		")
+		
+	get_target_property(${looparg}_LOCATION ${looparg} LOCATION)
+	get_target_property(${looparg}_TYPE ${looparg} TYPE)
+	if ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")
+		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${looparg}_LOCATION})
+		")
+	endif ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")
+	
+		
 	endforeach( looparg ${${PROJECT_NAME}_source_depends} )
 	
 	
 	foreach( looparg ${${PROJECT_NAME}_source_depends} )
 		#get_target_property(${looparg}_IMPLIB ${looparg}_IMPLIB)
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-	
-		set(${looparg}_LIBRARY ${looparg} ) #\${${looparg}_IMPLIB})
-		set(${looparg}_LIBRARIES \${${looparg}_LIBRARIES} ${looparg} ) #\${${looparg}_LIBRARY})
-	
+set(${looparg}_LIBRARY ${looparg} ) #\${${looparg}_IMPLIB})
+set(${looparg}_LIBRARIES \${${looparg}_LIBRARIES} ${looparg} ) #\${${looparg}_LIBRARY})
 		")
 		
 	endforeach( looparg ${${PROJECT_NAME}_source_depends} )
@@ -139,28 +156,26 @@ CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 
 	if ( ${ARGC} GREATER 1 )
-		set(load_type ${ARGV1} )
+		set(${PROJECT_NAME}_load_type ${ARGV1} )
 	endif ( ${ARGC} GREATER 1 )
 
-	message ( STATUS "Configuring ${PROJECT_NAME}" )	
+	message ( STATUS "Configuring ${PROJECT_NAME} as ${project_type} ${${PROJECT_NAME}_load_type}" )	
 		
 	# testing type
 	if (NOT ${project_type} STREQUAL "EXECUTABLE" AND NOT ${project_type} STREQUAL "LIBRARY" )
 		message ( FATAL_ERROR " Project type ${project_type} is not valid. Project type can be either EXECUTABLE or LIBRARY")
 	endif (NOT ${project_type} STREQUAL "EXECUTABLE" AND NOT ${project_type} STREQUAL "LIBRARY" )
 	if ( ${project_type} STREQUAL "LIBRARY" 
-					AND NOT ${load_type} STREQUAL "STATIC"
-					AND NOT ${load_type} STREQUAL "SHARED"
-					AND NOT ${load_type} STREQUAL "MODULE"
+					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "STATIC"
+					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "SHARED"
+					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "MODULE"
 		)
-		message ( FATAL_ERROR " Project Load type ${load_type} is not valid. Project Load type can be either STATIC, SHARED or MODULE")
+		message ( FATAL_ERROR " Project Load type ${${PROJECT_NAME}_load_type} is not valid. Project Load type can be either STATIC, SHARED or MODULE")
 	endif  ( ${project_type} STREQUAL "LIBRARY" 
-					AND NOT ${load_type} STREQUAL "STATIC"
-					AND NOT ${load_type} STREQUAL "SHARED"
-					AND NOT ${load_type} STREQUAL "MODULE"
+					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "STATIC"
+					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "SHARED"
+					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "MODULE"
 		)
-	
-
 	
 		#Building dependencies recursively ( not looking into hidden directories (beginning with '.' or '..') )
 		
@@ -171,11 +186,11 @@ CMAKE_POLICY(VERSION 2.6)
 			get_filename_component( dependency_project ${looparg} NAME)
 			list( APPEND ${PROJECT_NAME}_source_depends ${dependency_project} )
 		endforeach ( looparg )
-		if (${PROJECT_NAME}_source_depends} )
+		if (${PROJECT_NAME}_source_depends )
 			message ( STATUS "Source Dependencies detected : ${${PROJECT_NAME}_source_depends}" )
-		else (${PROJECT_NAME}_source_depends} )
+		else (${PROJECT_NAME}_source_depends )
 			message ( STATUS "Source Dependencies detected : None" )
-		endif (${PROJECT_NAME}_source_depends} )
+		endif (${PROJECT_NAME}_source_depends )
 		
 		if ( ${PROJECT_NAME}_source_depends )
 			set(${PROJECT_NAME}_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
@@ -188,6 +203,18 @@ CMAKE_POLICY(VERSION 2.6)
 				add_subdirectory(ext/${looparg} ext/${looparg}_build )
 				message ( STATUS "Cmake'ing dependency ${looparg} : Done." )
 				message ( STATUS "==" )
+				#finding the package that has just been built
+				find_package( ${looparg} NO_MODULE PATHS ext/${looparg}_build )
+				if ( ${looparg}_FOUND )
+					include_directories(${${looparg}_INCLUDE_DIRS})
+					message ( " Now including ${${looparg}_INCLUDE_DIRS} ")
+					target_link_libraries(${PROJECT_NAME} ${${looparg}_LIBRARIES})
+					add_dependencies(${PROJECT_NAME} ${looparg})
+					#if the find module also defines the runtime libraries ( Wk find module standard )
+					if ( ${package_name}_RUN_LIBRARIES )
+						set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_name}_RUN_LIBRARIES} )
+					endif ( ${package_name}_RUN_LIBRARIES )
+				endif ( ${looparg}_FOUND )
 			endforeach ( looparg )
 			#MESSAGE ( STATUS "Back to configuring ${PROJECT_NAME} build" )
 			set( BUILD_SHARED_LIBS ${${PROJECT_NAME}_BUILD_SHARED_LIBS} )
@@ -220,21 +247,21 @@ CMAKE_POLICY(VERSION 2.6)
 	#	-source for the unmodified ones, 
 	#	-and in source/src for internal ones)
 	INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/CMake ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
-	foreach ( looparg ${${PROJECT_NAME}_source_depends} )
-		include_directories( ${PROJECT_BINARY_DIR}/ext/${looparg}_build/include )
-	endforeach ( looparg)
+	#foreach ( looparg ${${PROJECT_NAME}_source_depends} )
+	#	include_directories( ${PROJECT_BINARY_DIR}/ext/${looparg}_build/include )
+	#endforeach ( looparg)
 
 	#TODO : find a simpler way than this complex merge...
 	MERGE("${HEADERS}" "${SOURCES}" SOURCES)
 	#MESSAGE ( STATUS "Sources : ${SOURCES}" )
 	
 	if(${project_type} STREQUAL "LIBRARY")
-		add_library(${PROJECT_NAME} ${load_type} ${SOURCES})
-		if ( load_type )
-		if(${load_type} STREQUAL "SHARED")
+		add_library(${PROJECT_NAME} ${${PROJECT_NAME}_load_type} ${SOURCES})
+		if ( ${PROJECT_NAME}_load_type )
+		if(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
 			set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL "WK_SHAREDLIB_BUILD")
-		endif(${load_type} STREQUAL "SHARED")
-		endif (load_type)		
+		endif(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
+		endif (${PROJECT_NAME}_load_type)		
 	endif(${project_type} STREQUAL "LIBRARY")
 	if(${project_type} STREQUAL "EXECUTABLE")
 		add_executable(${PROJECT_NAME} ${SOURCES})
@@ -244,18 +271,12 @@ CMAKE_POLICY(VERSION 2.6)
 	#Linking dependencies
 	#
 	
-	IF ( ${PROJECT_NAME}_source_depends )
-		FOREACH ( looparg ${${PROJECT_NAME}_source_depends} )
-			IF(${project_type} STREQUAL "LIBRARY")
-				TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${looparg})
-				ADD_DEPENDENCIES(${PROJECT_NAME} ${looparg})
-			ENDIF(${project_type} STREQUAL "LIBRARY")
-			IF(${project_type} STREQUAL "EXECUTABLE")
-				TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${looparg})
-				ADD_DEPENDENCIES(${PROJECT_NAME} ${looparg})
-			ENDIF(${project_type} STREQUAL "EXECUTABLE")
-		ENDFOREACH ( looparg )
-	ENDIF ( ${PROJECT_NAME}_source_depends )
+	#IF ( ${PROJECT_NAME}_source_depends )
+	#	FOREACH ( looparg ${${PROJECT_NAME}_source_depends} )
+	#			TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${looparg})
+	#			ADD_DEPENDENCIES(${PROJECT_NAME} ${looparg})
+	#	ENDFOREACH ( looparg )
+	#ENDIF ( ${PROJECT_NAME}_source_depends )
 	
 	#
 	# Defining where to put what has been built
@@ -312,9 +333,14 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	find_package( ${package_name} ${ARGN} )
 	if ( ${package_name}_FOUND )
+		message ( STATUS "Binary Dependency ${package_name} : Found ! " )
 		include_directories(${${package_name}_INCLUDE_DIRS})
 		target_link_libraries(${PROJECT_NAME} ${${package_name}_LIBRARIES})
-		
+		#if the find module also defines the runtime libraries ( Wk find module standard )
+		if ( ${package_name}_RUN_LIBRARIES )
+			#message ( STATUS " Adding ${package_name}_RUN_LIBRARIES : ${${package_name}_RUN_LIBRARIES} to ${PROJECT_NAME}_RUN_LIBRARIES . " )
+			set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_name}_RUN_LIBRARIES} )
+		endif ( ${package_name}_RUN_LIBRARIES )
 		#once the project is built with it the dependency becomes mandatory
 		# we append to the config cmake script
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
@@ -325,9 +351,15 @@ find_package( ${package_name} REQUIRED )
 if ( ${package_name}_FOUND )
 	set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \${${package_name}_INCLUDE_DIRS} )
 	set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} \${${package_name}_LIBRARIES} )
+	if ( ${package_name}_RUN_LIBRARIES )
+		set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${package_name}_RUN_LIBRARIES} )
+	endif ( ${package_name}_RUN_LIBRARIES )	
 endif ( ${package_name}_FOUND )
 		
 		")
+		
+	else ( ${package_name}_FOUND )	
+		message ( STATUS "Binary Dependency ${package_name} : FAILED ! " )
 	endif ( ${package_name}_FOUND )
 	
 	#set(${package_name}_EXPORT_CMAKE CACHE FILEPATH " Export.cmake filepath for ${package_name} dependency " )
