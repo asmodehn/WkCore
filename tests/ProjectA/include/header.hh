@@ -33,6 +33,6 @@
 
 #include <string>
 
-int displayXX(std::string txt);
+int A_display(std::string txt);
 
 #endif
