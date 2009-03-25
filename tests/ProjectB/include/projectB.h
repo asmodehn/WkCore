@@ -32,7 +32,7 @@
  */
 
 /*We are depending on projectC*/
-#include "projectC.h"
+#include "ProjectC/header.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
