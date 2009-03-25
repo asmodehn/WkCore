@@ -28,7 +28,7 @@
  * 
  */
 
-#include "projectB.h"
+#include "ProjectB/header.h"
 
 int main ( int argc, char* argv[] )
 {
