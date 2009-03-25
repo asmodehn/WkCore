@@ -40,13 +40,13 @@ macro ( WkGenFind )
 	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E make_directory ${PROJECT_BINARY_DIR}/CMake/
 													COMMENT "Creating ${PROJECT_BINARY_DIR}/CMake/" )
 	
-	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/CMake/ext/LibFindMacros.cmake ${PROJECT_BINARY_DIR}/CMake/
-													COMMENT "Copying ${PROJECT_SOURCE_DIR}/CMake/ext/LibFindMacros.cmake to ${PROJECT_BINARY_DIR}/CMake/" )
+	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/CMake/Modules/LibFindMacros.cmake ${PROJECT_BINARY_DIR}/CMake/
+													COMMENT "Copying ${PROJECT_SOURCE_DIR}/CMake/Modules/LibFindMacros.cmake to ${PROJECT_BINARY_DIR}/CMake/" )
 	
 	#
 	#start of the file + looking for dependencies
 	#
-	file( WRITE ${PROJECT_SOURCE_DIR}/CMake/ext/Find${PROJECT_NAME}.cmake "
+	file( WRITE ${PROJECT_SOURCE_DIR}/CMake/Modules/Find${PROJECT_NAME}.cmake "
 # - Try to find ${PROJECT_NAME}
 # Once done, this will define
 #
@@ -62,7 +62,7 @@ include(LibFindMacros)
 	# finding dependencies
 	#
 	if ( ${PROJECT_NAME}_bin_depends )
-	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/ext/Find${PROJECT_NAME}.cmake "
+	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/Modules/Find${PROJECT_NAME}.cmake "
 	
 # Dependencies
 libfind_package(${PROJECT_NAME} ${${PROJECT_NAME}_bin_depends})
@@ -73,7 +73,7 @@ libfind_package(${PROJECT_NAME} ${${PROJECT_NAME}_bin_depends})
 	#
 	#using pkg_config
 	#
-	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/ext/Find${PROJECT_NAME}.cmake "
+	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/Modules/Find${PROJECT_NAME}.cmake "
 
 # Use pkg-config to get hints about paths
 libfind_pkg_check_modules(${PROJECT_NAME}_PKGCONF ${PROJECT_NAME})
@@ -94,7 +94,7 @@ find_library(${PROJECT_NAME}_LIBRARY
 	#
 	# setting up variables
 	#
-	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/ext/Find${PROJECT_NAME}.cmake "
+	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/Modules/Find${PROJECT_NAME}.cmake "
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
 set(${PROJECT_NAME}_PROCESS_INCLUDES ${PROJECT_NAME}_INCLUDE_DIR )
@@ -105,23 +105,24 @@ set(${PROJECT_NAME}_PROCESS_LIBS ${PROJECT_NAME}_LIBRARY )
 	# Adding dependencies
 	#
 	foreach ( looparg ${${PROJECT_NAME}_bin_depends} )
-		file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/ext/Find${PROJECT_NAME}.cmake "
+		file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/Modules/Find${PROJECT_NAME}.cmake "
 	set(${PROJECT_NAME}_PROCESS_INCLUDES ${PROJECT_NAME}_PROCESS_INCLUDES ${looparg}_INCLUDE_DIRS)
 	set(${PROJECT_NAME}_PROCESS_LIBS ${PROJECT_NAME}_PROCESS_LIBS ${looparg}_LIBRARIES)
+	#TODO : Add support for ${looparg}_RUN_LIBRARIES
 		")
 	endforeach ( looparg ${${PROJECT_NAME}_bin_depends} )
 	
 	#
 	# Finalising
 	#
-	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/ext/Find${PROJECT_NAME}.cmake "
+	file ( APPEND ${PROJECT_SOURCE_DIR}/CMake/Modules/Find${PROJECT_NAME}.cmake "
 
 libfind_process(${PROJECT_NAME})
 	
 	")
 
-	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/CMake/ext/Find${PROJECT_NAME}.cmake ${PROJECT_BINARY_DIR}/CMake/
-													COMMENT "Copying ${PROJECT_SOURCE_DIR}/CMake/ext/LibFindMacros.cmake to ${PROJECT_BINARY_DIR}/CMake/" )
+	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/CMake/Modules/Find${PROJECT_NAME}.cmake ${PROJECT_BINARY_DIR}/CMake/
+													COMMENT "Copying ${PROJECT_SOURCE_DIR}/CMake/Modules/LibFindMacros.cmake to ${PROJECT_BINARY_DIR}/CMake/" )
 	
 	
 endmacro ( WkGenFind )
