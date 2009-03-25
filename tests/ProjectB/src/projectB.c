@@ -28,7 +28,10 @@
  * 
  */
 
-#include "projectB.h"
+#include "ProjectB/header.h"
+
+/*We are depending on projectC*/
+#include "ProjectC/header.h"
 
 #include <stdio.h>
 
