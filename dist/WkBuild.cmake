@@ -66,6 +66,60 @@ MACRO(MERGE ALIST BLIST OUTPUT)
    SET(${OUTPUT} ${BTEMP})
 ENDMACRO(MERGE ALIST BLIST OUTPUT)
 
+
+#
+# Generate a config file for the project.
+#
+# Automatically called after WkBuild
+#
+
+macro ( WkGenConfig )
+	#Exporting targets
+	export(TARGETS ${PROJECT_NAME} ${${PROJECT_NAME}_source_depends} FILE ${PROJECT_NAME}Export.cmake)
+	
+	#Generating config file
+	file( WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+	
+	get_filename_component(SELF_DIR \"${CMAKE_CURRENT_LIST_FILE}\" PATH)
+	#all required target should be defined there... no need to specify ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
+	include(${SELF_DIR}/${PROJECT_NAME}Export.cmake)
+	get_filename_component(${PROJECT_NAME}_INCLUDE_DIR "${SELF_DIR}/include/" ABSOLUTE)
+	set(${PROJECT_NAME}_INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIR})
+	")
+	
+	foreach( looparg ${${PROJECT_NAME}_source_depends} )
+		# TODO better : linked ot the include copy in the binary dir...
+		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+		get_filename_component(${looparg}_INCLUDE_DIR \"${SELF_DIR}/ext/${looparg}/include\" ABSOLUTE)
+		set(${PROJECT_NAME}_INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS} ${looparg}_INCLUDE_DIR)
+		")
+	endforeach( looparg ${${PROJECT_NAME}_source_depends} )
+	
+	
+	get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
+	
+	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+	
+	#however we still want to have ${PROJECT_NAME}_LIBRARIES to be able to move them around if needed
+	set(${PROJECT_NAME}_LIBRARY ${${PROJECT_NAME}_LOCATION})
+	set(${PROJECT_NAME}_LIBRARIES ${${PROJECT_NAME}_LIBRARY})
+	
+	" )
+	
+	foreach( looparg ${${PROJECT_NAME}_source_depends} )
+		get_target_property(${looparg}_LOCATION ${looparg} LOCATION)
+		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+	
+		set(${looparg}_LIBRARY ${${looparg}_LOCATION})
+		set(${looparg}_LIBRARIES ${${looparg}_LIBRARIES} ${${looparg}_LIBRARY})
+	
+		")
+		
+	endforeach( looparg ${${PROJECT_NAME}_source_depends} )
+	
+endmacro ( WkGenConfig )
+
+
 #
 # Configure and Build process based on well-known hierarchy
 # You need include and src in your hierarchy at least for this to work correctly
@@ -215,14 +269,15 @@ CMAKE_POLICY(VERSION 2.6)
 													COMMENT "Copying ${PROJECT_SOURCE_DIR}/include to ${PROJECT_BINARY_DIR}" )
 	endif(${project_type} STREQUAL "LIBRARY") 
 	
-	#
-	#Exporting main targets (and source dependencies )
-	#
-	
-	export(TARGETS ${PROJECT_NAME} ${${PROJECT_NAME}_source_depends} FILE Export.cmake)
 
 	#
-	# we must generate the findProject.cmake
+	# Generating configuration cmake file
+	#
+	
+	WkGenConfig( )
+	
+	#
+	# Generating the findProject.cmake in case external projects want to use it...
 	#
 	
 	WkGenFind( )
@@ -235,54 +290,52 @@ endmacro (WkBuild)
 # Find a dependency built in an external WK hierarchy
 # Different than for a package because this dependency hasnt been installed yet.
 #
-# WkBinDepends( RELEASE | DEBUG  [ bin_depend [...] ] )
+# WkBinDepends( dependency_name [QUIET] [REQUIRED] )
 
-macro (WkBinDepends build_type )
+macro (WkDepends package_name)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
-
-foreach ( looparg ${ARGN} )
 	
-	if ( NOT ${looparg}_EXPORT_CMAKE )
-		set(${looparg}_EXPORT_CMAKE CACHE FILEPATH " Export.cmake filepath for ${looparg} dependency " )
-	endif ( NOT ${looparg}_EXPORT_CMAKE )
+	#
+	# First check if the package is installed already , quietly
+	#
 	
-	if ( EXISTS ${${looparg}_EXPORT_CMAKE})
-		include(${${looparg}_EXPORT_CMAKE})
-		
-		#saving project_bin_depends for future use
-		set(${PROJECT_NAME}_bin_depends ${${PROJECT_NAME}_bin_depends} ${looparg})
-		if ( ${build_type} STREQUAL "RELEASE")
-			get_target_property(${looparg}_LOCATION ${looparg} IMPORTED_LOCATION_RELEASE)
-		else ( ${build_type} STREQUAL "RELEASE")			
-			get_target_property(${looparg}_LOCATION ${looparg} IMPORTED_LOCATION_DEBUG)
-		endif ( ${build_type} STREQUAL "RELEASE")
-		set(${looparg}_BIN_LOCATION ${${looparg}_LOCATION} CACHE FILEPATH "Location of the binary dependency - .lib or .dll" )
-
-		if ( NOT EXISTS ${${looparg}_BIN_LOCATION} )
-			message (FATAL_ERROR "Binary dependency ${${looparg}_LOCATION} NOT FOUND. Please correct ${looparg}_LOCATION")
-		endif ( NOT EXISTS ${${looparg}_BIN_LOCATION} )
-		
-		#include if present
-		get_filename_component(${looparg}_DEPEND_PATH ${${looparg}_EXPORT_CMAKE} PATH)
-		if (EXISTS ${${looparg}_DEPEND_PATH}/include)
-			include_directories( ${${looparg}_DEPEND_PATH}/include )
-		endif (EXISTS ${${looparg}_DEPEND_PATH}/include)
-		target_link_libraries( ${PROJECT_NAME} ${looparg})
-		#reminder : imported targets wont be built by curent project, so no need to specify dependencies building priorities.
-		
-		#propagating exported target upwards...
-		export(TARGETS ${looparg} APPEND FILE Export.cmake)
+	find_package( ${package_name} QUIET)
 	
-	else ( EXISTS ${${looparg}_EXPORT_CMAKE} )
-		message ( FATAL_ERROR "${looparg} build not detected ( looking for Export.cmake ). Please correct ${looparg}_EXPORT_CMAKE" )
-	endif ( EXISTS ${${looparg}_EXPORT_CMAKE} )
+	set(${package_name}_EXPORT_CMAKE CACHE FILEPATH " Export.cmake filepath for ${package_name} dependency " )
+	
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+	
+	# if ( EXISTS ${${package_name}_EXPORT_CMAKE})
+		# include(${${package_name}_EXPORT_CMAKE})
+		
+		# #saving project_bin_depends for future use
+		# set(${PROJECT_NAME}_bin_depends ${${PROJECT_NAME}_bin_depends} ${package_name})
+		# if ( ${build_type} STREQUAL "RELEASE")
+			# get_target_property(${package_name}_LOCATION ${package_name} IMPORTED_LOCATION_RELEASE)
+		# else ( ${build_type} STREQUAL "RELEASE")			
+			# get_target_property(${package_name}_LOCATION ${package_name} IMPORTED_LOCATION_DEBUG)
+		# endif ( ${build_type} STREQUAL "RELEASE")
+		# set(${package_name}_BIN_LOCATION ${${package_name}_LOCATION} CACHE FILEPATH "Location of the binary dependency - .lib or .dll" )
 
-
-endforeach ( looparg ${ARGN} )
+		# if ( NOT EXISTS ${${package_name}_BIN_LOCATION} )
+			# message (FATAL_ERROR "Binary dependency ${${package_name}_LOCATION} NOT FOUND. Please correct ${package_name}_LOCATION")
+		# endif ( NOT EXISTS ${${package_name}_BIN_LOCATION} )
+		
+		# #include if present
+		# get_filename_component(${package_name}_DEPEND_PATH ${${package_name}_EXPORT_CMAKE} PATH)
+		# if (EXISTS ${${package_name}_DEPEND_PATH}/include)
+			# include_directories( ${${package_name}_DEPEND_PATH}/include )
+		# endif (EXISTS ${${package_name}_DEPEND_PATH}/include)
+		# target_link_libraries( ${PROJECT_NAME} ${package_name})
+		# #reminder : imported targets wont be built by curent project, so no need to specify dependencies building priorities.
+			
+	# else ( EXISTS ${${package_name}_EXPORT_CMAKE} )
+		# message ( FATAL_ERROR "${package_name} build not detected ( looking for Export.cmake ). Please correct ${package_name}_EXPORT_CMAKE" )
+	# endif ( EXISTS ${${package_name}_EXPORT_CMAKE} )
 
 CMAKE_POLICY(POP)
-endmacro (WkBinDepends build_type )
+endmacro (WkDepends package_name)
 
 
