@@ -29,13 +29,13 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-INCLUDE ( CMake/WkCMake/WkBuild.cmake )
-INCLUDE ( CMake/WkCMake/WkTest.cmake )
+INCLUDE ( CMake/WkBuild.cmake )
+INCLUDE ( CMake/WkTest.cmake )
 
 WkProject( ProjectA C CXX )
 
 WkBuild( LIBRARY SHARED)
 
-WkTestBuild( maintestA)
-WkTestRun( maintestA)
+WkTestBuild( maintest )
+WkTestRun( maintest )
 
