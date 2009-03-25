@@ -39,7 +39,7 @@
 extern "C" {
 #endif
 
-int B_display(const char* txt);
+WK_DECLSPEC int B_display(const char* txt);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
