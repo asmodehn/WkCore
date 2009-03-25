@@ -28,12 +28,16 @@
  * 
  */
 
-#include "header.hh"
+#include "ProjectA/header.hh"
 
 //including and hiding dependency header
-#include "header.h"
+#include "ProjectB/header.h"
 
-int displayXX(std::string txt)
+#include <iostream>
+
+int A_display(std::string txt)
 {
-	return display(txt.c_str());
+	std::cout << txt;
+	return B_display("B");
+	return 0;
 }
