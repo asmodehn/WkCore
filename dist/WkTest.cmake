@@ -77,6 +77,12 @@ MACRO(WkTestBuild )
 				get_filename_component(${test_name}_PATH ${${test_name}_LOCATION} PATH)
 				ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
 														COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
+				#needed for each source dependency
+				foreach ( looparg ${${PROJECT_NAME}_source_depends} )
+					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${looparg}_LOCATION} ${${test_name}_PATH}
+														COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
+				
+				endforeach ( looparg ${${PROJECT_NAME}_source_depends} )
 				#needed for each imported binary dependency as well
 				foreach ( looparg ${${PROJECT_NAME}_bin_depends} )
 					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${looparg}_BIN_LOCATION} ${${test_name}_PATH}
