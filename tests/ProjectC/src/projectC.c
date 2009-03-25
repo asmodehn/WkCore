@@ -28,7 +28,7 @@
  * 
  */
  
-#include "projectC.h"
+#include "ProjectC/header.h"
  
 #include <stdio.h>
 

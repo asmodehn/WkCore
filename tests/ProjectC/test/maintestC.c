@@ -28,7 +28,7 @@
  * 
  */
 
-#include "projectC.h"
+#include "ProjectC/header.h"
 
 int main ( int argc, char* argv[] )
 {
