@@ -75,24 +75,24 @@ ENDMACRO(MERGE ALIST BLIST OUTPUT)
 #
 # macro (  WkIncludeDirectories [dir [...] ] )
 
-macro (  WkIncludeDirectories )
-	foreach ( loopdir ${ARGN} )
-		include_directories(${loopdir})
-		set( ${PROJECT_NAME}_INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS} ${loopdir} CACHE INTERNAL " Includes directories for ${PROJECT_NAME} ")
-	endforeach ( loopdir ${ARGN} )
-endmacro (  WkIncludeDirectories )
+#macro (  WkIncludeDirectories )
+#	foreach ( loopdir ${ARGN} )
+#		include_directories(${loopdir})
+#		set( ${PROJECT_NAME}_INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS} ${loopdir} CACHE INTERNAL " Includes directories for ${PROJECT_NAME} ")
+#	endforeach ( loopdir ${ARGN} )
+#endmacro (  WkIncludeDirectories )
 
 #
 # Macro to store linked libraries in a variable, to have built binary similar to an installed package already found...
 #
 # macro (  WkLinkLibraries target_name [lib [...] ] )
 
-macro ( WkLinkLibraries target_name )
-	foreach ( looplib ${ARGN} )
-		target_link_libraries(${target_name} ${looplib})
-		set( ${target_name}_LIBRARIES ${${PROJECT_NAME}_LIBRARIES} ${looplib} CACHE INTERNAL " libraries needed for ${target_name} " )
-	endforeach ( looplib ${ARGN} )
-endmacro (  WkLinkLibraries target_name)
+#macro ( WkLinkLibraries target_name )
+#	foreach ( looplib ${ARGN} )
+#		target_link_libraries(${target_name} ${looplib})
+#		set( ${target_name}_LIBRARIES ${${PROJECT_NAME}_LIBRARIES} ${looplib} CACHE INTERNAL " libraries needed for ${target_name} " )
+#	endforeach ( looplib ${ARGN} )
+#endmacro (  WkLinkLibraries target_name)
 
 
 #
@@ -100,11 +100,11 @@ endmacro (  WkLinkLibraries target_name)
 #
 # macro (  WkRunLibraries  target_name[lib [...] ] )
 
-macro (  WkRunLibraries target_name )
-	foreach ( looplib ${ARGN} )
-		set( ${target_name}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${looplib} CACHE INTERNAL " libraries needed to run ${target_name} " )
-	endforeach ( looplib ${ARGN} )
-endmacro (  WkRunLibraries target_name)
+#macro (  WkRunLibraries target_name )
+#	foreach ( looplib ${ARGN} )
+#		set( ${target_name}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${looplib} CACHE INTERNAL " libraries needed to run ${target_name} " )
+#	endforeach ( looplib ${ARGN} )
+#endmacro (  WkRunLibraries target_name)
 
 #
 # Generate a config file for the project.
@@ -155,37 +155,6 @@ set(${PROJECT_NAME}_FOUND TRUE)
 	")	
 	
 	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-### Second Section : Source dependencies ###
-	")
-	
-	foreach( looparg ${${PROJECT_NAME}_source_depends} )
-		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-get_filename_component(${looparg}_INCLUDE_DIR \"\${PROJECT_BINARY_DIR}/ext/${looparg}_build/include\" ABSOLUTE)
-set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \${${looparg}_INCLUDE_DIR})
-		")
-		
-	get_target_property(${looparg}_LOCATION ${looparg} LOCATION)
-	get_target_property(${looparg}_TYPE ${looparg} TYPE)
-	if ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")
-		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${looparg}_LOCATION})
-		")
-	endif ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")
-	
-		
-	endforeach( looparg ${${PROJECT_NAME}_source_depends} )
-	
-	
-	foreach( looparg ${${PROJECT_NAME}_source_depends} )
-		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-		#This is fine because we know the dependency target, and it will be exported along with the main target
-set(${looparg}_LIBRARY ${looparg})
-set(${looparg}_LIBRARIES \${${looparg}_LIBRARIES} \${${looparg}_LIBRARY})
-		")
-		
-	endforeach( looparg ${${PROJECT_NAME}_source_depends} )
-	
-	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 CMAKE_POLICY(POP)
 	")
 	
@@ -225,44 +194,7 @@ CMAKE_POLICY(VERSION 2.6)
 					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "SHARED"
 					AND NOT ${${PROJECT_NAME}_load_type} STREQUAL "MODULE"
 		)
-	
-		#Building dependencies recursively ( not looking into hidden directories (beginning with '.' or '..') )
 		
-		file(GLOB ${PROJECT_NAME}_sourcedir_depends RELATIVE ${PROJECT_SOURCE_DIR} ext/[^.]* )
-		#to get rid of the ext/ prefix
-		set(${PROJECT_NAME}_source_depends)
-		foreach ( looparg ${${PROJECT_NAME}_sourcedir_depends} )
-			get_filename_component( dependency_project ${looparg} NAME)
-			list( APPEND ${PROJECT_NAME}_source_depends ${dependency_project} )
-		endforeach ( looparg )
-		if (${PROJECT_NAME}_source_depends )
-			message ( STATUS "Source Dependencies detected : ${${PROJECT_NAME}_source_depends}" )
-		else (${PROJECT_NAME}_source_depends )
-			message ( STATUS "Source Dependencies detected : None" )
-		endif (${PROJECT_NAME}_source_depends )
-		
-		if ( ${PROJECT_NAME}_source_depends )
-			set(${PROJECT_NAME}_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-			#making sure that by default we build static libraries for source dependencies
-			set(BUILD_SHARED_LIBS OFF)
-			foreach ( looparg ${${PROJECT_NAME}_source_depends} )
-				message ( STATUS "==" )
-				message ( STATUS "Cmake'ing dependency ${looparg} : Started." )
-				#building in separate build directory in case the father project is built in source...
-				add_subdirectory(ext/${looparg} ext/${looparg}_build )
-				message ( STATUS "Cmake'ing dependency ${looparg} : Done." )
-				message ( STATUS "==" )
-				#finding the package that has just been built
-				#find_package( ${looparg} NO_MODULE PATHS ext/${looparg}_build )
-				#if ( ${looparg}_FOUND )
-					WkIncludeDirectories(${${looparg}_INCLUDE_DIRS})
-					message ( STATUS " ${PROJECT_NAME} Now including ${${looparg}_INCLUDE_DIRS} ")
-				#endif ( ${looparg}_FOUND )
-			endforeach ( looparg )
-			#MESSAGE ( STATUS "Back to configuring ${PROJECT_NAME} build" )
-			set( BUILD_SHARED_LIBS ${${PROJECT_NAME}_BUILD_SHARED_LIBS} )
-		endif ( ${PROJECT_NAME}_source_depends )	
-	
 	#Verbose Makefile if not release build. Making them internal not to confuse user by appearing with values used only for one project.
 	if (${${PROJECT_NAME}_BUILD_TYPE} STREQUAL Release)
 		set(CMAKE_VERBOSE_MAKEFILE OFF CACHE INTERNAL "Verbose build commands disabled for Release build." FORCE)
@@ -317,23 +249,6 @@ CMAKE_POLICY(VERSION 2.6)
 		message( FATAL_ERROR " Project Type can only be EXECUTABLE or LIBRARY " )
 	endif(${project_type} STREQUAL "LIBRARY")
 
-	#
-	# Handling Sources dependencies
-	#
-	
-	foreach ( looparg ${${PROJECT_NAME}_source_depends} )
-		WkLinkLibraries(${PROJECT_NAME} ${${looparg}_LIBRARIES})
-		message ( STATUS " ${PROJECT_NAME} Now linking with ${${looparg}_LIBRARIES} ")
-		#to make sur the source dependencies are built before
-		add_dependencies( ${PROJECT_NAME} ${looparg} )
-		#if the find module also defines the runtime libraries ( Wk find module convention)
-		WkRunLibraries( ${PROJECT_NAME} ${${package_name}_RUN_LIBRARIES} )
-		message ( STATUS " ${PROJECT_NAME} Now running with ${${looparg}_RUN_LIBRARIES} ")
-	endforeach ( looparg ${${PROJECT_NAME}_source_depends} )
-	
-
-	
-	
 	#
 	# Defining where to put what has been built
 	#
@@ -390,10 +305,10 @@ CMAKE_POLICY(VERSION 2.6)
 	find_package( ${package_name} ${ARGN} )
 	if ( ${package_name}_FOUND )
 		message ( STATUS "Binary Dependency ${package_name} : Found ! " )
-		WkIncludeDirectories(${${package_name}_INCLUDE_DIRS})
-		WkLinkLibraries(${PROJECT_NAME} ${${package_name}_LIBRARIES})
+		include_directories(${${package_name}_INCLUDE_DIRS})
+		target_link_libraries(${PROJECT_NAME} ${${package_name}_LIBRARIES})
 		#if the find module also defines the runtime libraries ( Wk find module standard )
-		WkRunLibraries(${PROJECT_NAME} ${${package_name}_RUN_LIBRARIES} )
+		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_name}_RUN_LIBRARIES} CACHE INTERNAL " libraries needed to run ${PROJECT_NAME} " )
 		#once the project is built with it the dependency becomes mandatory
 		# we append to the config cmake script
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "

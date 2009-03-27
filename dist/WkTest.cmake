@@ -79,13 +79,6 @@ MACRO(WkTestBuild )
 					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
 															COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
 				endif ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
-				#needed for each source dependency
-				foreach ( looparg ${${PROJECT_NAME}_source_depends} )
-					if ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")
-						ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${looparg}_LOCATION} ${${test_name}_PATH}
-																COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
-					endif ( ${${looparg}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${looparg}_TYPE} STREQUAL "MODULE_LIBRARY")				
-				endforeach ( looparg ${${PROJECT_NAME}_source_depends} )
 				#needed for each run library dependency as well
 				#message ( STATUS "Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
 				foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
