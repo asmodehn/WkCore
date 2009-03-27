@@ -31,8 +31,21 @@
  * 
  */
 
+#include "WkPlatform.h"
+
 #include <string>
 
-int A_display(std::string txt);
+/* Set up for C function definitions, even when using C++ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+WK_DECLSPEC int A_display(std::string txt);
+
+/* Ends C function definitions when using C++ */
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif
