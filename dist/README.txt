@@ -9,8 +9,7 @@ WkCMake currently supports :
 - only one main target per project hierarchy
 - Few simple executable tests ( in test/ subdirectory ) that don't require additional dependencies
 - target can be executable, library shared or static (module not tested yet, need a Mac...)
-- auto source dependency ( in ext/ subdirectory , automatically added as static library target )
-- auto binary dependency ( in another Wk build directory, automatically imported )
+- auto dependency ( in another Wk build directory, automatically finding importing all needed details )
 
 WkCMake will eventually support :
 - Doxygen generated documentation
