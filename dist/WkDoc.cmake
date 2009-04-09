@@ -65,6 +65,7 @@ else (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile" )
 endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile" )
 	 
   ADD_CUSTOM_TARGET(doc ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile" )
+  add_dependencies( ${PROJECT_NAME} doc )
   
 ENDIF(DOXYGEN_FOUND)
 
