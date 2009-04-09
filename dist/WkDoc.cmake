@@ -1,45 +1,42 @@
-macro( WKDoc Doxygen_config)
-find_package(Doxygen)
+macro( WKDoc )
+FIND_PACKAGE(Doxygen)
 
-set(DOXYFILE_FOUND false)
+IF (DOXYGEN_FOUND)
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/${Doxygen_config})
-	set(DOXYFILE_FOUND true)
-endif(EXISTS ${PROJECT_SOURCE_DIR}/${Doxygen_config})
+  # click+jump in Emacs and Visual Studio (for doxy.config) (jw)
+  IF    (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv)")
+    SET(DOXY_WARN_FORMAT "\"$file($line) : $text \"")
+  ELSE  (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv)")
+    SET(DOXY_WARN_FORMAT "\"$file:$line: $text \"")
+  ENDIF (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv)")
+  
+  # we need latex for doxygen because of the formulas
+  FIND_PACKAGE(LATEX)
+  IF    (NOT LATEX_COMPILER)
+    MESSAGE(STATUS "latex command LATEX_COMPILER not found but usually required. You will probably get warnings and user inetraction on doxy run.")
+  ENDIF (NOT LATEX_COMPILER)
+  IF    (NOT MAKEINDEX_COMPILER)
+    MESSAGE(STATUS "makeindex command MAKEINDEX_COMPILER not found but usually required.")
+  ENDIF (NOT MAKEINDEX_COMPILER)
+  IF    (NOT DVIPS_CONVERTER)
+    MESSAGE(STATUS "dvips command DVIPS_CONVERTER not found but usually required.")
+  ENDIF (NOT DVIPS_CONVERTER)
+  
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile" )
+	message( STATUS "Using existing ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile" )
+	# use static hand-edited Doxyfile :
+	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY )
+elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Doxyfile.wk" )
+	message( STATUS "Configuring Template ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Doxyfile.wk --> ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile" )
+	# use template to generate Doxyfile :
+	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/CMake/Doxyfile.wk ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY )
+else (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile" )
+	# failed completely...
+    message(SEND_ERROR "Please create ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile or check that ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Doxyfile.wk template exists")
+endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile" )
+	 
+  ADD_CUSTOM_TARGET(doc ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile" )
+  
+ENDIF(DOXYGEN_FOUND)
 
-
-if(DOXYGEN_FOUND)
-	if(DOXYFILE_FOUND)
-		#Add target
-		ADD_CUSTOM_TARGET( doc ALL ${DOXYGEN_EXECUTABLE} "${PROJECT_SOURCE_DIR}/${Doxygen_config}" )
-		
-		#Add .tag file and generated documentation to the list of files we must erase when distcleaning
-		
-		#Read dosygen configuration file
-		FILE( READ ${PROJECT_SOURCE_DIR}/${Doxygen_config} DOXYFILE_CONTENTS )
-		STRING( REGEX REPLACE "\n" ";" DOXYFILE_LINES ${DOXYFILES_CONTENTS} )
-		
-		#Parse .tag filename and add to list of files to delete if it exists
-		foreach( DOXYLINE ${DOXYFILE_CONTENTS} )
-			STRING (REGEX REPLACE ".*GENERATE_TAGFILE *= *([^^\n]+).*" "\\1" DOXYGEN_TAG_FILE ${DOXYLINE} )
-		endforeach( DOXYLINE )
-		
-		ADD_TO_DISTCLEAN( ${PROJECT_BINARY_DIR}/${DOXYGEN_TAG_FILE} )
-		
-		# Parse doxygen output doc dir and add to list of filees to delete if it exists
-		foreach( DOXYLINE ${DOXYFILE_CONTENTS} )
-			STRING( REGEX REPLACE ".*OUTPUT_DIRECTORY *= *([^^\n]+).*" "\\1" DOXYGEN_DOC_DIR ${DOXYLINE} )
-		endforeach( DOXYLINE )
-
-		ADD_TO_DISTCLEAN( ${PROJECT_BINARY_DIR}/${DOXYGEN_DOC_DIR} )
-		ADD_TO_DISTCLEAN( ${PROJECT_BINARY_DIR}/${DOXYGEN_DOC_DIR}.dir )
-		
-	else (DOXYFILE_FOUND)
-		message ( STATUS "Doxygen configuration file not found - Documentation will not be generated" )
-	endif(DOXYFILE_FOUND)
-
-else( DOXYGEN_FOUND)
-	message( STATUS "Doxygen not found - Documentation will not be generated" )
-endif(DOXYGEN_FOUND)
-
-endmacro( WKDoc Doxygen_config)
+endmacro( WKDoc )
