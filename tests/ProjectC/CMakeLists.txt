@@ -31,10 +31,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
 
 INCLUDE ( CMake/WkBuild.cmake )
 INCLUDE ( CMake/WkTest.cmake )
+INCLUDE ( CMake/WkDoc.cmake )
 
 WkProject( ProjectC C )
 
 WkBuild( LIBRARY SHARED )
+WkDoc( )
 
 WkTestBuild( maintestC )
 WkTestRun( maintestC )
