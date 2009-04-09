@@ -34,7 +34,6 @@ endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
 #To setup the compiler
 include ( CMake/WkCompilerSetup.cmake )
-include ( CMake/WkFind.cmake )
 
 macro(WKProject project_name_arg)
 CMAKE_POLICY(PUSH)
@@ -239,13 +238,7 @@ CMAKE_POLICY(VERSION 2.6)
 	#
 	
 	WkGenConfig( )
-	
-	#
-	# Generating the findProject.cmake in case external projects want to use it...
-	#
-	
-	WkGenFind( )
-	
+		
 CMAKE_POLICY(POP)
 endmacro (WkBuild)
 
