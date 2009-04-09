@@ -79,15 +79,18 @@ MACRO(WkTestBuild )
 					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
 															COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
 				endif ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
-				#needed for each run library dependency as well
-				#message ( STATUS "Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
-				foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
-					if ( NOT looparg )
-						message ( SEND_ERROR "Error with dependency needed to run test : ${looparg}" )
-					endif ( NOT looparg )
-					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
-														COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
-				endforeach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
+				
+				if ( WIN32 )
+					#needed for each run library dependency as well
+					#message ( STATUS "Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
+					foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
+						if ( NOT looparg )
+							message ( SEND_ERROR "Error with dependency needed to run test : ${looparg}" )
+						endif ( NOT looparg )
+						ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
+															COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
+					endforeach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
+				endif ( WIN32 )
 			ENDIF (testsource)
 		endforeach ( test_name ${ARGN})
 	ENDIF(${PROJECT_NAME}_ENABLE_TESTS)
