@@ -182,6 +182,11 @@ CMAKE_POLICY(VERSION 2.6)
 	FILE(GLOB_RECURSE HEADERS RELATIVE ${PROJECT_SOURCE_DIR} include/*.h include/*.hh include/*.hpp)
 	FILE(GLOB_RECURSE SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c src/*.cpp src/*.cc)
 
+	FIND_PACKAGE(AStyle)
+	IF ( ASTYLE_FOUND )
+		MESSAGE (STATUS " ASTYLE FOUND !!!!!" )		
+	ENDIF ( ASTYLE_FOUND )
+
 	#Including configured headers (
 	#	-binary_dir for the configured header,  (useful ? )
 	#	-Cmake for Wk headers
