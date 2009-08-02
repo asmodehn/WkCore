@@ -182,9 +182,14 @@ CMAKE_POLICY(VERSION 2.6)
 	FILE(GLOB_RECURSE HEADERS RELATIVE ${PROJECT_SOURCE_DIR} include/*.h include/*.hh include/*.hpp)
 	FILE(GLOB_RECURSE SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c src/*.cpp src/*.cc)
 
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 	FIND_PACKAGE(AStyle)
 	IF ( ASTYLE_FOUND )
-		MESSAGE (STATUS " ASTYLE FOUND !!!!!" )		
+		option (${PROJECT_NAME}_CODE_FORMAT "Enable Code Formatting" ON)
+		IF ( ${PROJECT_NAME}_CODE_FORMAT )
+			set(${PROJECT_NAME}_CODE_FORMAT_STYLE "ansi" CACHE STRING "Format Style for AStyle")
+		ENDIF ( ${PROJECT_NAME}_CODE_FORMAT )
+		ADD_CUSTOM_TARGET(format ALL ${ASTYLE_EXECUTABLE} "--style=${${PROJECT_NAME}_CODE_FORMAT_STYLE}" "${HEADERS}" "${SOURCES}" WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM )
 	ENDIF ( ASTYLE_FOUND )
 
 	#Including configured headers (
@@ -219,6 +224,10 @@ CMAKE_POLICY(VERSION 2.6)
 	else (${project_type} STREQUAL "LIBRARY")
 		message( FATAL_ERROR " Project Type can only be EXECUTABLE or LIBRARY " )
 	endif(${project_type} STREQUAL "LIBRARY")
+	
+	if( ASTYLE_FOUND )
+		add_dependencies(${PROJECT_NAME} format)
+	endif( ASTYLE_FOUND )
 
 	#
 	# Defining where to put what has been built
@@ -269,7 +278,7 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	# if possible by using WkFind modules
 	# maybe belongs somewhere else
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 	
 	find_package( ${package_name} ${ARGN} )
 	if ( ${package_name}_FOUND )
