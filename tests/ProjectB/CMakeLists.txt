@@ -35,7 +35,7 @@ INCLUDE ( CMake/WkDoc.cmake )
 
 WkProject( ProjectB C )
 
-WkBuild( LIBRARY )
+WkBuild( LIBRARY SHARED )
 WkDepends( ProjectC )
 WkDoc( )
 
