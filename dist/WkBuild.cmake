@@ -281,12 +281,35 @@ CMAKE_POLICY(VERSION 2.6)
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 	
 	find_package( ${package_name} ${ARGN} )
-	if ( ${package_name}_FOUND )
+
+	#Sometime the variable name is differnet from the package name... annoying
+	set ( package_var_name ${package_name} )
+	#handle special cases
+	if ( ${package_var_name} STREQUAL "SDL_image") 
+		set ( package_var_name "SDLIMAGE")
+	endif ( ${package_var_name} STREQUAL "SDL_image") 	
+	if ( ${package_var_name} STREQUAL "SDL_mixer") 
+		set ( package_var_name "SDLMIXER")
+	endif ( ${package_var_name} STREQUAL "SDL_mixer") 	
+	if ( ${package_var_name} STREQUAL "SDL_ttf") 
+		set ( package_var_name "SDLTTF")
+	endif ( ${package_var_name} STREQUAL "SDL_ttf") 	
+	if ( ${package_var_name} STREQUAL "SDL_net") 
+		set ( package_var_name "SDLNET")
+	endif ( ${package_var_name} STREQUAL "SDL_net") 	
+	if ( ${package_var_name} STREQUAL "OpenGL" )
+		set ( package_var_name "OPENGL")
+	endif ( ${package_var_name} STREQUAL "OpenGL" )
+	#etc.
+	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
+	# TODO : put that ina  separate file to avoid noise here...
+
+	if ( ${package_var_name}_FOUND )
 		message ( STATUS "Binary Dependency ${package_name} : Found ! " )
-		include_directories(${${package_name}_INCLUDE_DIRS})
-		target_link_libraries(${PROJECT_NAME} ${${package_name}_LIBRARIES})
+		include_directories(${${package_var_name}_INCLUDE_DIRS})
+		target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
 		#if the find module also defines the runtime libraries ( Wk find module standard )
-		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_name}_RUN_LIBRARIES} CACHE INTERNAL " libraries needed to run ${PROJECT_NAME} " )
+		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} CACHE INTERNAL " libraries needed to run ${PROJECT_NAME} " )
 		#once the project is built with it the dependency becomes mandatory
 		# we append to the config cmake script
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
@@ -296,19 +319,19 @@ CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 		
 find_package( ${package_name} REQUIRED )
-if ( ${package_name}_FOUND )
-	set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \${${package_name}_INCLUDE_DIRS} )
-	set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} \${${package_name}_LIBRARIES} )
-	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${package_name}_RUN_LIBRARIES} )
-endif ( ${package_name}_FOUND )
+if ( ${package_var_name}_FOUND )
+	set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \${${package_var_name}_INCLUDE_DIRS} )
+	set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} \${${package_var_name}_LIBRARIES} )
+	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${package_var_name}_RUN_LIBRARIES} )
+endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)
 	
 		")
 		
-	else ( ${package_name}_FOUND )	
+	else ( ${package_var_name}_FOUND )	
 		message ( STATUS "Binary Dependency ${package_name} : FAILED ! " )
-	endif ( ${package_name}_FOUND )
+	endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)
 endmacro (WkDepends package_name)
