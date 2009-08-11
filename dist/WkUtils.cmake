@@ -61,3 +61,27 @@ macro(WkWhitespaceSplit source WSsplitted)
 		#message ( "WSsplitted: ${${WSsplitted}} ")
 	endforeach(arg ${${source}})
 endmacro(WkWhitespaceSplit source WSsplitted)
+
+macro(SetPackageVarName varname pkgname)
+#Sometime the variable name is differnet from the package name... annoying
+	set ( ${varname} ${pkgname} )
+	#handle special cases
+	if ( ${${varname}} STREQUAL "SDL_image") 
+		set ( ${varname} "SDLIMAGE")
+	endif ( ${${varname}} STREQUAL "SDL_image") 	
+	if ( ${${varname}} STREQUAL "SDL_mixer") 
+		set ( ${varname} "SDLMIXER")
+	endif ( ${${varname}} STREQUAL "SDL_mixer") 	
+	if ( ${${varname}} STREQUAL "SDL_ttf") 
+		set ( ${varname} "SDLTTF")
+	endif ( ${${varname}} STREQUAL "SDL_ttf") 	
+	if ( ${${varname}} STREQUAL "SDL_net") 
+		set ( ${varname} "SDLNET")
+	endif ( ${${varname}} STREQUAL "SDL_net") 	
+	if ( ${${varname}} STREQUAL "OpenGL" )
+		set ( ${varname} "OPENGL")
+	endif ( ${${varname}} STREQUAL "OpenGL" )
+	#etc.
+	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
+
+endmacro(SetPackageVarName varname pkgname)

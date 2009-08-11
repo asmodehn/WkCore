@@ -170,7 +170,7 @@ CMAKE_POLICY(VERSION 2.6)
 		ENDIF ( ${PROJECT_NAME}_CODE_FORMAT )
 		WkWhitespaceSplit( HEADERS HEADERS_PARAM )
 		WkWhitespaceSplit( SOURCES SOURCES_PARAM )
-		message ( "Sources :  ${HEADERS_PARAM} ${SOURCES_PARAM}" )
+		#message ( "Sources :  ${HEADERS_PARAM} ${SOURCES_PARAM}" )
 		set ( cmdline " ${ASTYLE_EXECUTABLE} --style=${${PROJECT_NAME}_CODE_FORMAT_STYLE} ${HEADERS_PARAM} ${SOURCES_PARAM}" )
 		#message ( "CMD : ${cmdline} " )
 		ADD_CUSTOM_TARGET(format ALL sh -c ${cmdline} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM )
@@ -250,7 +250,7 @@ endmacro (WkBuild)
 # Find a dependency built in an external WK hierarchy
 # Different than for a package because this dependency hasnt been installed yet.
 #
-# WkBinDepends( dependency_name [QUIET] [REQUIRED] )
+# WkBinDepends( dependency_name [QUIET / REQUIRED] )
 
 macro (WkDepends package_name)
 CMAKE_POLICY(PUSH)
@@ -265,35 +265,28 @@ CMAKE_POLICY(VERSION 2.6)
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 	
 	find_package( ${package_name} ${ARGN} )
-
-	#Sometime the variable name is differnet from the package name... annoying
-	set ( package_var_name ${package_name} )
-	#handle special cases
-	if ( ${package_var_name} STREQUAL "SDL_image") 
-		set ( package_var_name "SDLIMAGE")
-	endif ( ${package_var_name} STREQUAL "SDL_image") 	
-	if ( ${package_var_name} STREQUAL "SDL_mixer") 
-		set ( package_var_name "SDLMIXER")
-	endif ( ${package_var_name} STREQUAL "SDL_mixer") 	
-	if ( ${package_var_name} STREQUAL "SDL_ttf") 
-		set ( package_var_name "SDLTTF")
-	endif ( ${package_var_name} STREQUAL "SDL_ttf") 	
-	if ( ${package_var_name} STREQUAL "SDL_net") 
-		set ( package_var_name "SDLNET")
-	endif ( ${package_var_name} STREQUAL "SDL_net") 	
-	if ( ${package_var_name} STREQUAL "OpenGL" )
-		set ( package_var_name "OPENGL")
-	endif ( ${package_var_name} STREQUAL "OpenGL" )
-	#etc.
-	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
-	# TODO : put that ina  separate file to avoid noise here...
+	SetPackageVarName( package_var_name ${package_name} )
+	#message ( "${package_name} -> ${package_var_name}" )
 
 	if ( ${package_var_name}_FOUND )
+
+		# to handle cmake moule who dont have exactly the same standard as WkModules
+		if ( NOT ${package_var_name}_INCLUDE_DIRS )
+			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR})
+		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
+		if ( NOT ${package_var_name}_LIBRARIES )
+			set ( ${package_var_name}_LIBRARIES ${${package_var_name}_LIBRARY})
+		endif ( NOT ${package_var_name}_LIBRARIES )
+		#todo : maybe we need a complete layer over that, Wk Modules handling Wk fetures such as run_libraries and correct variable name...
+
+		add_definitions(-D WK_${package_var_name}_FOUND)
+
 		message ( STATUS "Binary Dependency ${package_name} : Found ! " )
 		include_directories(${${package_var_name}_INCLUDE_DIRS})
-		target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
-		#if the find module also defines the runtime libraries ( Wk find module standard )
+		message ( STATUS "Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS}")
+		#if the find module also defines the runtime libraries ( Wk find module standard  NOT CMAKE itself !)
 		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} CACHE INTERNAL " libraries needed to run ${PROJECT_NAME} " )
+		message ( STATUS "Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES}")
 		#once the project is built with it the dependency becomes mandatory
 		# we append to the config cmake script
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
@@ -320,4 +313,7 @@ CMAKE_POLICY(POP)
 CMAKE_POLICY(POP)
 endmacro (WkDepends package_name)
 
-
+macro(WkDependsLink package_name)
+	SetPackageVarName(package_var_name ${package_name})
+	target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
+endmacro(WkDependsLink package_name)
