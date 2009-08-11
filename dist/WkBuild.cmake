@@ -31,6 +31,8 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
+# using useful Macros
+include ( CMake/WkUtils.cmake )
 
 #To setup the compiler
 include ( CMake/WkCompilerSetup.cmake )
@@ -46,28 +48,6 @@ CMAKE_POLICY(VERSION 2.6)
 	set( ${project_name_arg}_RUN_LIBRARIES CACHE INTERNAL " libraries needed to run ${target_name} " )
 CMAKE_POLICY(POP)
 endmacro(WKProject PROJECT_NAME)
-
-MACRO(MERGE ALIST BLIST OUTPUT)
-   SET(BTEMP ${BLIST})
-   FOREACH(A ${ALIST})
-       SET(SORTED)
-       SET(UNINSERTED 1)
-       FOREACH(B ${BTEMP})
-           IF(${UNINSERTED})
-               IF(${A} STRLESS ${B})
-                   SET(SORTED ${SORTED} ${A})
-                   SET(UNINSERTED 0)
-               ENDIF(${A} STRLESS ${B})
-           ENDIF(${UNINSERTED})
-           SET(SORTED ${SORTED} ${B})
-       ENDFOREACH(B ${BLIST})
-       IF(${UNINSERTED})
-           SET(SORTED ${SORTED} ${A})
-       ENDIF(${UNINSERTED})
-       SET(BTEMP ${SORTED})
-   ENDFOREACH(A ${ALIST})
-   SET(${OUTPUT} ${BTEMP})
-ENDMACRO(MERGE ALIST BLIST OUTPUT)
 
 #
 # Generate a config file for the project.
@@ -88,7 +68,6 @@ IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.5)
 ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.5)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
-
 	
 get_filename_component(SELF_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
 #all required target should be defined there... no need to specify all targets in ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
@@ -189,7 +168,12 @@ CMAKE_POLICY(VERSION 2.6)
 		IF ( ${PROJECT_NAME}_CODE_FORMAT )
 			set(${PROJECT_NAME}_CODE_FORMAT_STYLE "ansi" CACHE STRING "Format Style for AStyle")
 		ENDIF ( ${PROJECT_NAME}_CODE_FORMAT )
-		ADD_CUSTOM_TARGET(format ALL ${ASTYLE_EXECUTABLE} "--style=${${PROJECT_NAME}_CODE_FORMAT_STYLE}" "${HEADERS}" "${SOURCES}" WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM )
+		WkWhitespaceSplit( HEADERS HEADERS_PARAM )
+		WkWhitespaceSplit( SOURCES SOURCES_PARAM )
+		message ( "Sources :  ${HEADERS_PARAM} ${SOURCES_PARAM}" )
+		set ( cmdline " ${ASTYLE_EXECUTABLE} --style=${${PROJECT_NAME}_CODE_FORMAT_STYLE} ${HEADERS_PARAM} ${SOURCES_PARAM}" )
+		#message ( "CMD : ${cmdline} " )
+		ADD_CUSTOM_TARGET(format ALL sh -c ${cmdline} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM )
 	ENDIF ( ASTYLE_FOUND )
 
 	#Including configured headers (
