@@ -252,7 +252,7 @@ endmacro (WkBuild)
 #
 # WkBinDepends( dependency_name [QUIET / REQUIRED] )
 
-macro (WkDepends package_name)
+macro (WkDependsInclude package_name)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 	
@@ -274,19 +274,38 @@ CMAKE_POLICY(VERSION 2.6)
 		if ( NOT ${package_var_name}_INCLUDE_DIRS )
 			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR})
 		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
+
+		add_definitions(-D WK_${package_var_name}_FOUND)
+
+		include_directories(${${package_var_name}_INCLUDE_DIRS})
+		message ( STATUS "Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
+		
+	else ( ${package_var_name}_FOUND )	
+		message ( STATUS "Binary Dependency ${package_name} : FAILED ! " )
+	endif ( ${package_var_name}_FOUND )
+	
+CMAKE_POLICY(POP)
+endmacro (WkDependsInclude package_name)
+
+macro(WkDependsLink package_name)
+CMAKE_POLICY(PUSH)
+CMAKE_POLICY(VERSION 2.6)
+	
+	SetPackageVarName( package_var_name ${package_name} )
+	#message ( "${package_name} -> ${package_var_name}" )
+
+	if ( ${package_var_name}_FOUND )
+
+		# to handle cmake moule who dont have exactly the same standard as WkModules
 		if ( NOT ${package_var_name}_LIBRARIES )
 			set ( ${package_var_name}_LIBRARIES ${${package_var_name}_LIBRARY})
 		endif ( NOT ${package_var_name}_LIBRARIES )
 		#todo : maybe we need a complete layer over that, Wk Modules handling Wk fetures such as run_libraries and correct variable name...
 
-		add_definitions(-D WK_${package_var_name}_FOUND)
-
-		message ( STATUS "Binary Dependency ${package_name} : Found ! " )
-		include_directories(${${package_var_name}_INCLUDE_DIRS})
-		message ( STATUS "Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS}")
+		target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
 		#if the find module also defines the runtime libraries ( Wk find module standard  NOT CMAKE itself !)
 		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} CACHE INTERNAL " libraries needed to run ${PROJECT_NAME} " )
-		message ( STATUS "Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES}")
+		message ( STATUS "Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")
 		#once the project is built with it the dependency becomes mandatory
 		# we append to the config cmake script
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
@@ -311,9 +330,4 @@ CMAKE_POLICY(POP)
 	endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)
-endmacro (WkDepends package_name)
-
-macro(WkDependsLink package_name)
-	SetPackageVarName(package_var_name ${package_name})
-	target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
 endmacro(WkDependsLink package_name)
