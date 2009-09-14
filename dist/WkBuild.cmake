@@ -303,9 +303,12 @@ CMAKE_POLICY(VERSION 2.6)
 		#todo : maybe we need a complete layer over that, Wk Modules handling Wk fetures such as run_libraries and correct variable name...
 
 		target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
+		message ( STATUS "Binary Dependency ${package_name} libs : ${${package_var_name}_LIBRARIES} OK !")
 		#if the find module also defines the runtime libraries ( Wk find module standard  NOT CMAKE itself !)
 		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} CACHE INTERNAL " libraries needed to run ${PROJECT_NAME} " )
-		message ( STATUS "Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")
+		IF ( WIN32 )
+			message ( STATUS "Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")
+		ENDIF ( WIN32 )
 		#once the project is built with it the dependency becomes mandatory
 		# we append to the config cmake script
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
