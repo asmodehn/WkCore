@@ -319,9 +319,9 @@ CMAKE_POLICY(VERSION 2.6)
 		
 find_package( ${package_name} REQUIRED )
 if ( ${package_var_name}_FOUND )
-	set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \${${package_var_name}_INCLUDE_DIRS} )
-	set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} \${${package_var_name}_LIBRARIES} )
-	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${package_var_name}_RUN_LIBRARIES} )
+	set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} ${${package_var_name}_INCLUDE_DIRS} )
+	set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} ${${package_var_name}_LIBRARIES} )
+	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} )
 endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)
