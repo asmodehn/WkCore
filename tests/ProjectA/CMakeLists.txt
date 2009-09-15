@@ -35,8 +35,10 @@ INCLUDE ( CMake/WkDoc.cmake )
 
 WkProject( ProjectA C CXX )
 
+WkDependsInclude( ProjectB REQUIRED)
 WkBuild( LIBRARY SHARED)
-WkDepends( ProjectB )
+WkDependsLink( ProjectB REQUIRED)
+
 WkDoc( )
 
 WkTestBuild( maintest )

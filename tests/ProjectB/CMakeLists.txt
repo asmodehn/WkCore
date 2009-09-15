@@ -35,8 +35,9 @@ INCLUDE ( CMake/WkDoc.cmake )
 
 WkProject( ProjectB C )
 
+WkDependsInclude( ProjectC )
 WkBuild( LIBRARY SHARED )
-WkDepends( ProjectC )
+WkDependsLink( ProjectC )
 WkDoc( )
 
 WkTestBuild( maintestB )
