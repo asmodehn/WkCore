@@ -81,6 +81,9 @@ macro(SetPackageVarName varname pkgname)
 	if ( ${${varname}} STREQUAL "OpenGL" )
 		set ( ${varname} "OPENGL")
 	endif ( ${${varname}} STREQUAL "OpenGL" )
+	if ( ${${varname}} STREQUAL "Guichan" )
+		set ( ${varname} "GUICHAN")
+	endif ( ${${varname}} STREQUAL "Guichan" )
 	#etc.
 	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
 
