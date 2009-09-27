@@ -38,64 +38,86 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6.3 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 
-#WkTestBuild( test_name )
+#WkTestBuild( test_name [test_source [...] ] )
 
-MACRO(WkTestBuild )
+MACRO(WkTestBuild test_name)
 
 	option(${PROJECT_NAME}_ENABLE_TESTS "Wether or not you want the project to include the tests and enable automatic testing for ${PROJECT_NAME}" OFF)
 
 	IF(${PROJECT_NAME}_ENABLE_TESTS)
 		ENABLE_TESTING()
 		
-		foreach( test_name ${ARGN})
+		IF ( ${ARGC} EQUAL 1 )
 			FILE(GLOB testsource RELATIVE ${PROJECT_SOURCE_DIR} test/${test_name}.c test/${test_name}.cc test/${test_name}.cpp )
-			#MESSAGE ( STATUS "Detected ${test_name} Source : ${testsource}" )
-		
-			#To make sure the source file exists
-			IF (testsource)
-				#Create output directories
-				IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/test )
-					FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/test )
-				ENDIF ( NOT EXISTS ${PROJECT_BINARY_DIR}/test )
-			
-				#Set where test executables should be found
-				SET(${PROJECT_NAME}_TESTS_OUTPUT_PATH ${PROJECT_BINARY_DIR}/test CACHE PATH "Ouput directory for ${Project} tests.")
-				mark_as_advanced(FORCE ${PROJECT_NAME}_TESTS_OUTPUT_PATH)
-				SET(EXECUTABLE_OUTPUT_PATH "${${PROJECT_NAME}_TESTS_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake executables output directory. Do not edit." FORCE)
-			
-				#build
-				ADD_EXECUTABLE(${test_name} ${testsource})
-				TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
-				ADD_DEPENDENCIES(${test_name} ${PROJECT_NAME})
-				
-				#We need to move project libraries and dependencies to the test target location after build.
-				#We need to do that everytime to make sure we have the latest version
-				
-				GET_TARGET_PROPERTY(${test_name}_LOCATION ${test_name} LOCATION)
-				get_filename_component(${test_name}_PATH ${${test_name}_LOCATION} PATH)
+			MESSAGE ( STATUS "Detected ${test_name} Source : ${testsource}" )
+		ELSE ( ${ARGC} EQUAL 1 )
+			set( testsource "" )
+			#To make sure the sources file exists
+			foreach( testsrc ${ARGN} )
+				set ( testsrc ${PROJECT_SOURCE_DIR}/test/${testsrc} )
+				IF (NOT EXISTS ${testsrc})
+					MESSAGE ( FATAL_ERROR "${testsrc} Not Found !" )
+				ELSE ( NOT EXISTS ${testsrc})
+					SET (testsource ${testsource} ${testsrc})
+				ENDIF (NOT EXISTS ${testsrc})
+			endforeach( testsrc ${ARGN} )
+			MESSAGE ( STATUS "Detected ${test_name} Source : ${testsource}" )
+		ENDIF ( ${ARGC} EQUAL 1 )
 
-				if ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
-					GET_TARGET_PROPERTY(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
-					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
-															COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
-				endif ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
-				
-				if ( WIN32 )
-					#needed for each run library dependency as well
-					#message ( STATUS "Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
-					foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
-						if ( NOT looparg )
-							message ( SEND_ERROR "Error with dependency needed to run test : ${looparg}" )
-						endif ( NOT looparg )
-						ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
-															COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
-					endforeach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
-				endif ( WIN32 )
-			ENDIF (testsource)
-		endforeach ( test_name ${ARGN})
+		IF (testsource)
+			#Create output directories
+			IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/test )
+				FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/test )
+			ENDIF ( NOT EXISTS ${PROJECT_BINARY_DIR}/test )
+		
+			#Set where test executables should be found
+			SET(${PROJECT_NAME}_TESTS_OUTPUT_PATH ${PROJECT_BINARY_DIR}/test CACHE PATH "Ouput directory for ${Project} tests.")
+			mark_as_advanced(FORCE ${PROJECT_NAME}_TESTS_OUTPUT_PATH)
+			SET(EXECUTABLE_OUTPUT_PATH "${${PROJECT_NAME}_TESTS_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake executables output directory. Do not edit." FORCE)
+		
+			#build
+			ADD_EXECUTABLE(${test_name} ${testsource} )
+			TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
+			ADD_DEPENDENCIES(${test_name} ${PROJECT_NAME})
+			
+			#We need to move project libraries and dependencies to the test target location after build.
+			#We need to do that everytime to make sure we have the latest version
+			
+			GET_TARGET_PROPERTY(${test_name}_LOCATION ${test_name} LOCATION)
+			get_filename_component(${test_name}_PATH ${${test_name}_LOCATION} PATH)
+
+			if ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
+				GET_TARGET_PROPERTY(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
+				ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
+														COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
+			endif ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
+			
+			if ( WIN32 )
+				#needed for each run library dependency as well
+				#message ( STATUS "Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
+				foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
+					if ( NOT looparg )
+						message ( SEND_ERROR "Error with dependency needed to run test : ${looparg}" )
+					endif ( NOT looparg )
+					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
+														COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
+				endforeach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
+			endif ( WIN32 )
+		ENDIF (testsource)
 	ENDIF(${PROJECT_NAME}_ENABLE_TESTS)
 
-ENDMACRO(WkTestBuild)
+ENDMACRO(WkTestBuild test_name)
+
+#
+# WkTestData( test_name [ datafile1 [ datafile2 [ ... ] ] ] )
+#
+MACRO (WkTestData test_name )
+
+	foreach ( test_data ${ARGN} )
+		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/test/${test_data} ${PROJECT_BINARY_DIR}/test/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/test/${test_data} to ${PROJECT_BINARY_DIR}/test/${test_data}" )
+	endforeach ( test_data ${ARGN} )
+	
+ENDMACRO (WkTestData data_path)
 
 #
 # Calls the same test executable multiple times, eachtime with 1 argument
