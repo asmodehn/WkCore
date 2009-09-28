@@ -27,7 +27,7 @@ FIND_LIBRARY(Guichan_LIBRARY
     PATHS /usr/lib /usr/local/lib
     )
 
-MARK_AS_ADVANCED(Guichan_INCLUDE_DIR Guichan_LIBRARY)
+#MARK_AS_ADVANCED(Guichan_INCLUDE_DIR Guichan_LIBRARY)
 
 IF (Guichan_INCLUDE_DIR AND Guichan_LIBRARY)
     SET(GUICHAN_FOUND TRUE)
@@ -91,7 +91,7 @@ FOREACH (COMPONENT ${Guichan_FIND_COMPONENTS})
         PATHS /usr/lib /usr/local/lib
         )
 
-    MARK_AS_ADVANCED(Guichan_LIBRARY_${COMPONENT})
+   #MARK_AS_ADVANCED(Guichan_LIBRARY_${COMPONENT})
 
     IF (NOT EXISTS ${Guichan_INCLUDE_DIR}/${Guichan_HEADER} OR 
     	NOT Guichan_LIBRARY_${COMPONENT})
