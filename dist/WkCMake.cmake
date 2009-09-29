@@ -31,20 +31,45 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
+#Putting a useful default for backwards compatibility
+set ( WKCMAKE_DIR "CMake" )
 
-#
-# Defining installation rules based on well known hierarchy
-#
+macro(WkCMakeDir dir)
+	set ( WKCMAKE_DIR ${dir} )
+#setting defaults for directories
+	set ( WKCMAKE_INCLUDE_DIR "include" )
+	set ( WKCMAKE_SRC_DIR "src" )
+	set ( WKCMAKE_BIN_DIR "bin" )
+	set ( WKCMAKE_LIB_DIR "lib" )
+	set ( WKCMAKE_STATIC_DIR "lib/static")
+#including other useful files
+	include ( ${dir}/WkBuild.cmake )
+	include ( ${dir}/WkTest.cmake )
+	include ( ${dir}/WkDoc.cmake )
+endmacro(WkCMakeDir dir)
 
-MACRO (WkInstall project_name)
+macro(WkIncludeDir dir)
+	set ( WKCMAKE_INCLUDE_DIR ${dir} )
 
-	INSTALL ( FILES ${HEADERS} DESTINATION ${VERSION}/${WKCMAKE_INCLUDE_DIR} )
+endmacro(WkIncludeDir dir)
 
-	INSTALL	(
-		TARGETS ${project_name}
-		RUNTIME DESTINATION ${VERSION}/${WKCMAKE_BIN_DIR}
-		LIBRARY DESTINATION ${VERSION}/${WKCMAKE_LIB_DIR}
-		ARCHIVE DESTINATION ${VERSION}/${WKCMAKE_STATIC_DIR}
-		)
+macro(WkSrcDir dir)
+	set ( WKCMAKE_SRC_DIR ${dir} )
 
-ENDMACRO(WkInstall project_name)
+endmacro(WkSrcDir dir)
+
+macro(WkBinDir dir)
+	set ( WKCMAKE_BIN_DIR ${dir} )
+
+endmacro(WkBinDir dir)
+
+macro(WkLibDir dir)
+	set ( WKCMAKE_LIB_DIR ${dir} )
+
+endmacro(WkLibDir dir)
+
+macro(WkStaticDir dir)
+	set ( WKCMAKE_STATIC_DIR ${dir} )
+
+endmacro(WkStaticDir dir)
+

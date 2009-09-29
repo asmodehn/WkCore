@@ -31,11 +31,17 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
+#test to make sure necessary variles have been set.
+
+if ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR OR NOT WKCMAKE_BIN_DIR OR NOT WKCMAKE_LIB_DIR ) 
+	message( FATAL_ERROR "You need to include WkCMake.cmake in your CMakeLists.txt, and call WkCMakeDir(<path_to WkCMake scripts> )" )
+endif ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR OR NOT WKCMAKE_BIN_DIR OR NOT WKCMAKE_LIB_DIR ) 
+
 # using useful Macros
-include ( CMake/WkUtils.cmake )
+include ( ${WKCMAKE_DIR}/WkUtils.cmake )
 
 #To setup the compiler
-include ( CMake/WkCompilerSetup.cmake )
+include ( ${WKCMAKE_DIR}/WkCompilerSetup.cmake )
 
 macro(WKProject project_name_arg)
 CMAKE_POLICY(PUSH)
@@ -72,7 +78,7 @@ CMAKE_POLICY(VERSION 2.6)
 get_filename_component(SELF_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
 #all required target should be defined there... no need to specify all targets in ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
 include(\${SELF_DIR}/${PROJECT_NAME}Export.cmake)
-get_filename_component(${PROJECT_NAME}_INCLUDE_DIR "\${SELF_DIR}/include/" ABSOLUTE)
+get_filename_component(${PROJECT_NAME}_INCLUDE_DIR "\${SELF_DIR}/${WKCMAKE_INCLUDE_DIR}/" ABSOLUTE)
 set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIR})
 	")
 	
@@ -158,10 +164,10 @@ CMAKE_POLICY(VERSION 2.6)
 	#Defining target
 	
 	#VS workaround to display headers
-	FILE(GLOB_RECURSE HEADERS RELATIVE ${PROJECT_SOURCE_DIR} include/*.h include/*.hh include/*.hpp)
-	FILE(GLOB_RECURSE SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c src/*.cpp src/*.cc)
+	FILE(GLOB_RECURSE HEADERS RELATIVE ${PROJECT_SOURCE_DIR} ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp)
+	FILE(GLOB_RECURSE SOURCES RELATIVE ${PROJECT_SOURCE_DIR} ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
 
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
 	FIND_PACKAGE(AStyle)
 	IF ( ASTYLE_FOUND )
 		option (${PROJECT_NAME}_CODE_FORMAT "Enable Code Formatting" ON)
@@ -181,9 +187,9 @@ CMAKE_POLICY(VERSION 2.6)
 	#	-Cmake for Wk headers
 	#	-include for the unmodified ones, 
 	#	-and in source/src for internal ones)
-	include_directories( ${PROJECT_SOURCE_DIR}/CMake ${PROJECT_SOURCE_DIR}/include )
+	include_directories( ${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR} CMake ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} )
 	#internal headers ( non visible by outside project )
-	include_directories(${PROJECT_SOURCE_DIR}/src)
+	include_directories(${PROJECT_SOURCE_DIR}/${WKCMAKE_SRC_DIR})
 
 	#TODO : find a simpler way than this complex merge...
 	MERGE("${HEADERS}" "${SOURCES}" SOURCES)
@@ -217,11 +223,11 @@ CMAKE_POLICY(VERSION 2.6)
 	# Defining where to put what has been built
 	#
 	
-	SET(${PROJECT_NAME}_LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib CACHE PATH "Ouput directory for ${Project} libraries." )
+	SET(${PROJECT_NAME}_LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${WKCMAKE_LIB_DIR} CACHE PATH "Ouput directory for ${Project} libraries." )
 	mark_as_advanced(FORCE ${PROJECT_NAME}_LIBRARY_OUTPUT_PATH)
 	SET(LIBRARY_OUTPUT_PATH "${${PROJECT_NAME}_LIBRARY_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake libraries output directory. Do not edit." FORCE)
 	
-	SET(${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH "Ouput directory for ${Project} executables." )
+	SET(${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${WKCMAKE_BIN_DIR} CACHE PATH "Ouput directory for ${Project} executables." )
 	mark_as_advanced(FORCE ${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH)
 	SET(EXECUTABLE_OUTPUT_PATH "${${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake executables output directory. Do not edit." FORCE)
 
@@ -231,7 +237,7 @@ CMAKE_POLICY(VERSION 2.6)
 	#
 	
 	if(${project_type} STREQUAL "LIBRARY") 
-		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include COMMENT "Copying ${PROJECT_SOURCE_DIR}/include to ${PROJECT_BINARY_DIR}" )
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" )
 	endif(${project_type} STREQUAL "LIBRARY") 
 	
 
@@ -261,7 +267,7 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	# if possible by using WkFind modules
 	# maybe belongs somewhere else
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
 	
 	find_package( ${package_name} ${ARGN} )
 	SetPackageVarName( package_var_name ${package_name} )
@@ -333,3 +339,4 @@ CMAKE_POLICY(POP)
 	
 CMAKE_POLICY(POP)
 endmacro(WkDependsLink package_name)
+

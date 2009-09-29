@@ -38,6 +38,13 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6.3 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 
+set ( WKCMAKE_TEST_DIR "test" )
+
+macro(WkTestDir dir)
+	set ( WKCMAKE_TEST_DIR ${dir} )
+
+endmacro(WkTestDir dir)
+
 #WkTestBuild( test_name [test_source [...] ] )
 
 MACRO(WkTestBuild test_name)
@@ -48,13 +55,13 @@ MACRO(WkTestBuild test_name)
 		ENABLE_TESTING()
 		
 		IF ( ${ARGC} EQUAL 1 )
-			FILE(GLOB testsource RELATIVE ${PROJECT_SOURCE_DIR} test/${test_name}.c test/${test_name}.cc test/${test_name}.cpp )
+			FILE(GLOB testsource RELATIVE ${PROJECT_SOURCE_DIR} ${WKCMAKE_TEST_DIR}/${test_name}.c ${WKCMAKE_TEST_DIR}/${test_name}.cc ${WKCMAKE_TEST_DIR}/${test_name}.cpp )
 			MESSAGE ( STATUS "Detected ${test_name} Source : ${testsource}" )
 		ELSE ( ${ARGC} EQUAL 1 )
 			set( testsource "" )
 			#To make sure the sources file exists
 			foreach( testsrc ${ARGN} )
-				set ( testsrc ${PROJECT_SOURCE_DIR}/test/${testsrc} )
+				set ( testsrc ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${testsrc} )
 				IF (NOT EXISTS ${testsrc})
 					MESSAGE ( FATAL_ERROR "${testsrc} Not Found !" )
 				ELSE ( NOT EXISTS ${testsrc})
@@ -66,12 +73,12 @@ MACRO(WkTestBuild test_name)
 
 		IF (testsource)
 			#Create output directories
-			IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/test )
-				FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/test )
-			ENDIF ( NOT EXISTS ${PROJECT_BINARY_DIR}/test )
+			IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
+				FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
+			ENDIF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
 		
 			#Set where test executables should be found
-			SET(${PROJECT_NAME}_TESTS_OUTPUT_PATH ${PROJECT_BINARY_DIR}/test CACHE PATH "Ouput directory for ${Project} tests.")
+			SET(${PROJECT_NAME}_TESTS_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} CACHE PATH "Ouput directory for ${Project} tests.")
 			mark_as_advanced(FORCE ${PROJECT_NAME}_TESTS_OUTPUT_PATH)
 			SET(EXECUTABLE_OUTPUT_PATH "${${PROJECT_NAME}_TESTS_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake executables output directory. Do not edit." FORCE)
 		
@@ -114,7 +121,7 @@ ENDMACRO(WkTestBuild test_name)
 MACRO (WkTestData test_name )
 
 	foreach ( test_data ${ARGN} )
-		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/test/${test_data} ${PROJECT_BINARY_DIR}/test/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/test/${test_data} to ${PROJECT_BINARY_DIR}/test/${test_data}" )
+		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data}" )
 	endforeach ( test_data ${ARGN} )
 	
 ENDMACRO (WkTestData data_path)
@@ -133,12 +140,13 @@ MACRO(WkTestRun test_name )
 		#if test arguments
 		IF ( ${ARGC} GREATER 2 )
 			FOREACH ( looparg ${ARGN} )
-				ADD_TEST(${test_name}_${looparg} ${PROJECT_BINARY_DIR}/test/${test_name} ${looparg})
+				ADD_TEST(${test_name}_${looparg} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_name} ${looparg})
 			ENDFOREACH ( looparg )
 		ELSE ( ${ARGC} GREATER 2  )
-			ADD_TEST(${test_name} ${PROJECT_BINARY_DIR}/test/${test_name})
+			ADD_TEST(${test_name} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_name})
 		ENDIF ( ${ARGC} GREATER 2  )
 	
 	ENDIF(${PROJECT_NAME}_ENABLE_TESTS)
 
 ENDMACRO(WkTestRun)
+
