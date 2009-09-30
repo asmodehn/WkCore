@@ -27,20 +27,23 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#Mandatory calls to use WkCMake
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+INCLUDE ( CMake/WkCMake.cmake )
+WkCMakeDir ( CMake )
 
-INCLUDE ( CMake/WkBuild.cmake )
-INCLUDE ( CMake/WkTest.cmake )
-INCLUDE ( CMake/WkDoc.cmake )
-
+#Project declaration
 WkProject( ProjectA C CXX )
 
+#Build Rules
 WkDependsInclude( ProjectB REQUIRED)
 WkBuild( LIBRARY SHARED)
 WkDependsLink( ProjectB REQUIRED)
 
+# Generate Documentation Target
 WkDoc( )
 
+#Testing
 WkTestBuild( maintest )
 WkTestRun( maintest )
 

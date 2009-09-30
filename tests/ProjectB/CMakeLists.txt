@@ -27,18 +27,28 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-	
-INCLUDE ( CMake/WkBuild.cmake )
-INCLUDE ( CMake/WkTest.cmake )
-INCLUDE ( CMake/WkDoc.cmake )
+#Mandatory comands to use wkcmake
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)	
+INCLUDE ( CustomCMake/WkCMake.cmake )
+WkCMakeDir( CustomCMake )
 
+#Configuration of custom directories
+WkSrcDir ( CustomSrc )
+WkIncludeDir ( CustomInclude )
+WkBinDir ( CustomBin )
+WkLibDir ( CustomLib )
+WkTestDir ( CustomTest )
+WkDocDir ( CustomDoc )
+
+#Project Declaration
 WkProject( ProjectB C )
 
+#Build rules
 WkDependsInclude( ProjectC )
 WkBuild( LIBRARY SHARED )
 WkDependsLink( ProjectC )
 WkDoc( )
 
+#Testing
 WkTestBuild( maintestB )
 WkTestRun( maintestB )

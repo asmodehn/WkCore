@@ -27,17 +27,19 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
+#Using WkCMake, mandatory calls
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR )
+INCLUDE ( CMake/WkCMake.cmake )
+WkCMakeDir ( CMake )
 
-INCLUDE ( CMake/WkBuild.cmake )
-INCLUDE ( CMake/WkTest.cmake )
-INCLUDE ( CMake/WkDoc.cmake )
-
+#declaring the project
 WkProject( ProjectC C )
 
+#build rules for the project
 WkBuild( LIBRARY SHARED )
 WkDoc( )
 
+#Testing
 WkTestBuild( maintestC )
 WkTestRun( maintestC )
 
