@@ -67,11 +67,11 @@ IF (DOXYGEN_FOUND)
   ENDIF (NOT DVIPS_CONVERTER)
   
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
-	message( STATUS "Using existing ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
+	message( "== Using existing ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
 	# use static hand-edited Doxyfile :
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile @ONLY )
 elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk" )
-	message( STATUS "Configuring Template ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk --> ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
+	message( "== Configuring Template ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk --> ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
 	# use template to generate Doxyfile :
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile @ONLY )
 else (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
