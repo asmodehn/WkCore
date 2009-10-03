@@ -33,12 +33,12 @@ INCLUDE ( CustomCMake/WkCMake.cmake )
 WkCMakeDir( CustomCMake )
 
 #Configuration of custom directories
-WkSrcDir ( CustomSrc )
-WkIncludeDir ( CustomInclude )
-WkBinDir ( CustomBin )
-WkLibDir ( CustomLib )
-WkTestDir ( CustomTest )
-WkDocDir ( CustomDoc )
+WkSrcDir ( "Custom Src" )
+WkIncludeDir ( "Custom Include" )
+WkBinDir ( "Custom Bin" )
+WkLibDir ( "Custom Lib" )
+WkTestDir ( "Custom Test" )
+WkDocDir ( "Custom Doc" )
 
 #Project Declaration
 WkProject( ProjectB C )
