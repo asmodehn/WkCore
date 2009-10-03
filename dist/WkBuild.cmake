@@ -27,6 +27,9 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#debug
+message ( "== Loading WkBuild.cmake ..." )
+
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
@@ -38,19 +41,19 @@ if ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR OR NOT WK
 endif ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR OR NOT WKCMAKE_BIN_DIR OR NOT WKCMAKE_LIB_DIR ) 
 
 # using useful Macros
-include ( ${WKCMAKE_DIR}/WkUtils.cmake )
+include ( "${WKCMAKE_DIR}/WkUtils.cmake" )
 
 #To setup the compiler
-include ( ${WKCMAKE_DIR}/WkCompilerSetup.cmake )
+include ( "${WKCMAKE_DIR}/WkCompilerSetup.cmake" )
 
 macro(WKProject project_name_arg)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 	project(${project_name_arg} ${ARGN})
-	WkCompilerSetup( )
+	WkCompilerSetup()
 	#preparing and cleaning internal build variables
 	set( ${PROJECT_NAME}_INCLUDE_DIRS CACHE INTERNAL " Includes directories for ${PROJECT_NAME} ")
-	set( ${project_name_arg}_LIBRARIES CACHE INTERNAL " libraries needed for ${target_name} " )
+	set( ${project_name_arg}_LIBRARIES CACHE INTERNAL " Libraries needed for ${target_name} " )
 	set( ${project_name_arg}_RUN_LIBRARIES CACHE INTERNAL " libraries needed to run ${target_name} " )
 CMAKE_POLICY(POP)
 endmacro(WKProject PROJECT_NAME)
@@ -78,14 +81,14 @@ CMAKE_POLICY(VERSION 2.6)
 get_filename_component(SELF_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
 #all required target should be defined there... no need to specify all targets in ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
 include(\${SELF_DIR}/${PROJECT_NAME}Export.cmake)
-get_filename_component(${PROJECT_NAME}_INCLUDE_DIR "\${SELF_DIR}/${WKCMAKE_INCLUDE_DIR}/" ABSOLUTE)
-set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIR})
+get_filename_component(${PROJECT_NAME}_INCLUDE_DIR \"\${SELF_DIR}/${WKCMAKE_INCLUDE_DIR}/\" ABSOLUTE)
+set(${PROJECT_NAME}_INCLUDE_DIRS \"\${${PROJECT_NAME}_INCLUDE_DIR}\")
 	")
 	
 	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 #however we still want to have ${PROJECT_NAME}_LIBRARIES available
 set(${PROJECT_NAME}_LIBRARY ${PROJECT_NAME} )
-set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARY})
+set(${PROJECT_NAME}_LIBRARIES \"\${${PROJECT_NAME}_LIBRARY}\")
 	" )
 	
 	get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
@@ -128,7 +131,7 @@ CMAKE_POLICY(VERSION 2.6)
 		set(${PROJECT_NAME}_load_type ${ARGV1} )
 	endif ( ${ARGC} GREATER 1 )
 
-	message ( STATUS "Configuring ${PROJECT_NAME} as ${project_type} ${${PROJECT_NAME}_load_type}" )	
+	message ( "== Configuring ${PROJECT_NAME} as ${project_type} ${${PROJECT_NAME}_load_type}" )	
 		
 	# testing type
 	if (NOT ${project_type} STREQUAL "EXECUTABLE" AND NOT ${project_type} STREQUAL "LIBRARY" )
@@ -151,7 +154,7 @@ CMAKE_POLICY(VERSION 2.6)
 		set(CMAKE_VERBOSE_MAKEFILE OFF CACHE INTERNAL "Verbose build commands disabled for Release build." FORCE)
 		set(CMAKE_USE_RELATIVE_PATHS OFF CACHE INTERNAL "Absolute paths used in makefiles and projects for Release build." FORCE)
 	else (${${PROJECT_NAME}_BUILD_TYPE} STREQUAL Release)
-		message( STATUS "Non Release build detected : enabling verbose makefile" )
+		message( "== Non Release build detected : enabling verbose makefile" )
 		# To get the actual commands used
 		set(CMAKE_VERBOSE_MAKEFILE ON CACHE INTERNAL "Verbose build commands enabled for Non Release build." FORCE)
 				#VLD
@@ -163,11 +166,18 @@ CMAKE_POLICY(VERSION 2.6)
 
 	#Defining target
 	
-	#VS workaround to display headers
-	FILE(GLOB_RECURSE HEADERS RELATIVE ${PROJECT_SOURCE_DIR} ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp)
-	FILE(GLOB_RECURSE SOURCES RELATIVE ${PROJECT_SOURCE_DIR} ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
+	message ( "== Sources Files autodetection..." )	
 
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
+	#VS workaround to display headers
+	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp)
+	FILE(GLOB_RECURSE SOURCES RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
+	message ( "== Headers detected in ${WKCMAKE_INCLUDE_DIR} : ${HEADERS}" )
+	message ( "== Sources detected in ${WKCMAKE_SRC_DIR} : ${SOURCES}" )
+
+	if ( NOT CMAKE_MODULE_PATH )
+		set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
+	endif ( NOT CMAKE_MODULE_PATH )
+
 	FIND_PACKAGE(AStyle)
 	IF ( ASTYLE_FOUND )
 		option (${PROJECT_NAME}_CODE_FORMAT "Enable Code Formatting" ON)
@@ -179,21 +189,21 @@ CMAKE_POLICY(VERSION 2.6)
 		#message ( "Sources :  ${HEADERS_PARAM} ${SOURCES_PARAM}" )
 		set ( cmdline " ${ASTYLE_EXECUTABLE} --style=${${PROJECT_NAME}_CODE_FORMAT_STYLE} ${HEADERS_PARAM} ${SOURCES_PARAM}" )
 		#message ( "CMD : ${cmdline} " )
-		ADD_CUSTOM_TARGET(format ALL sh -c ${cmdline} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM )
+		ADD_CUSTOM_TARGET(format ALL sh -c ${cmdline} WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" VERBATIM )
 	ENDIF ( ASTYLE_FOUND )
 
 	#Including configured headers (
 	#	-binary_dir for the configured header,  (useful ? )
-	#	-Cmake for Wk headers
+	#	-CmakeDir for Wk headers
 	#	-include for the unmodified ones, 
 	#	-and in source/src for internal ones)
-	include_directories( ${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR} CMake ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} )
+	include_directories( "${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}" "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}")
 	#internal headers ( non visible by outside project )
-	include_directories(${PROJECT_SOURCE_DIR}/${WKCMAKE_SRC_DIR})
+	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_SRC_DIR}")
 
 	#TODO : find a simpler way than this complex merge...
 	MERGE("${HEADERS}" "${SOURCES}" SOURCES)
-	#MESSAGE ( STATUS "Sources : ${SOURCES}" )
+	MESSAGE ( "== ${PROJECT_NAME} Sources : ${SOURCES}" )
 	
 	#
 	# Handling my own build config
@@ -237,7 +247,7 @@ CMAKE_POLICY(VERSION 2.6)
 	#
 	
 	if(${project_type} STREQUAL "LIBRARY") 
-		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" )
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" )
 	endif(${project_type} STREQUAL "LIBRARY") 
 	
 
@@ -283,10 +293,10 @@ CMAKE_POLICY(VERSION 2.6)
 		add_definitions(-D WK_${package_var_name}_FOUND)
 
 		include_directories(${${package_var_name}_INCLUDE_DIRS})
-		message ( STATUS "Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
+		message ( "== Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
 		
 	else ( ${package_var_name}_FOUND )	
-		message ( STATUS "Binary Dependency ${package_name} : FAILED ! " )
+		message ( "== Binary Dependency ${package_name} : FAILED ! " )
 	endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)
@@ -308,11 +318,11 @@ CMAKE_POLICY(VERSION 2.6)
 		#todo : maybe we need a complete layer over that, Wk Modules handling Wk fetures such as run_libraries and correct variable name...
 
 		target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
-		message ( STATUS "Binary Dependency ${package_name} libs : ${${package_var_name}_LIBRARIES} OK !")
+		message ( "== Binary Dependency ${package_name} libs : ${${package_var_name}_LIBRARIES} OK !")
 		#if the find module also defines the runtime libraries ( Wk find module standard  NOT CMAKE itself !)
 		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} CACHE INTERNAL " libraries needed to run ${PROJECT_NAME} " )
 		IF ( WIN32 )
-			message ( STATUS "Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")
+			message ( "== Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")
 		ENDIF ( WIN32 )
 		#once the project is built with it the dependency becomes mandatory
 		# we append to the config cmake script
@@ -324,9 +334,9 @@ CMAKE_POLICY(VERSION 2.6)
 		
 find_package( ${package_name} REQUIRED )
 if ( ${package_var_name}_FOUND )
-	set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} ${${package_var_name}_INCLUDE_DIRS} )
-	set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} ${${package_var_name}_LIBRARIES} )
-	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} )
+	set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \"${${package_var_name}_INCLUDE_DIRS}\" )
+	set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} \"${${package_var_name}_LIBRARIES}\" )
+	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \"${${package_var_name}_RUN_LIBRARIES}\" )
 endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)
@@ -334,7 +344,7 @@ CMAKE_POLICY(POP)
 		")
 		
 	else ( ${package_var_name}_FOUND )	
-		message ( STATUS "Binary Dependency ${package_name} : FAILED ! " )
+		message ( "== Binary Dependency ${package_name} : FAILED ! " )
 	endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)

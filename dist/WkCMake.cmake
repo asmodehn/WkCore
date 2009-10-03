@@ -27,49 +27,63 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#debug
+message ( "== Loading WkCMake.cmake ... ")
+
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
 #Putting a useful default for backwards compatibility
-set ( WKCMAKE_DIR "CMake" )
+set ( WKCMAKE_DIR "CMake" CACHE PATH "WkCMake Scripts path" )
+mark_as_advanced ( WKCMAKE_DIR )
 
 macro(WkCMakeDir dir)
-	set ( WKCMAKE_DIR ${dir} )
+	set ( WKCMAKE_DIR ${dir} CACHE PATH "WkCMake Scripts path" FORCE )
 #setting defaults for directories
-	set ( WKCMAKE_INCLUDE_DIR "include" )
-	set ( WKCMAKE_SRC_DIR "src" )
-	set ( WKCMAKE_BIN_DIR "bin" )
-	set ( WKCMAKE_LIB_DIR "lib" )
-	set ( WKCMAKE_STATIC_DIR "lib/static")
+	set ( WKCMAKE_INCLUDE_DIR "include" CACHE PATH "Headers directory for autodetection by WkCMake" FORCE )
+	set ( WKCMAKE_SRC_DIR "src" CACHE PATH "Sources directory for autodetection by WkCMake" FORCE )
+	set ( WKCMAKE_BIN_DIR "bin" CACHE PATH "Binary directory for WkCMake build products" FORCE )
+	set ( WKCMAKE_LIB_DIR "lib" CACHE PATH "Library directory for WkCMake build products" FORCE )
+	set ( WKCMAKE_STATIC_DIR "lib/static" CACHE PATH "Static Library directory for WkCMake build products" FORCE )
+	mark_as_advanced ( WKCMAKE_DIR WKCMAKE_INCLUDE_DIR WKCMAKE_SRC_DIR WKCMAKE_BIN_DIR WKCMAKE_LIB_DIR WKCMAKE_STATIC_DIR )
 #including other useful files
-	include ( ${dir}/WkBuild.cmake )
-	include ( ${dir}/WkTest.cmake )
-	include ( ${dir}/WkDoc.cmake )
+	include ( "${WKCMAKE_DIR}/WkBuild.cmake" RESULT_VARIABLE WKCMAKEBUILD_FOUND )
+	IF ( NOT WKCMAKEBUILD_FOUND )
+		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkBuild.cmake Not Found !!!" )
+	ENDIF ( NOT WKCMAKEBUILD_FOUND )
+	include ( "${WKCMAKE_DIR}/WkTest.cmake" RESULT_VARIABLE WKCMAKETEST_FOUND )
+	IF ( NOT WKCMAKETEST_FOUND )
+		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkTest.cmake Not Found !!!" )
+	ENDIF ( NOT WKCMAKETEST_FOUND )
+	include ( "${WKCMAKE_DIR}/WkDoc.cmake" RESULT_VARIABLE WKCMAKEDOC_FOUND )
+	IF ( NOT WKCMAKEDOC_FOUND )
+		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkDoc.cmake Not Found !!!" )
+	ENDIF ( NOT WKCMAKEDOC_FOUND )
 endmacro(WkCMakeDir dir)
 
 macro(WkIncludeDir dir)
-	set ( WKCMAKE_INCLUDE_DIR ${dir} )
-
+	set ( WKCMAKE_INCLUDE_DIR ${dir} CACHE PATH "Headers directory for autodetection by WkCMake" FORCE )
+	mark_as_advanced ( WKCMAKE_INCLUDE_DIR )
 endmacro(WkIncludeDir dir)
 
 macro(WkSrcDir dir)
-	set ( WKCMAKE_SRC_DIR ${dir} )
-
+	set ( WKCMAKE_SRC_DIR ${dir} CACHE PATH "Sources directory for autodetection by WkCMake" FORCE )
+	mark_as_advanced ( WKCMAKE_SRC_DIR )
 endmacro(WkSrcDir dir)
 
 macro(WkBinDir dir)
-	set ( WKCMAKE_BIN_DIR ${dir} )
-
+	set ( WKCMAKE_BIN_DIR ${dir} CACHE PATH "Binary directory for WkCMake build products" FORCE )
+	mark_as_advanced ( WKCMAKE_BIN_DIR )
 endmacro(WkBinDir dir)
 
 macro(WkLibDir dir)
-	set ( WKCMAKE_LIB_DIR ${dir} )
-
+	set ( WKCMAKE_LIB_DIR ${dir} CACHE PATH "Library directory for WkCMake build products" FORCE )
+	mark_as_advanced ( WKCMAKE_LIB_DIR )
 endmacro(WkLibDir dir)
 
 macro(WkStaticDir dir)
-	set ( WKCMAKE_STATIC_DIR ${dir} )
-
+	set ( WKCMAKE_STATIC_DIR ${dir} CACHE PATH "Static Library directory for WkCMake build products" FORCE )
+	mark_as_advanced ( WKCMAKE_STATIC_DIR )
 endmacro(WkStaticDir dir)
 

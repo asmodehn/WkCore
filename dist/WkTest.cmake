@@ -34,15 +34,19 @@
 # One source file can be used for a set of tests.
 #
 
+#debug
+message ( "== Loading WkTest.cmake ..." )
+
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6.3 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 
-set ( WKCMAKE_TEST_DIR "test" )
+set ( WKCMAKE_TEST_DIR "test" CACHE PATH "Test directory for WkCMake build products" )
+mark_as_advanced ( WKCMAKE_TEST_DIR )
 
 macro(WkTestDir dir)
-	set ( WKCMAKE_TEST_DIR ${dir} )
-
+	set ( WKCMAKE_TEST_DIR ${dir} CACHE PATH "Test directory for WkCMake build products" FORCE )
+	mark_as_advanced ( WKCMAKE_TEST_DIR )
 endmacro(WkTestDir dir)
 
 #WkTestBuild( test_name [test_source [...] ] )

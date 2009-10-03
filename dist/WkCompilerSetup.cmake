@@ -33,6 +33,9 @@
 # These macros exists to use more pedantic rules to build software. Thus improving the quality of working code
 #
 
+#debug
+message ( "== Loading WkCompilerSetup.cmake ... ")
+
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )

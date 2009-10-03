@@ -27,15 +27,19 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#debug
+message ( "== Loading WkDoc.cmake ... ")
+
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
-set ( WKCMAKE_DOC_DIR "doc" )
+set ( WKCMAKE_DOC_DIR "doc" CACHE PATH "Documentation directory for WkCMake build products" )
+mark_as_advanced ( WKCMAKE_DOC_DIR )
 
 macro(WkDocDir dir)
-	set ( WKCMAKE_DOC_DIR ${dir} )
-
+	set ( WKCMAKE_DOC_DIR ${dir} CACHE PATH "Documentation directory for WkCMake build products" FORCE )
+	mark_as_advanced ( WKCMAKE_DOC_DIR )
 endmacro(WkDocDir dir)
 
 macro( WKDoc )

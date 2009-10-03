@@ -27,8 +27,11 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#debug
+message( "== Loading WkUtils.cmake ... " )
+
 MACRO(MERGE ALIST BLIST OUTPUT)
-   SET(BTEMP ${BLIST})
+   SET(BTEMP "${BLIST}")
    FOREACH(A ${ALIST})
        SET(SORTED)
        SET(UNINSERTED 1)
@@ -57,7 +60,7 @@ macro(WkWhitespaceSplit source WSsplitted)
 	foreach(arg ${${source}})
 		#message ( "WSsplitted: ${${WSsplitted}} ")
 		#message ( "arg: ${arg} " )
-		set(${WSsplitted} "${${WSsplitted}} ${arg}")
+		set(${WSsplitted} "${${WSsplitted}} \"${arg}\"")
 		#message ( "WSsplitted: ${${WSsplitted}} ")
 	endforeach(arg ${${source}})
 endmacro(WkWhitespaceSplit source WSsplitted)
