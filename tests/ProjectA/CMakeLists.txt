@@ -46,6 +46,7 @@ WkDependsLink( ProjectB REQUIRED)
 # even if not included before. Maybe the link in this case is not even needed
 # But doesnt hurt to be written if we use the dependency
 #WkDependsLink( ProjectC REQUIRED)
+WkLink()
 
 # Generate Documentation Target
 WkDoc( )

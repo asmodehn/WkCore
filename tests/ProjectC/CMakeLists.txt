@@ -37,6 +37,8 @@ WkProject( ProjectC C )
 
 #build rules for the project
 WkBuild( LIBRARY SHARED )
+WkLink()
+
 WkDoc( )
 
 #Testing

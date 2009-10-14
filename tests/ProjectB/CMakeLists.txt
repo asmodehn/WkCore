@@ -47,6 +47,8 @@ WkProject( ProjectB C )
 WkDependsInclude( ProjectC )
 WkBuild( LIBRARY SHARED )
 WkDependsLink( ProjectC )
+WkLink()
+
 WkDoc( )
 
 #Testing
