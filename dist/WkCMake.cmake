@@ -28,7 +28,7 @@
 #
 
 #debug
-message ( "== Loading WkCMake.cmake ... ")
+message ( STATUS "== Loading WkCMake.cmake ... ")
 
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )

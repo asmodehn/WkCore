@@ -34,7 +34,7 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
-#test to make sure necessary variles have been set.
+#test to make sure necessary variables have been set.
 
 if ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR OR NOT WKCMAKE_BIN_DIR OR NOT WKCMAKE_LIB_DIR ) 
 	message( FATAL_ERROR "You need to include WkCMake.cmake in your CMakeLists.txt, and call WkCMakeDir(<path_to WkCMake scripts> )" )
@@ -173,7 +173,7 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	message ( STATUS "== Sources Files autodetection..." )	
 
-	#VS workaround to display headers
+	#VS workaround to display headers even if strictly not needd when building
 	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp)
 	FILE(GLOB_RECURSE SOURCES RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
 	message ( STATUS "== Headers detected in ${WKCMAKE_INCLUDE_DIR} : ${HEADERS}" )
@@ -197,12 +197,14 @@ CMAKE_POLICY(VERSION 2.6)
 		ADD_CUSTOM_TARGET(format ALL sh -c ${cmdline} WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" VERBATIM )
 	ENDIF ( ASTYLE_FOUND )
 
+	#generating configured Header for detected packages
+	configure_file(${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/WkPlatform.h )
+
 	#Including configured headers (
-	#	-binary_dir for the configured header,  (useful ? )
-	#	-CmakeDir for Wk headers
-	#	-include for the unmodified ones, 
-	#	-and in source/src for internal ones)
-	include_directories( "${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}" "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}")
+	#	-binary_dir/include for the configured header, 
+	#	-source_dir/include for the unmodified ones, 
+	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}")
+
 	#internal headers ( non visible by outside project )
 	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_SRC_DIR}")
 

@@ -28,7 +28,7 @@
 #
 
 #debug
-message( "== Loading WkUtils.cmake ... " )
+message( STATUS "== Loading WkUtils.cmake ... " )
 
 MACRO(MERGE ALIST BLIST OUTPUT)
    SET(BTEMP "${BLIST}")

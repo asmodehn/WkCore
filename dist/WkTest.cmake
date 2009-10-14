@@ -35,7 +35,7 @@
 #
 
 #debug
-message ( "== Loading WkTest.cmake ..." )
+message ( STATUS "== Loading WkTest.cmake ..." )
 
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6.3 !" )
@@ -60,7 +60,7 @@ MACRO(WkTestBuild test_name)
 		
 		IF ( ${ARGC} EQUAL 1 )
 			FILE(GLOB testsource RELATIVE ${PROJECT_SOURCE_DIR} ${WKCMAKE_TEST_DIR}/${test_name}.c ${WKCMAKE_TEST_DIR}/${test_name}.cc ${WKCMAKE_TEST_DIR}/${test_name}.cpp )
-			MESSAGE ( "== Detected ${test_name} Source : ${testsource}" )
+			MESSAGE ( STATUS "== Detected ${test_name} Source : ${testsource}" )
 		ELSE ( ${ARGC} EQUAL 1 )
 			set( testsource "" )
 			#To make sure the sources file exists
@@ -72,7 +72,7 @@ MACRO(WkTestBuild test_name)
 					SET (testsource ${testsource} ${testsrc})
 				ENDIF (NOT EXISTS ${testsrc})
 			endforeach( testsrc ${ARGN} )
-			MESSAGE ( "== Detected ${test_name} Source : ${testsource}" )
+			MESSAGE ( STATUS "== Detected ${test_name} Source : ${testsource}" )
 		ENDIF ( ${ARGC} EQUAL 1 )
 
 		IF (testsource)
@@ -105,7 +105,7 @@ MACRO(WkTestBuild test_name)
 			
 			if ( WIN32 )
 				#needed for each run library dependency as well
-				message ( "== Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
+				message ( STATUS "== Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
 				foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
 					if ( NOT looparg )
 						message ( SEND_ERROR "Error with dependency needed to run test : ${looparg}" )
