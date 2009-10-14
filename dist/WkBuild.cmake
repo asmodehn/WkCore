@@ -210,7 +210,7 @@ CMAKE_POLICY(VERSION 2.6)
 
 	#TODO : find a simpler way than this complex merge...
 	MERGE("${HEADERS}" "${SOURCES}" SOURCES)
-	MESSAGE ( STATUS "== ${PROJECT_NAME} Sources : ${SOURCES}" )
+	#MESSAGE ( STATUS "== ${PROJECT_NAME} Sources : ${SOURCES}" )
 	
 	#
 	# Handling my own build config
@@ -297,11 +297,15 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	if ( ${package_var_name}_FOUND )
 	
+		#hiding the original cmake Module variable, displaying the WkCMake later on
+		mark_as_advanced ( FORCE ${package_var_name}_INCLUDE_DIR )
+
 		# to handle cmake moule who dont have exactly the same standard as WkModules
 		if ( NOT ${package_var_name}_INCLUDE_DIRS )
 			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
 		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
 
+		set ( WK_${package_var_name}_FOUND ON )
 		add_definitions(-D WK_${package_var_name}_FOUND)
 
 		include_directories(${${package_var_name}_INCLUDE_DIRS})
@@ -323,6 +327,9 @@ CMAKE_POLICY(VERSION 2.6)
 
 	if ( ${package_var_name}_FOUND )
 
+		#hiding the original cmake Module variable, displaying the WkCMake later on
+		mark_as_advanced ( FORCE ${package_var_name}_LIBRARY ) 
+
 		# to handle cmake moule who dont have exactly the same standard as WkModules
 		if ( NOT ${package_var_name}_LIBRARIES )
 			set ( ${package_var_name}_LIBRARIES ${${package_var_name}_LIBRARY} CACHE FILEPATH "${package_name} Libraries ")
@@ -333,12 +340,16 @@ CMAKE_POLICY(VERSION 2.6)
 		message ( STATUS "== Binary Dependency ${package_name} libs : ${${package_var_name}_LIBRARIES} OK !")
 		#if the find module also defines the runtime libraries ( Wk find module standard  NOT CMAKE itself !)
 		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} CACHE FILEPATH " ${package_name} libraries needed to run ${PROJECT_NAME} " )
+		mark_as_advanced( FORCE ${PROJECT_NAME}_RUN_LIBRARIES )
 		IF ( WIN32 )
 			message ( STATUS "== Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")
 		ENDIF ( WIN32 )
 		# Once the project is built with it, the dependency becomes mandatory
-		# However we need to propagate hte location of dependencies, to make it easier for later
-		get_filename_component( ${package_name}_FDIR ${${package_name}_DIR} ABSOLUTE )
+		# However we need to propagate the location of Custom Wk-dependencies, to make it easier for later
+		if ( ${package_name}_DIR )
+			get_filename_component( ${package_name}_FDIR ${${package_name}_DIR} ABSOLUTE )
+		endif ( ${package_name}_DIR )
+
 		# we append to the config cmake script
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 
@@ -347,8 +358,21 @@ CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 
 # We need to find the dependency here to get the directory of the library...
+
+		")
+
+		#If it s a custom Wk-dependency we can propagate the build directory
+		if ( ${package_name}_DIR )
+			file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+
 #However we already know where it is going to be
 set ( ${package_name}_DIR ${${package_name}_FDIR} CACHE PATH \"Imported location of ${package_name} from ${PROJECT_NAME}\" )
+
+			")
+		endif ( ${package_name}_DIR )
+
+		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+
 find_package( ${package_name} )
 
 # Include directory might be needed by upper project if ${PROJECT_NAME} doesn totally encapsulate it.
