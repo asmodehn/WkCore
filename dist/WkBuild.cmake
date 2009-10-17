@@ -171,7 +171,7 @@ CMAKE_POLICY(VERSION 2.6)
 	message ( STATUS "== Sources Files autodetection..." )	
 
 	#VS workaround to display headers even if strictly not needd when building
-	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp)
+	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp ${WKCMAKE_SRC_DIR}/*.h ${WKCMAKE_SRC_DIR}/*.hh ${WKCMAKE_SRC_DIR}/*.hpp)
 	FILE(GLOB_RECURSE SOURCES RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
 	message ( STATUS "== Headers detected in ${WKCMAKE_INCLUDE_DIR} : ${HEADERS}" )
 	message ( STATUS "== Sources detected in ${WKCMAKE_SRC_DIR} : ${SOURCES}" )
