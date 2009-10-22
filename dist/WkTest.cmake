@@ -121,11 +121,17 @@ ENDMACRO(WkTestBuild test_name)
 
 #
 # WkTestData( test_name [ datafile1 [ datafile2 [ ... ] ] ] )
+# Copy the data associated to test from the test directory in the source_path,
+# to the binary_path, at the root
 #
 MACRO (WkTestData test_name )
 
 	foreach ( test_data ${ARGN} )
-		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data}" )
+		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${test_data}" )
+#
+# Not this since in the IDE the tests is run from the project root...
+#
+#		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data}" )
 	endforeach ( test_data ${ARGN} )
 	
 ENDMACRO (WkTestData data_path)
