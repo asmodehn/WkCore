@@ -254,6 +254,10 @@ CMAKE_POLICY(VERSION 2.6)
 		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" )
 	endif(${project_type} STREQUAL "LIBRARY") 
 	
+	#
+	# Copying data directory after build ( fo use by project later )
+	#
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" )
 
 	#
 	# Generating configuration cmake file
@@ -313,4 +317,32 @@ CMAKE_POLICY(VERSION 2.6)
 
 CMAKE_POLICY(POP)
 endmacro (WkDependsInclude package_name)
+
+#
+# WkExtData( [ datafile1 [ datafile2 [ ... ] ] ] )
+# Copy the external data ( not in WKCMAKE_DATA_DIR ) associated to the project from the path,
+# to the binary_path, in the WKCMAKE_DATA_DIR directory
+#
+MACRO (WkExtData)
+
+	foreach ( data ${ARGN} )
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${data} ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}/${data} COMMENT "Copying ${data} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}/${data}" )
+	endforeach ( data ${ARGN} )
+	
+ENDMACRO (WkExtData data_path)
+
+#
+# WkExtDataDir( [ datadir1 [ datadir2 [ ... ] ] ] )
+# Copy the external data directory ( not in WKCMAKE_DATA_DIR ) associated to the project from the path,
+# to the binary_path, in the WKCMAKE_DATA_DIR directory
+#
+MACRO (WkExtDataDir)
+
+	foreach ( datadir ${ARGN} )
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${datadir} ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}/${datadir} COMMENT "Copying ${datadir} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}/${datadir}" )
+	endforeach ( datadir ${ARGN} )
+	
+ENDMACRO (WkExtDataDir data_path)
+
+
 
