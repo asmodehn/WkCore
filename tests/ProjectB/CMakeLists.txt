@@ -37,6 +37,7 @@ WkSrcDir ( "Custom Src" )
 WkIncludeDir ( "Custom Include" )
 WkBinDir ( "Custom Bin" )
 WkLibDir ( "Custom Lib" )
+WkDataDir ( "Custom Data")
 WkTestDir ( "Custom Test" )
 WkDocDir ( "Custom Doc" )
 
