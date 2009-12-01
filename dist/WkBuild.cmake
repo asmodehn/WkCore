@@ -213,6 +213,9 @@ CMAKE_POLICY(VERSION 2.6)
 	# Handling my own build config
 	#
 	
+	# to show we are using WkCMake to build ( can be #ifdef in header )
+	add_definitions( -D WK_BUILD )
+
 	if(${project_type} STREQUAL "LIBRARY")
 		add_library(${PROJECT_NAME} ${${PROJECT_NAME}_load_type} ${SOURCES})
 		set( ${PROJECT_NAME}_LIBRARIES ${PROJECT_NAME} CACHE INTERNAL " libraries needed for ${target_name} " )
