@@ -1,521 +1,88 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
-<title>WkCMake.cmake script</title>
-<style type="text/css">
+=========================================
+ReStructuredText (rst): plain text markup
+=========================================
 
-/*
-:Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 6194 2009-11-11 12:05:10Z milde $
-:Copyright: This stylesheet has been placed in the public domain.
+.. sectnum::
 
-Default cascading style sheet for the HTML output of Docutils.
+.. contents:: The tiny table of contents
 
-See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
-customize this style sheet.
-*/
+What is reStructuredText?
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-/* used to remove borders from tables and images */
-.borderless, table.borderless td, table.borderless th {
-  border: 0 }
+An easy-to-read, what-you-see-is-what-you-get plaintext markup syntax
+and parser system, abbreviated *rst*. In other words, using a simple
+text editor, documents can be created which
 
-table.borderless td, table.borderless th {
-  /* Override padding for "table.docutils td" with "! important".
-     The right padding separates the table cells. */
-  padding: 0 0.5em 0 0 ! important }
+- are easy to read in text editor and
+- can be *automatically* converted to
+ 
+  - html and 
+  - latex (and therefore pdf)
 
-.first {
-  /* Override more specific margin styles with "! important". */
-  margin-top: 0 ! important }
+What is it good for?
+~~~~~~~~~~~~~~~~~~~~
 
-.last, .with-subtitle {
-  margin-bottom: 0 ! important }
+reStructuredText can be used, for example, to
 
-.hidden {
-  display: none }
+- write technical documentation (so that it can easily be offered as a
+  pdf file or a web page)
 
-a.toc-backref {
-  text-decoration: none ;
-  color: black }
+- create html webpages without knowing html 
 
-blockquote.epigraph {
-  margin: 2em 5em ; }
+- to document source code
 
-dl.docutils dd {
-  margin-bottom: 0.5em }
+Show me some formatting examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-/* Uncomment (and remove this text!) to get bold-faced definition list terms
-dl.docutils dt {
-  font-weight: bold }
-*/
+You can highlight text in *italics* or, to provide even more emphasis
+in **bold**. Often, when describing computer code, we like to use a
+``fixed space font`` to quote code snippets.
 
-div.abstract {
-  margin: 2em 5em }
+We can also include footnotes [1]_. We could include source code files
+(by specifying their name) which is useful when documenting code. We
+can also copy source code verbatim (i.e. include it in the rst
+document) like this::
 
-div.abstract p.topic-title {
-  font-weight: bold ;
-  text-align: center }
+  int main ( int argc, char *argv[] ) {
+      printf("Hello World\n");
+      return 0;
+  }
 
-div.admonition, div.attention, div.caution, div.danger, div.error,
-div.hint, div.important, div.note, div.tip, div.warning {
-  margin: 2em ;
-  border: medium outset ;
-  padding: 1em }
+We have already seen at itemised list in section `What is it good
+for?`_. Enumerated list and descriptive lists are supported as
+well. It provides very good support for including html-links in a
+variety of ways. Any section and subsections defined can be linked to,
+as well.
 
-div.admonition p.admonition-title, div.hint p.admonition-title,
-div.important p.admonition-title, div.note p.admonition-title,
-div.tip p.admonition-title {
-  font-weight: bold ;
-  font-family: sans-serif }
 
-div.attention p.admonition-title, div.caution p.admonition-title,
-div.danger p.admonition-title, div.error p.admonition-title,
-div.warning p.admonition-title {
-  color: red ;
-  font-weight: bold ;
-  font-family: sans-serif }
+Where can I learn more?
+~~~~~~~~~~~~~~~~~~~~~~~
 
-/* Uncomment (and remove this text!) to get reduced vertical space in
-   compound paragraphs.
-div.compound .compound-first, div.compound .compound-middle {
-  margin-bottom: 0.5em }
+reStructuredText is described at
+http://docutils.sourceforge.net/rst.html. We provide some geeky small
+print in this footnote [2]_.
 
-div.compound .compound-last, div.compound .compound-middle {
-  margin-top: 0.5em }
-*/
 
-div.dedication {
-  margin: 2em 5em ;
-  text-align: center ;
-  font-style: italic }
+Show me some more stuff, please
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-div.dedication p.topic-title {
-  font-weight: bold ;
-  font-style: normal }
+We can also include figures:
 
-div.figure {
-  margin-left: 2em ;
-  margin-right: 2em }
+.. figure:: image.png
+   :width: 300pt
 
-div.footer, div.header {
-  clear: both;
-  font-size: smaller }
 
-div.line-block {
-  display: block ;
-  margin-top: 1em ;
-  margin-bottom: 1em }
+   The magnetisation in a small ferromagnetic disk. The diametre is of the order of 120 nanometers and the material is Ni20Fe80. Png is a file format that is both acceptable for html pages as well as for (pdf)latex.
 
-div.line-block div.line-block {
-  margin-top: 0 ;
-  margin-bottom: 0 ;
-  margin-left: 1.5em }
+---------------------------------------------------------------------------
 
-div.sidebar {
-  margin: 0 0 0.5em 1em ;
-  border: medium outset ;
-  padding: 1em ;
-  background-color: #ffffee ;
-  width: 40% ;
-  float: right ;
-  clear: right }
+.. [1] although there isn't much point of using a footnote here.
 
-div.sidebar p.rubric {
-  font-family: sans-serif ;
-  font-size: medium }
+.. [2] Random facts: 
 
-div.system-messages {
-  margin: 5em }
+  - Emacs provides an rst mode 
+  - when converting rst to html, a style sheet can be provided (there is a similar feature for latex)
+  - rst can also be converted into XML
+  - the recommended file extension for rst is ``.txt``
 
-div.system-messages h1 {
-  color: red }
 
-div.system-message {
-  border: medium outset ;
-  padding: 1em }
-
-div.system-message p.system-message-title {
-  color: red ;
-  font-weight: bold }
-
-div.topic {
-  margin: 2em }
-
-h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
-h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
-  margin-top: 0.4em }
-
-h1.title {
-  text-align: center }
-
-h2.subtitle {
-  text-align: center }
-
-hr.docutils {
-  width: 75% }
-
-img.align-left, .figure.align-left{
-  clear: left ;
-  float: left ;
-  margin-right: 1em }
-
-img.align-right, .figure.align-right {
-  clear: right ;
-  float: right ;
-  margin-left: 1em }
-
-img.align-center, .figure.align-center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.align-left {
-  text-align: left }
-
-.align-center {
-  clear: both ;
-  text-align: center }
-
-.align-right {
-  text-align: right }
-
-/* reset inner alignment in figures */
-div.align-right {
-  text-align: left }
-
-/* div.align-center * { */
-/*   text-align: left } */
-
-ol.simple, ul.simple {
-  margin-bottom: 1em }
-
-ol.arabic {
-  list-style: decimal }
-
-ol.loweralpha {
-  list-style: lower-alpha }
-
-ol.upperalpha {
-  list-style: upper-alpha }
-
-ol.lowerroman {
-  list-style: lower-roman }
-
-ol.upperroman {
-  list-style: upper-roman }
-
-p.attribution {
-  text-align: right ;
-  margin-left: 50% }
-
-p.caption {
-  font-style: italic }
-
-p.credits {
-  font-style: italic ;
-  font-size: smaller }
-
-p.label {
-  white-space: nowrap }
-
-p.rubric {
-  font-weight: bold ;
-  font-size: larger ;
-  color: maroon ;
-  text-align: center }
-
-p.sidebar-title {
-  font-family: sans-serif ;
-  font-weight: bold ;
-  font-size: larger }
-
-p.sidebar-subtitle {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-p.topic-title {
-  font-weight: bold }
-
-pre.address {
-  margin-bottom: 0 ;
-  margin-top: 0 ;
-  font: inherit }
-
-pre.literal-block, pre.doctest-block {
-  margin-left: 2em ;
-  margin-right: 2em }
-
-span.classifier {
-  font-family: sans-serif ;
-  font-style: oblique }
-
-span.classifier-delimiter {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-span.interpreted {
-  font-family: sans-serif }
-
-span.option {
-  white-space: nowrap }
-
-span.pre {
-  white-space: pre }
-
-span.problematic {
-  color: red }
-
-span.section-subtitle {
-  /* font-size relative to parent (h1..h6 element) */
-  font-size: 80% }
-
-table.citation {
-  border-left: solid 1px gray;
-  margin-left: 1px }
-
-table.docinfo {
-  margin: 2em 4em }
-
-table.docutils {
-  margin-top: 0.5em ;
-  margin-bottom: 0.5em }
-
-table.footnote {
-  border-left: solid 1px black;
-  margin-left: 1px }
-
-table.docutils td, table.docutils th,
-table.docinfo td, table.docinfo th {
-  padding-left: 0.5em ;
-  padding-right: 0.5em ;
-  vertical-align: top }
-
-table.docutils th.field-name, table.docinfo th.docinfo-name {
-  font-weight: bold ;
-  text-align: left ;
-  white-space: nowrap ;
-  padding-left: 0 }
-
-h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
-h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
-  font-size: 100% }
-
-ul.auto-toc {
-  list-style-type: none }
-
-</style>
-</head>
-<body>
-<div class="document" id="wkcmake-cmake-script">
-<h1 class="title">WkCMake.cmake script</h1>
-<h2 class="subtitle" id="manage-mandatory-directories">Manage mandatory directories</h2>
-
-<ul>
-<li><p class="first">Define the WkCMake directory</p>
-<blockquote>
-<p>#
-# Copyright (c) 2009, Asmodehn's Corp.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-#     * Redistributions of source code must retain the above copyright notice,
-#           this list of conditions and the following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright
-#               notice, this list of conditions and the following disclaimer in the
-#           documentation and/or other materials provided with the distribution.
-#     * Neither the name of the Asmodehn's Corp. nor the names of its
-#           contributors may be used to endorse or promote products derived
-#           from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-# THE POSSIBILITY OF SUCH DAMAGE.
-#</p>
-<p>#debug
-message ( STATUS &quot;== Loading WkCMake.cmake ... &quot;)</p>
-<dl class="docutils">
-<dt>if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )</dt>
-<dd><p class="first last">message ( FATAL_ERROR &quot; CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !&quot; )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 35)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )</p>
-<p>#Putting a useful default for backwards compatibility
-set ( WKCMAKE_DIR &quot;CMake&quot; CACHE PATH &quot;WkCMake Scripts path&quot; )
-mark_as_advanced ( WKCMAKE_DIR )</p>
-<dl class="docutils">
-<dt>macro(WkCMakeDir dir)</dt>
-<dd><p class="first last">set ( WKCMAKE_DIR ${dir} CACHE PATH &quot;WkCMake Scripts path&quot; FORCE )</p>
-</dd>
-<dt>#setting defaults for directories</dt>
-<dd><p class="first last">set ( WKCMAKE_INCLUDE_DIR &quot;include&quot; CACHE PATH &quot;Headers directory for autodetection by WkCMake&quot; FORCE )
-set ( WKCMAKE_SRC_DIR &quot;src&quot; CACHE PATH &quot;Sources directory for autodetection by WkCMake&quot; FORCE )
-set ( WKCMAKE_BIN_DIR &quot;bin&quot; CACHE PATH &quot;Binary directory for WkCMake build products&quot; FORCE )
-set ( WKCMAKE_LIB_DIR &quot;lib&quot; CACHE PATH &quot;Library directory for WkCMake build products&quot; FORCE )
-set ( WKCMAKE_STATIC_DIR &quot;lib/static&quot; CACHE PATH &quot;Static Library directory for WkCMake build products&quot; FORCE )
-set ( WKCMAKE_DATA_DIR &quot;data&quot; CACHE PATH &quot;Data directory for WkCMake build products&quot; FORCE )
-mark_as_advanced ( WKCMAKE_DIR WKCMAKE_INCLUDE_DIR WKCMAKE_SRC_DIR WKCMAKE_BIN_DIR WKCMAKE_LIB_DIR WKCMAKE_STATIC_DIR WKCMAKE_DATA_DIR)</p>
-</dd>
-<dt>#including other useful files</dt>
-<dd><p class="first">include ( &quot;${WKCMAKE_DIR}/WkBuild.cmake&quot; RESULT_VARIABLE WKCMAKEBUILD_FOUND )
-IF ( NOT WKCMAKEBUILD_FOUND )</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 54)</p>
-<p>Unexpected indentation.</p>
-</div>
-<blockquote>
-<p>message ( FATAL_ERROR &quot;${WKCMAKE_DIR}/WkBuild.cmake Not Found !!!&quot; )</p>
-</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 55)</p>
-<p>Block quote ends without a blank line; unexpected unindent.</p>
-</div>
-<p>ENDIF ( NOT WKCMAKEBUILD_FOUND )
-include ( &quot;${WKCMAKE_DIR}/WkLink.cmake&quot; RESULT_VARIABLE WKCMAKELINK_FOUND )
-IF ( NOT WKCMAKELINK_FOUND )</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 58)</p>
-<p>Unexpected indentation.</p>
-</div>
-<blockquote>
-<p>message ( FATAL_ERROR &quot;${WKCMAKE_DIR}/WkLink.cmake Not Found !!!&quot; )</p>
-</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 59)</p>
-<p>Block quote ends without a blank line; unexpected unindent.</p>
-</div>
-<p>ENDIF ( NOT WKCMAKELINK_FOUND )
-include ( &quot;${WKCMAKE_DIR}/WkTest.cmake&quot; RESULT_VARIABLE WKCMAKETEST_FOUND )
-IF ( NOT WKCMAKETEST_FOUND )</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 62)</p>
-<p>Unexpected indentation.</p>
-</div>
-<blockquote>
-<p>message ( FATAL_ERROR &quot;${WKCMAKE_DIR}/WkTest.cmake Not Found !!!&quot; )</p>
-</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 63)</p>
-<p>Block quote ends without a blank line; unexpected unindent.</p>
-</div>
-<p>ENDIF ( NOT WKCMAKETEST_FOUND )
-include ( &quot;${WKCMAKE_DIR}/WkDoc.cmake&quot; RESULT_VARIABLE WKCMAKEDOC_FOUND )
-IF ( NOT WKCMAKEDOC_FOUND )</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 66)</p>
-<p>Unexpected indentation.</p>
-</div>
-<blockquote>
-<p>message ( FATAL_ERROR &quot;${WKCMAKE_DIR}/WkDoc.cmake Not Found !!!&quot; )</p>
-</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 67)</p>
-<p>Block quote ends without a blank line; unexpected unindent.</p>
-</div>
-<p class="last">ENDIF ( NOT WKCMAKEDOC_FOUND )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 68)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endmacro(WkCMakeDir dir)</p>
-<dl class="docutils">
-<dt>macro(WkIncludeDir dir)</dt>
-<dd><p class="first last">set ( WKCMAKE_INCLUDE_DIR ${dir} CACHE PATH &quot;Headers directory for autodetection by WkCMake&quot; FORCE )
-mark_as_advanced ( WKCMAKE_INCLUDE_DIR )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 73)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endmacro(WkIncludeDir dir)</p>
-<dl class="docutils">
-<dt>macro(WkSrcDir dir)</dt>
-<dd><p class="first last">set ( WKCMAKE_SRC_DIR ${dir} CACHE PATH &quot;Sources directory for autodetection by WkCMake&quot; FORCE )
-mark_as_advanced ( WKCMAKE_SRC_DIR )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 78)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endmacro(WkSrcDir dir)</p>
-<dl class="docutils">
-<dt>macro(WkBinDir dir)</dt>
-<dd><p class="first last">set ( WKCMAKE_BIN_DIR ${dir} CACHE PATH &quot;Binary directory for WkCMake build products&quot; FORCE )
-mark_as_advanced ( WKCMAKE_BIN_DIR )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 83)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endmacro(WkBinDir dir)</p>
-<dl class="docutils">
-<dt>macro(WkLibDir dir)</dt>
-<dd><p class="first last">set ( WKCMAKE_LIB_DIR ${dir} CACHE PATH &quot;Library directory for WkCMake build products&quot; FORCE )
-mark_as_advanced ( WKCMAKE_LIB_DIR )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 88)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endmacro(WkLibDir dir)</p>
-<dl class="docutils">
-<dt>macro(WkStaticDir dir)</dt>
-<dd><p class="first last">set ( WKCMAKE_STATIC_DIR ${dir} CACHE PATH &quot;Static Library directory for WkCMake build products&quot; FORCE )
-mark_as_advanced ( WKCMAKE_STATIC_DIR )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 93)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endmacro(WkStaticDir dir)</p>
-<dl class="docutils">
-<dt>macro(WkDataDir dir)</dt>
-<dd><p class="first last">set ( WKCMAKE_DATA_DIR ${dir} CACHE PATH &quot;Data directory for WkCMake build products&quot; FORCE )
-mark_as_advanced ( WKCMAKE_DATA_DIR )</p>
-</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">../dist/WkCMake.cmake</tt>, line 98)</p>
-<p>Definition list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>endmacro(WkDataDir dir)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">start:</th><td class="field-body"></td>
-</tr>
-<tr class="field"><th class="field-name">end:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</blockquote>
-</li>
-</ul>
-</div>
-</body>
-</html>
