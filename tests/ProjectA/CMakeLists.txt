@@ -40,7 +40,7 @@ WkDependsInclude( ProjectB REQUIRED)
 # To test dependency propagation by B. Include shouldnt be propagated...
 # However if Include specified here, link should happen painlessly, as usual.
 #WkDependsInclude( ProjectC REQUIRED)
-WkBuild( LIBRARY SHARED)
+WkCompile( LIBRARY SHARED)
 WkDependsLink( ProjectB REQUIRED)
 # To test dependency propagation by B. link should be propagated...
 # even if not included before. Maybe the link in this case is not even needed

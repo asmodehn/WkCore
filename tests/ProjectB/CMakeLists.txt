@@ -46,7 +46,7 @@ WkProject( ProjectB C )
 
 #Build rules
 WkDependsInclude( ProjectC )
-WkBuild( LIBRARY SHARED )
+WkCompile( LIBRARY SHARED )
 WkDependsLink( ProjectC )
 WkLink()
 
