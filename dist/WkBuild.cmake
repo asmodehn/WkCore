@@ -123,11 +123,6 @@ endmacro ( WkGenConfig )
 # You also need MergeLists.txt 
 #
 
-#for backward compatibility
-macro (WkBuild project_type )
-	WkCompile ${project_type}
-endmacro (WkBuild)
-
 #WkCompile( target_name EXECUTABLE | LIBRARY [ STATIC|SHARED|MODULE ]  )
 
 macro (WkCompile project_type)
@@ -275,6 +270,11 @@ CMAKE_POLICY(VERSION 2.6)
 		
 CMAKE_POLICY(POP)
 endmacro (WkCompile)
+
+#for backward compatibility
+macro (WkBuild project_type )
+	WkCompile( ${project_type} )
+endmacro (WkBuild)
 
 
 #
