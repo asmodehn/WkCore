@@ -40,8 +40,10 @@ WkCompile( LIBRARY SHARED )
 WkLink()
 
 WkDoc( )
+WkSvn( )
 
 #Testing
 WkTestBuild( maintestC )
 WkTestRun( maintestC )
+
 
