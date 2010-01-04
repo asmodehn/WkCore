@@ -40,18 +40,19 @@ endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 #
 
 
-macro (WkSvn project_name)
+macro (WkSvn)
 
 find_package(Subversion)
 if(Subversion_FOUND)
-	message("Retrieving SVN repository information...")
-	Subversion_WC_INFO(${PROJECT_SOURCE_DIR} ${project_name})
+	message(STATUS "== Retrieving SVN repository information...")
+	Subversion_WC_INFO(${PROJECT_SOURCE_DIR} ${PROJECT_NAME})
 	#This requires connection to the server which might be annoying...
-	#Subversion_WC_LOG(${PROJECT_SOURCE_DIR} ${project_name})
-	#message("Last changed log is ${${project_name}_LAST_CHANGED_LOG}")
-	SET (${project_name}_REVISION ${${project_name}_WC_REVISION} CACHE STRING "The detected revision of the source repository" FORCE)
+	#Subversion_WC_LOG(${PROJECT_SOURCE_DIR} ${PROJECT_NAME})
+	#message("Last changed log is ${${PROJECT_NAME}_LAST_CHANGED_LOG}")
+	# TODO : generate changelog...
+	SET (${PROJECT_NAME}_SVN_REVISION ${${PROJECT_NAME}_WC_REVISION} CACHE STRING "The detected revision of the source repository" FORCE)
 else(Subversion_FOUND)
-	SET (${project_name}_REVISION "SVN-NOTFOUND" CACHE STRING "The detected revision of the source repository" FORCE)
+	SET (${PROJECT_NAME}_SVN_REVISION "SVN-NOTFOUND" CACHE STRING "The detected revision of the source repository" FORCE)
 endif(Subversion_FOUND)
 
 endmacro (WkSvn)
