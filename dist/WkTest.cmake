@@ -76,6 +76,16 @@ MACRO(WkTestBuild test_name)
 		ENDIF ( ${ARGC} EQUAL 1 )
 
 		IF (testsource)
+
+			#Format test source code if formatting project
+			IF ( ${PROJECT_NAME}_CODE_FORMAT )
+				WkWhitespaceSplit( testsource testsource_spc )
+				#message ( "Sources :  ${testsource_spc}" )
+				set ( cmdline " ${ASTYLE_EXECUTABLE} --style=${${PROJECT_NAME}_CODE_FORMAT_STYLE} ${testsource_spc}" )
+				#message ( "CMD : ${cmdline} " )
+				ADD_CUSTOM_TARGET(${PROJECT_NAME}_${test_name}_format ALL sh -c ${cmdline} WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" VERBATIM )
+			ENDIF ( ${PROJECT_NAME}_CODE_FORMAT )
+
 			#Create output directories
 			IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
 				FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
