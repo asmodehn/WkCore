@@ -43,6 +43,9 @@ endif ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR )
 # using useful Macros
 include ( "${WKCMAKE_DIR}/WkUtils.cmake" )
 
+# To detect the Platform
+include ( "${WKCMAKE_DIR}/WkPlatform.cmake")
+
 #To setup the compiler
 include ( "${WKCMAKE_DIR}/WkCompilerSetup.cmake" )
 
@@ -195,7 +198,7 @@ CMAKE_POLICY(VERSION 2.6)
 	ENDIF ( ASTYLE_FOUND )
 
 	#generating configured Header for detected packages
-	configure_file(${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/WkPlatform.h )
+	PlatformCheck()
 
 	#Including configured headers (
 	#	-binary_dir/include for the configured header, 
