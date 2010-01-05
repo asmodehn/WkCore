@@ -36,8 +36,7 @@ WkCMakeDir ( CMake )
 WkProject( ProjectC C )
 
 #build rules for the project
-WkCompile( LIBRARY SHARED )
-WkLink()
+WkBuild( LIBRARY SHARED )
 
 WkDoc( )
 WkSvn( )
