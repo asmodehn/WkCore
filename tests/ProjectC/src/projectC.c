@@ -34,7 +34,6 @@
 
 int C_display()
 {
-    printf("This is ProjectC !\n");
     WkDebug();
     return 0;
 }

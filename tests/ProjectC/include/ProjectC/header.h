@@ -31,6 +31,7 @@
  *
  */
 
+/* This should always be the first of your include statements */
 #include "WkPlatform.h"
 
 /* Set up for C function definitions, even when using C++ */
