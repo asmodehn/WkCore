@@ -45,12 +45,11 @@ WkDocDir ( "Custom Doc" )
 WkProject( ProjectB C )
 
 #Build rules
-WkDependsInclude( ProjectC )
-WkCompile( LIBRARY SHARED )
-WkDependsLink( ProjectC )
-WkLink()
+WkDepends( ProjectC )
+WkBuild( LIBRARY SHARED )
 
 WkDoc( )
+WkSvn()
 
 #Testing
 WkTestBuild( maintestB )

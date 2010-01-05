@@ -30,14 +30,13 @@
 
 #include "ProjectB/header.h"
 
-/*We are depending on projectC*/
-#include "ProjectC/header.h"
-
 #include <stdio.h>
 
-int B_display(const char* txt)
+int B_display()
 {
-    printf(" %s ",txt);
-    C_display("C");
+    WkDebug();
+
+    printf("\nProject Dependency : \n");
+    C_display();
     return 0;
 }
