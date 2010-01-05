@@ -32,8 +32,9 @@
 
 #include <stdio.h>
 
-int C_display(const char* txt)
+int C_display()
 {
-    printf(" %s ",txt);
+    printf("This is ProjectC !\n");
+    WkDebug();
     return 0;
 }
