@@ -1,5 +1,5 @@
 # 
-# Copyright (c) 2009, Asmodehn's Corp.
+# Copyright (c) 2009-2010, Asmodehn's Corp.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without 
@@ -28,25 +28,74 @@
 #
 
 #debug
-message ( STATUS "== Loading WkLink.cmake ..." )
+message ( STATUS "== Loading WkDepends.cmake ..." )
 
 if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
-#test to make sure necessary variables have been set.
-
-if ( NOT WKCMAKE_DIR OR NOT WKCMAKE_BIN_DIR OR NOT WKCMAKE_LIB_DIR ) 
-	message( FATAL_ERROR "You need to include WkCMake.cmake in your CMakeLists.txt, and call WkCMakeDir(<path_to WkCMake scripts> )" )
-endif ( NOT WKCMAKE_DIR OR NOT WKCMAKE_BIN_DIR OR NOT WKCMAKE_LIB_DIR ) 
+# using useful Macros
+include ( "${WKCMAKE_DIR}/WkUtils.cmake" )
 
 #
-# Declaring Dependencies at link stage
-# The dependencies used here must be all dependencies needed
-# both by this project and its dependencies as well
+# Find a dependency built in an external WK hierarchy
+# Defines ${PROJECT_NAME_DEPENDS} containing all found dependencies
+#
+# WkDepends( dependency_name [QUIET / REQUIRED] )
+
+macro (WkDepends package_name)
+CMAKE_POLICY(PUSH)
+CMAKE_POLICY(VERSION 2.6)
+	
+	#
+	# First check if the package is installed already , quietly
+	#
+	
+	# if possible by using WkFind modules
+	# maybe belongs somewhere else
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
+	
+	SetPackageVarName( package_var_name ${package_name} )
+	#message ( "${package_name} -> ${package_var_name}" )
+
+	#Here to avoid redefinition of library target if already found by a dependency using my dependency as well...
+	if ( NOT ${package_var_name}_FOUND )
+		find_package( ${package_name} ${ARGN} )
+	endif ( NOT ${package_var_name}_FOUND )
+	
+	if ( ${package_var_name}_FOUND )
+	
+		#hiding the original cmake Module variable, displaying the WkCMake later on
+		mark_as_advanced ( FORCE ${package_var_name}_INCLUDE_DIR )
+
+		# to handle cmake modules who dont have exactly the same standard as WkModules
+		if ( NOT ${package_var_name}_INCLUDE_DIRS )
+			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
+		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
+
+#		#dependencies headers ( need to be included after project's own headers )
+#		include_directories(${${package_var_name}_INCLUDE_DIRS})
+#		message ( STATUS "== Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
+
+		set ( WK_${package_var_name}_FOUND ON )
+		#this is not necessary if WkPlatform does the job as it should
+		#add_definitions(-D WK_${package_var_name}_FOUND)
+
+		message ( STATUS "== Binary Dependency ${package_name} : FOUND ! " )
+
+		set ( ${PROJECT_NAME}_DEPENDS "${PROJECT_NAME_DEPENDS}" "${package_var_name}" ) 
+	else ( ${package_var_name}_FOUND )	
+		message ( STATUS "== Binary Dependency ${package_name} : NOT FOUND ! " )
+	endif ( ${package_var_name}_FOUND )
+
+CMAKE_POLICY(POP)
+endmacro (WkDepends package_name)
+
+#
+# Joining Dependencies for build
 # They will all be forwarded to client projects
 #
-macro(WkDependsLink package_name)
+macro(WkLinkDepends package_name)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 	
@@ -55,9 +104,18 @@ CMAKE_POLICY(VERSION 2.6)
 
 	if ( ${package_var_name}_FOUND )
 
+		# to handle cmake modules who dont have exactly the same standard as WkModules
+		if ( NOT ${package_var_name}_INCLUDE_DIRS )
+			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
+		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
+
+		#dependencies headers ( need to be included after project's own headers )
+		include_directories(${${package_var_name}_INCLUDE_DIRS})
+		message ( STATUS "== Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
+
 		#hiding the original cmake Module variable, displaying the WkCMake later on
 		mark_as_advanced ( FORCE ${package_var_name}_LIBRARY ) 
-
+		
 		# to handle cmake moule who dont have exactly the same standard as WkModules
 		if ( NOT ${package_var_name}_LIBRARIES )
 			set ( ${package_var_name}_LIBRARIES ${${package_var_name}_LIBRARY} CACHE FILEPATH "${package_name} Libraries ")
@@ -117,31 +175,9 @@ endif ( WIN32 )
 	endif ( ${package_var_name}_FOUND )
 	
 CMAKE_POLICY(POP)
-endmacro(WkDependsLink package_name)
+endmacro(WkLinkDepends package_name)
 
 
-#
-# WkLink () express the link procedure of the project, finalizing the build step
-# gathering all dependencies settings in one simple place
-# and creating the necessary lines in the config file for detection by other projects.
-#
-macro(WkLink )
-	CMAKE_POLICY(PUSH)
-	CMAKE_POLICY(VERSION 2.6)
 
-	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 
-#Displaying detected dependencies in interface, and storing in cache
-set(${PROJECT_NAME}_INCLUDE_DIRS \"\${${PROJECT_NAME}_INCLUDE_DIRS}\" CACHE PATH \"${PROJECT_NAME} Headers\" )
-set(${PROJECT_NAME}_LIBRARIES \"\${${PROJECT_NAME}_LIBRARIES}\" CACHE FILEPATH \"${PROJECT_NAME} Libraries\")
-if ( WIN32 )
-	set(${PROJECT_NAME}_RUN_LIBRARIES CACHE FILEPATH \"${PROJECT_NAME} DLLs\" )
-endif ( WIN32 )	
-
-CMAKE_POLICY(POP)
-	
-	")
-
-	CMAKE_POLICY(POP)
-endmacro(WkLink )
 

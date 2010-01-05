@@ -139,5 +139,6 @@ endif ( CMAKE_COMPILER_IS_GNUCXX )
 
 macro(PlatformCheck)
 # configure the file and copy it into the program headers.
+	message ( STATUS "== Configuring WkPlatform : ${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config -> ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/WkPlatform.h" )
 	configure_file(${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/WkPlatform.h )
 endmacro(PlatformCheck)
