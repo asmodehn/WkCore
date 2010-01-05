@@ -36,20 +36,15 @@ WkCMakeDir ( CMake )
 WkProject( ProjectA C CXX )
 
 #Build Rules
-WkDependsInclude( ProjectB REQUIRED)
+WkDepends( ProjectB REQUIRED)
 # To test dependency propagation by B. Include shouldnt be propagated...
 # However if Include specified here, link should happen painlessly, as usual.
-#WkDependsInclude( ProjectC REQUIRED)
-WkCompile( LIBRARY SHARED)
-WkDependsLink( ProjectB REQUIRED)
-# To test dependency propagation by B. link should be propagated...
-# even if not included before. Maybe the link in this case is not even needed
-# But doesnt hurt to be written if we use the dependency
-#WkDependsLink( ProjectC REQUIRED)
-WkLink()
+#WkDepends( ProjectC REQUIRED)
+WkBuild( LIBRARY SHARED)
 
 # Generate Documentation Target
 WkDoc( )
+WkSvn()
 
 #Testing
 WkTestBuild( maintest )

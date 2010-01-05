@@ -37,7 +37,9 @@
 
 int A_display(std::string txt)
 {
-    std::cout << txt;
-    return B_display("B");
+    WkDebug();
+
+    printf("\nProject Dependency : \n");
+    B_display();
     return 0;
 }
