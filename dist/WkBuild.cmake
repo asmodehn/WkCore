@@ -89,18 +89,13 @@ get_filename_component(SELF_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
 #all required target should be defined there... no need to specify all targets in ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
 include(\${SELF_DIR}/${PROJECT_NAME}Export.cmake)
 get_filename_component(${PROJECT_NAME}_INCLUDE_DIR \"\${SELF_DIR}/${WKCMAKE_INCLUDE_DIR}/\" ABSOLUTE)
-if ( NOT ${PROJECT_NAME}_INCLUDE_DIRS )
-	set(${PROJECT_NAME}_INCLUDE_DIRS \"\${${PROJECT_NAME}_INCLUDE_DIR}\")
-endif ( NOT ${PROJECT_NAME}_INCLUDE_DIRS )
+set(${PROJECT_NAME}_INCLUDE_DIRS \"\${${PROJECT_NAME}_INCLUDE_DIR}\")
 	")
 	
 	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 #however we still want to have ${PROJECT_NAME}_LIBRARIES available
 set(${PROJECT_NAME}_LIBRARY ${PROJECT_NAME} )
-if ( NOT ${PROJECT_NAME}_LIBRARIES )
-	set(${PROJECT_NAME}_LIBRARIES \"\${${PROJECT_NAME}_LIBRARY}\")
-endif ( NOT ${PROJECT_NAME}_LIBRARIES )
-
+set(${PROJECT_NAME}_LIBRARIES \"\${${PROJECT_NAME}_LIBRARY}\")
 	" )
 	
 	get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
