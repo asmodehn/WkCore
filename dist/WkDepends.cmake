@@ -168,8 +168,10 @@ set ( ${package_name}_DIR ${${package_name}_FDIR} CACHE PATH \"Imported location
 
 find_package( ${package_name} )
 #hiding depends variables from interface
-mark_as_advanced( ${package_var_name}_INCLUDE_DIR )
-mark_as_advanced( ${package_var_name}_LIBRARY )
+mark_as_advanced( ${package_var_name}_DIR )
+mark_as_advanced( ${package_var_name}_INCLUDE_DIRS )
+mark_as_advanced( ${package_var_name}_LIBRARIES )
+mark_as_advanced( ${package_var_name}_RUN_LIBRARIES )
 
 # Include directory might be needed by upper project if ${PROJECT_NAME} doesn totally encapsulate it.
 # NB : It shouldnt hurt if the upper project also define it as its own dependency
