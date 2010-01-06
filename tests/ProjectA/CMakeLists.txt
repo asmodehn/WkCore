@@ -37,9 +37,8 @@ WkProject( ProjectA C CXX )
 
 #Build Rules
 WkDepends( ProjectB REQUIRED)
-# To test dependency propagation by B. Include shouldnt be propagated...
-# However if Include specified here, link should happen painlessly, as usual.
-#WkDepends( ProjectC REQUIRED)
+# ProjectC is a dependency of ProjectB only, we shouldnt need to specify it here.
+# ProjectC should be propagated by ProjectB
 WkBuild( LIBRARY SHARED)
 
 # Generate Documentation Target
