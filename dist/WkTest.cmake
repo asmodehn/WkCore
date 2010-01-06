@@ -107,23 +107,30 @@ MACRO(WkTestBuild test_name)
 			GET_TARGET_PROPERTY(${test_name}_LOCATION ${test_name} LOCATION)
 			get_filename_component(${test_name}_PATH ${${test_name}_LOCATION} PATH)
 
+			#Moving project if library or module
+			
 			if ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
 				GET_TARGET_PROPERTY(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
 				ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${${PROJECT_NAME}_LOCATION} ${${test_name}_PATH}
 														COMMENT "Copying ${${PROJECT_NAME}_LOCATION} to ${${test_name}_PATH}" )
 			endif ( ${${PROJECT_NAME}_TYPE} STREQUAL "SHARED_LIBRARY" OR ${${PROJECT_NAME}_TYPE} STREQUAL "MODULE_LIBRARY")
 			
+			message ( STATUS "== Detected external dependencies for ${test_name} : ${${PROJECT_NAME}_DEPENDS}" )
+			#if win32, moving all dependencies' run libraries
 			if ( WIN32 )
 				#needed for each run library dependency as well
-				message ( STATUS "== Detected run libraries to copy : ${${PROJECT_NAME}_RUN_LIBRARIES}" )
-				foreach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
-					if ( NOT looparg )
-						message ( SEND_ERROR "Error with dependency needed to run test : ${looparg}" )
-					endif ( NOT looparg )
-					ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${looparg} ${${test_name}_PATH}
-														COMMENT "Copying ${looparg} to ${${test_name}_PATH}" )
-				endforeach ( looparg ${${PROJECT_NAME}_RUN_LIBRARIES} )
+				foreach ( looparg ${${PROJECT_NAME}_DEPENDS} )
+					# we might have multiplke libs in one dependency
+					foreach ( libarg ${${looparg}_RUN_LIBRARIES} ) 
+						if ( NOT libarg )
+							message ( SEND_ERROR "Error with dependency, needed to run test : ${libarg}" )
+						endif ( NOT libarg )
+						ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${libarg} ${${test_name}_PATH}
+															COMMENT "Copying ${libarg} to ${${test_name}_PATH}" )
+					endforeach ( libarg ${looparg} )
+				endforeach ( looparg ${${PROJECT_NAME}_DEPENDS} )
 			endif ( WIN32 )
+			
 		ENDIF (testsource)
 	ENDIF(${PROJECT_NAME}_ENABLE_TESTS)
 

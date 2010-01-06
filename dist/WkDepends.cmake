@@ -68,10 +68,10 @@ CMAKE_POLICY(VERSION 2.6)
 		#hiding the original cmake Module variable, displaying the WkCMake later on
 		mark_as_advanced ( FORCE ${package_var_name}_INCLUDE_DIR )
 
-		# to handle cmake modules who dont have exactly the same standard as WkModules
-		if ( NOT ${package_var_name}_INCLUDE_DIRS )
-			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
-		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
+#		# to handle cmake modules who dont have exactly the same standard as WkModules
+#		if ( NOT ${package_var_name}_INCLUDE_DIRS )
+#			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
+#		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
 
 #		#dependencies headers ( need to be included after project's own headers )
 #		include_directories(${${package_var_name}_INCLUDE_DIRS})
@@ -83,7 +83,13 @@ CMAKE_POLICY(VERSION 2.6)
 
 		message ( STATUS "== Binary Dependency ${package_name} : FOUND ! " )
 
-		set ( ${PROJECT_NAME}_DEPENDS "${PROJECT_NAME_DEPENDS}" "${package_var_name}" ) 
+		#Simple if structure to avoid oddities when setting ${PROJECT_NAME}_DEPENDS for the first time
+		if ( ${PROJECT_NAME}_DEPENDS)
+			set ( ${PROJECT_NAME}_DEPENDS "${PROJECT_NAME_DEPENDS}" "${package_var_name}" ) 
+		else ( ${PROJECT_NAME}_DEPENDS)
+			set ( ${PROJECT_NAME}_DEPENDS "${package_var_name}" ) 
+		endif ( ${PROJECT_NAME}_DEPENDS)
+		
 	else ( ${package_var_name}_FOUND )	
 		message ( STATUS "== Binary Dependency ${package_name} : NOT FOUND ! " )
 	endif ( ${package_var_name}_FOUND )
@@ -124,12 +130,17 @@ CMAKE_POLICY(VERSION 2.6)
 
 		target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
 		message ( STATUS "== Binary Dependency ${package_name} libs : ${${package_var_name}_LIBRARIES} OK !")
-		#if the find module also defines the runtime libraries ( Wk find module standard  NOT CMAKE itself !)
-		set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_RUN_LIBRARIES} ${${package_var_name}_RUN_LIBRARIES} CACHE FILEPATH " ${package_name} libraries needed to run ${PROJECT_NAME} " )
-		mark_as_advanced( FORCE ${PROJECT_NAME}_RUN_LIBRARIES )
+		
 		IF ( WIN32 )
 			message ( STATUS "== Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")
+			#if the find module also defines the runtime libraries ( Wk find module standard  NOT CMAKE itself !)
+			# then we need to add the run libraries of the dependency to the current project myrun libraries
+			#set( ${PROJECT_NAME}_RUN_LIBRARIES "${${PROJECT_NAME}_RUN_LIBRARIES}" "${${package_var_name}_RUN_LIBRARIES}" CACHE FILEPATH "blabla")
+			#message( "Project run lib WkDepends : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
+
+
 		ENDIF ( WIN32 )
+		
 		# Once the project is built with it, the dependency becomes mandatory
 		# However we need to propagate the location of Custom Wk-dependencies, to make it easier for later
 		if ( ${package_name}_DIR )

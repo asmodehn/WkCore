@@ -49,17 +49,18 @@ include ( "${WKCMAKE_DIR}/WkPlatform.cmake")
 #To setup the compiler
 include ( "${WKCMAKE_DIR}/WkCompilerSetup.cmake" )
 
-macro(WKProject project_name_arg)
+macro(WkProject project_name_arg)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 	project(${project_name_arg} ${ARGN})
 	WkCompilerSetup()
 	#preparing and cleaning internal build variables
-	set( ${PROJECT_NAME}_INCLUDE_DIRS CACHE INTERNAL " Includes directories for ${PROJECT_NAME} ")
-	set( ${project_name_arg}_LIBRARIES CACHE INTERNAL " Libraries needed for ${target_name} " )
-	set( ${project_name_arg}_RUN_LIBRARIES CACHE INTERNAL " libraries needed to run ${target_name} " )
+	# We might not need that at all : simpler
+	#set( ${PROJECT_NAME}_INCLUDE_DIRS CACHE PATH " Includes directories for ${PROJECT_NAME} ")
+	#set( ${project_name_arg}_LIBRARIES CACHE FILEPATH " Libraries needed for ${project_name_arg} " )
+	#set( ${project_name_arg}_RUN_LIBRARIES CACHE FILEPATH " libraries needed to run ${project_name_arg} " )
 CMAKE_POLICY(POP)
-endmacro(WKProject PROJECT_NAME)
+endmacro(WkProject PROJECT_NAME)
 
 #
 # Generate a config file for the project.
@@ -110,7 +111,7 @@ endif ( NOT ${PROJECT_NAME}_LIBRARIES )
 #On windows we need to copy the dlls as running dependencies along with the project's executable(s)
 if ( WIN32 )
 	get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
-	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \${${PROJECT_NAME}_LOCATION})
+	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_LOCATION})
 endif ( WIN32)
 
 		")
@@ -197,8 +198,10 @@ CMAKE_POLICY(VERSION 2.6)
 		endif(CHECK_MEM_LEAKS)
 	endif (${${PROJECT_NAME}_BUILD_TYPE} STREQUAL Release)
 
-	#Defining target
+	#Storing Main Include directory
+	#set( ${PROJECT_NAME}_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" CACHE PATH " Includes directories for ${PROJECT_NAME} blah ")
 	
+	#Defining target
 	message ( STATUS "== Sources Files autodetection..." )	
 
 	#VS workaround to display headers even if strictly not needd when building
@@ -249,19 +252,24 @@ CMAKE_POLICY(VERSION 2.6)
 
 	if(${project_type} STREQUAL "LIBRARY")
 		add_library(${PROJECT_NAME} ${${PROJECT_NAME}_load_type} ${SOURCES})
-		set( ${PROJECT_NAME}_LIBRARIES ${PROJECT_NAME} CACHE INTERNAL " libraries needed for ${target_name} " )
+		#seems useless on windows at least...
+		#set( ${PROJECT_NAME}_LIBRARIES ${PROJECT_NAME})
 		if ( ${PROJECT_NAME}_load_type )
 		if(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
 			set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL "WK_SHAREDLIB_BUILD")
 			get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
-			set( ${PROJECT_NAME}_RUN_LIBRARIES ${${PROJECT_NAME}_LOCATION} CACHE INTERNAL " libraries needed to run ${target_name} " )
+			#seems useless on windows at least...
+			#set( ${PROJECT_NAME}_RUN_LIBRARIES "${${PROJECT_NAME}_LOCATION}")
+			#message( "Project run lib WkBuild : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
 		endif(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
 		endif (${PROJECT_NAME}_load_type)		
 	elseif (${project_type} STREQUAL "EXECUTABLE")
 		add_executable(${PROJECT_NAME} ${SOURCES})
-	else (${project_type} STREQUAL "LIBRARY")
+		#We also need to copy run libraries on windows
+		
+	else ()
 		message( FATAL_ERROR " Project Type can only be EXECUTABLE or LIBRARY " )
-	endif(${project_type} STREQUAL "LIBRARY")
+	endif()
 	
 	if( ASTYLE_FOUND )
 		add_dependencies(${PROJECT_NAME} format)
@@ -286,12 +294,13 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	if(${project_type} STREQUAL "LIBRARY") 
 		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" )
+		#TODO : add a command to remove .svn subdir if present...
 	endif(${project_type} STREQUAL "LIBRARY") 
 	
 	#
 	# Copying data directory after build ( fo use by project later )
 	#
-		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" )
+	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" )
 
 	#
 	# Generating configuration cmake file
