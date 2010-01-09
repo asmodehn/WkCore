@@ -104,9 +104,9 @@ set(${PROJECT_NAME}_LIBRARIES \"\${${PROJECT_NAME}_LIBRARY}\")
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 		
 #On windows we need to copy the dlls as running dependencies along with the project's executable(s)
+#as a complement to the cmake mechanism...
 if ( WIN32 )
-	get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
-	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_LOCATION})
+		set(${PROJECT_NAME}_RUN_LIBRARIES \"${${PROJECT_NAME}_RUN_LIBRARIES}\" )
 endif ( WIN32)
 
 		")
@@ -179,6 +179,7 @@ CMAKE_POLICY(VERSION 2.6)
 		)
 		
 	#Verbose Makefile if not release build. Making them internal not to confuse user by appearing with values used only for one project.
+	if ( ${PROJECT_NAME}_BUILD_TYPE )
 	if (${${PROJECT_NAME}_BUILD_TYPE} STREQUAL Release)
 		set(CMAKE_VERBOSE_MAKEFILE OFF CACHE INTERNAL "Verbose build commands disabled for Release build." FORCE)
 		set(CMAKE_USE_RELATIVE_PATHS OFF CACHE INTERNAL "Absolute paths used in makefiles and projects for Release build." FORCE)
@@ -192,7 +193,8 @@ CMAKE_POLICY(VERSION 2.6)
 			add_definitions(-DVLD)
 		endif(CHECK_MEM_LEAKS)
 	endif (${${PROJECT_NAME}_BUILD_TYPE} STREQUAL Release)
-
+	endif ( ${PROJECT_NAME}_BUILD_TYPE )
+	
 	#Storing Main Include directory
 	#set( ${PROJECT_NAME}_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" CACHE PATH " Includes directories for ${PROJECT_NAME} blah ")
 	
@@ -252,10 +254,13 @@ CMAKE_POLICY(VERSION 2.6)
 		if ( ${PROJECT_NAME}_load_type )
 		if(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
 			set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL "WK_SHAREDLIB_BUILD")
-			get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
-			#seems useless on windows at least...
-			#set( ${PROJECT_NAME}_RUN_LIBRARIES "${${PROJECT_NAME}_LOCATION}")
-			#message( "Project run lib WkBuild : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
+			#if on windows we need to care about run libraries ( Dlls )
+			if ( WIN32 )
+				get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
+				#seems useless on windows at least...
+				set( ${PROJECT_NAME}_RUN_LIBRARIES "${${PROJECT_NAME}_LOCATION}")
+				message( "Project run lib WkBuild : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
+			endif( WIN32 )
 		endif(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
 		endif (${PROJECT_NAME}_load_type)		
 	elseif (${project_type} STREQUAL "EXECUTABLE")

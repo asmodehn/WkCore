@@ -170,14 +170,37 @@ endmacro ( WkDisableFlags )
   
 macro ( WkCompilerSetup )
 
-	# default build type and set of build mode possibilities for each project, even if dependencies exists. ( a debug project can depend on a release one)
-	IF(NOT ${PROJECT_NAME}_BUILD_TYPE)
-		SET(${PROJECT_NAME}_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(${PROJECT_NAME}_CXX_FLAGS or ${PROJECT_NAME}_C_FLAGS used) Debug Release." )
-	ENDIF(NOT ${PROJECT_NAME}_BUILD_TYPE)
-	SET(CMAKE_BUILD_TYPE "${${PROJECT_NAME}_BUILD_TYPE}" CACHE INTERNAL "Internal CMake Build Type. Do not edit." FORCE)
-	
+	#Default : Multiple-Configuration Generator ( MSVC )
+	#Forcing configuration at build time
+	SET(CMAKE_CONFIGURATION_TYPES "Debug;Release;" CACHE INTERNAL "Semicolon separated list of supported configuration types in your Build Environment. Do not edit." )
+	message ( "CMAKE_CONFIGURATION_TYPES : ${CMAKE_CONFIGURATION_TYPES} ")
 	WkDisableFlags( RelWithDebInfo )
 	WkDisableFlags( MinSizeRel )
+	
+	
+	# However special case for Single-Configuration Generator ( make ... )
+	# TODO : handle XCode
+	if ( NOT MSVC )
+		string( REGEX REPLACE ";" " " possible_build_types ${CMAKE_CONFIGURATION_TYPES} )
+		SET(${PROJECT_NAME}_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: ${possible_build_types}." FORCE )
+		
+		#Checking if a the required build type is available in configurations list...
+		IF( ${PROJECT_NAME}_BUILD_TYPE )
+			string ( REGEX MATCH "${${PROJECT_NAME}_BUILD_TYPE}" BUILD_TYPE_MATCH ${CMAKE_CONFIGURATION_TYPES} )
+			IF ( BUILD_TYPE_MATCH )
+				#Forcing configuration at generation time
+				SET(CMAKE_BUILD_TYPE "${${PROJECT_NAME}_BUILD_TYPE}" CACHE INTERNAL "Internal CMake Build Type. Do not edit." )
+				message ( "CMAKE_BUILD_TYPE : ${CMAKE_BUILD_TYPE} ")
+			ELSE ( BUILD_TYPE_MATCH )
+				message ( FATAL_ERROR " ${PROJECT_NAME}_BUILD_TYPE is not a possible build type. Change it ! " )
+			ENDIF ( BUILD_TYPE_MATCH )
+		ELSE( ${PROJECT_NAME}_BUILD_TYPE )
+			message ( FATAL_ERROR " ${PROJECT_NAME}_BUILD_TYPE is not defined ! " )
+		ENDIF( ${PROJECT_NAME}_BUILD_TYPE )
+
+	endif( NOT MSVC )
+	
+	
 	
 	IF(MSVC)
 	
