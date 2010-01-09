@@ -179,24 +179,24 @@ macro ( WkCompilerSetup )
 	
 	
 	# However special case for Single-Configuration Generator ( make ... )
-	# TODO : handle XCode
 	if ( NOT MSVC )
-		string( REGEX REPLACE ";" " " possible_build_types ${CMAKE_CONFIGURATION_TYPES} )
-		SET(${PROJECT_NAME}_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: ${possible_build_types}." FORCE )
+		SET(${PROJECT_NAME}_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}." )
 		
 		#Checking if a the required build type is available in configurations list...
 		IF( ${PROJECT_NAME}_BUILD_TYPE )
 			string ( REGEX MATCH "${${PROJECT_NAME}_BUILD_TYPE}" BUILD_TYPE_MATCH ${CMAKE_CONFIGURATION_TYPES} )
-			IF ( BUILD_TYPE_MATCH )
-				#Forcing configuration at generation time
-				SET(CMAKE_BUILD_TYPE "${${PROJECT_NAME}_BUILD_TYPE}" CACHE INTERNAL "Internal CMake Build Type. Do not edit." )
-				message ( "CMAKE_BUILD_TYPE : ${CMAKE_BUILD_TYPE} ")
-			ELSE ( BUILD_TYPE_MATCH )
-				message ( FATAL_ERROR " ${PROJECT_NAME}_BUILD_TYPE is not a possible build type. Change it ! " )
-			ENDIF ( BUILD_TYPE_MATCH )
+			IF ( NOT BUILD_TYPE_MATCH )
+				message ( " ${${PROJECT_NAME}_BUILD_TYPE} is not a possible build type ! Defaulting to Debug . " )
+				SET(${PROJECT_NAME}_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}." FORCE )
+			ENDIF ( NOT BUILD_TYPE_MATCH )
 		ELSE( ${PROJECT_NAME}_BUILD_TYPE )
-			message ( FATAL_ERROR " ${PROJECT_NAME}_BUILD_TYPE is not defined ! " )
+			message ( FATAL_ERROR " ${PROJECT_NAME}_BUILD_TYPE is not defined ! Defaulting to Debug. " )
+			SET(${PROJECT_NAME}_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: ${CMAKE_CONFIGURATION_TYPES}." FORCE )
 		ENDIF( ${PROJECT_NAME}_BUILD_TYPE )
+
+		#Forcing configuration at generation time
+		SET(CMAKE_BUILD_TYPE "${${PROJECT_NAME}_BUILD_TYPE}" CACHE INTERNAL "Internal CMake Build Type. Do not edit." )
+		message ( "CMAKE_BUILD_TYPE : ${CMAKE_BUILD_TYPE} ")
 
 	endif( NOT MSVC )
 	
