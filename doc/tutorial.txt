@@ -6,7 +6,9 @@ This simple tutorial will demonstrate how to create a simple cmakelist file usab
 
 | As with all Cmake projects you need to start by creating a CMakeLists.txt inside your project root. Then you need to fill it.
 | 
-| **First** you need to begin with wkcmake call::
+| 
+| 
+ **First** you need to begin with wkcmake call::
 
 	CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR )
 	INCLUDE ( WkCMake_Dir/WkCMake.cmake )
