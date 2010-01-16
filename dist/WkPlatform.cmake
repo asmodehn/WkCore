@@ -34,9 +34,10 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
-# Testing current platform
-# This will set WK_PLATFORM to WIN32, APPLE, or UNIX in the code
-#
+###################################################################
+# Testing current platform                                        #
+# This will set WK_PLATFORM to WIN32, APPLE, or UNIX in the code  #
+###################################################################
 if ( WIN32 )
 # is TRUE on Windows, including CygWin 
  set( WK_PLATFORM "WIN32" )
@@ -53,7 +54,9 @@ else ()
  set( WK_PLATFORM "Unknown" )
 endif()
 
-#Testing System in details ( cmake > 2.6 )
+###################################################################
+#Testing System in details ( cmake > 2.6 )                        #
+###################################################################
 if ( CMAKE_SYSTEM )
  set ( WK_SYSTEM "${CMAKE_SYSTEM}" )
 endif ( CMAKE_SYSTEM )
@@ -80,14 +83,14 @@ elseif ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
  set ( WK_SYSTEM_IS_LINUX ON )
 endif()
 
-
-# Testing curent Compiler
-# This will set 
-# WK_COMPILER to MINGW, MSYS, CYGWIN, BORLAND, WATCOM, MSVC90, MSVC80, MSVC71, MSVC70
-# WK_COMPILER_IS_MSVC if the compiler is a MS compiler
-# WK_COMPILER_IS_GNUCC if the compiler is a variant of GCC
-# WK_COMPILER_IS_GNUCXX if the compiler is a variant of G++
-#
+############################################################################################
+# Testing curent Compiler                                                                  #
+# This will set                                                                            #
+# WK_COMPILER to MINGW, MSYS, CYGWIN, BORLAND, WATCOM, MSVC90, MSVC80, MSVC71, MSVC70      #
+# WK_COMPILER_IS_MSVC if the compiler is a MS compiler                                     #
+# WK_COMPILER_IS_GNUCC if the compiler is a variant of GCC                                 #
+# WK_COMPILER_IS_GNUCXX if the compiler is a variant of G++                                #
+############################################################################################
 if ( MINGW )
 #    is TRUE when using the MinGW compiler in Windows 
  set ( WK_COMPILER "MINGW" )
@@ -137,6 +140,17 @@ if ( CMAKE_COMPILER_IS_GNUCXX )
  set ( WK_COMPILER_IS_GNUCXX ON )
 endif ( CMAKE_COMPILER_IS_GNUCXX )
 
+########################################################
+# Extensive tests on compilation environment           #
+########################################################
+INCLUDE (CheckIncludeFiles)
+# usage: CHECK_INCLUDE_FILES (<header> <RESULT_VARIABLE> )
+
+CHECK_INCLUDE_FILES (unistd.h WK_HAVE_UNISTD_H)
+
+########################################################
+# Macro to apply the variables to config header        #
+########################################################
 macro(PlatformCheck)
 # configure the file and copy it into the program headers.
 	message ( STATUS "== Configuring WkPlatform : ${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config -> ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/WkPlatform.h" )
