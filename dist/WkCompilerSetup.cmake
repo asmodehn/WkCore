@@ -173,7 +173,7 @@ macro ( WkCompilerSetup )
 	#Default : Multiple-Configuration Generator ( MSVC )
 	#Forcing configuration at build time
 	SET(CMAKE_CONFIGURATION_TYPES "Debug;Release;" CACHE INTERNAL "Semicolon separated list of supported configuration types in your Build Environment. Do not edit." )
-	message ( "CMAKE_CONFIGURATION_TYPES : ${CMAKE_CONFIGURATION_TYPES} ")
+	#message ( "CMAKE_CONFIGURATION_TYPES : ${CMAKE_CONFIGURATION_TYPES} ")
 	WkDisableFlags( RelWithDebInfo )
 	WkDisableFlags( MinSizeRel )
 	
@@ -196,7 +196,7 @@ macro ( WkCompilerSetup )
 
 		#Forcing configuration at generation time
 		SET(CMAKE_BUILD_TYPE "${${PROJECT_NAME}_BUILD_TYPE}" CACHE INTERNAL "Internal CMake Build Type. Do not edit." )
-		message ( "CMAKE_BUILD_TYPE : ${CMAKE_BUILD_TYPE} ")
+		#message ( "CMAKE_BUILD_TYPE : ${CMAKE_BUILD_TYPE} ")
 
 	endif( NOT MSVC )
 	
