@@ -59,6 +59,12 @@ CMAKE_POLICY(VERSION 2.6)
 	#set( ${PROJECT_NAME}_INCLUDE_DIRS CACHE PATH " Includes directories for ${PROJECT_NAME} ")
 	#set( ${project_name_arg}_LIBRARIES CACHE FILEPATH " Libraries needed for ${project_name_arg} " )
 	#set( ${project_name_arg}_RUN_LIBRARIES CACHE FILEPATH " libraries needed to run ${project_name_arg} " )
+
+	#TODO
+	#Quick test to make sure we build in different directory
+	#if ( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
+	#	SET(PROJECT_BINARY_DIR "${PROJECT_BINARY_DIR}/build" )
+	#endif ( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
 CMAKE_POLICY(POP)
 endmacro(WkProject PROJECT_NAME)
 
@@ -156,6 +162,7 @@ macro (WkBuild project_type)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 
+
 	if ( ${ARGC} GREATER 1 )
 		set(${PROJECT_NAME}_load_type ${ARGV1} )
 	endif ( ${ARGC} GREATER 1 )
@@ -240,6 +247,8 @@ CMAKE_POLICY(VERSION 2.6)
 	MERGE("${HEADERS}" "${SOURCES}" SOURCES)
 	#MESSAGE ( STATUS "== ${PROJECT_NAME} Sources : ${SOURCES}" )
 	
+	AddPlatformCheckSrc( SOURCES )
+
 	#
 	# Handling my own build config
 	#

@@ -152,7 +152,15 @@ CHECK_INCLUDE_FILES (unistd.h WK_HAVE_UNISTD_H)
 # Macro to apply the variables to config header        #
 ########################################################
 macro(PlatformCheck)
-# configure the file and copy it into the program headers.
+# configure the platform check component and copy it into the program sources.
+# We can afford to do that because the platform check is simple.
+# if it gets more complicated ( > 1 file), we need to make a custom library
+# and make the link to the project optional.
 	message ( STATUS "== Configuring WkPlatform : ${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config -> ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/WkPlatform.h" )
 	configure_file(${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/WkPlatform.h )
+	configure_file(${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.c.config ${PROJECT_BINARY_DIR}/${WKCMAKE_SRC_DIR}/WkPlatform.c )
 endmacro(PlatformCheck)
+
+macro(AddPlatformCheckSrc VAR )
+	SET( ${VAR} "${${VAR}}" "${WKCMAKE_SRC_DIR}/WkPlatform.c")
+endmacro(AddPlatformCheckSrc VAR )
