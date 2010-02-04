@@ -51,8 +51,7 @@ CMAKE_POLICY(VERSION 2.6)
 	# First check if the package is installed already , quietly
 	#
 	
-	# if possible by using WkFind modules
-	# maybe belongs somewhere else
+	# regroup original CMAKE_MODULE_PATH and WkCmake Module path in order for the find_package to look inside both locations
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
 	
 	SetPackageVarName( package_var_name ${package_name} )
@@ -62,6 +61,10 @@ CMAKE_POLICY(VERSION 2.6)
 	if ( NOT ${package_var_name}_FOUND )
 		find_package( ${package_name} ${ARGN} )
 	endif ( NOT ${package_var_name}_FOUND )
+	
+	#
+	#here we should use the external package/project command to download not found package
+	#
 	
 	if ( ${package_var_name}_FOUND )
 	
