@@ -154,27 +154,24 @@ CMAKE_POLICY(VERSION 2.6)
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 
 ### External Dependency ${package_name} ###
-
 		")
 
-		#If it s a custom Wk-dependency we can propagate the build directory
+		#If it s a custom Wk-dependency we need to use the Export from the dependency to be able to access built targets.
 		if ( ${package_name}_DIR )
 			file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-
-#However we already know where ${package_name} is going to be
-set ( ${package_name}_DIR ${${package_name}_FDIR} CACHE PATH \"Imported location of ${package_name} from ${PROJECT_NAME}\" )
+			
+#If it s a custom Wk-dependency we need to use the Export.cmake
+# from the dependency to be able to access built targets.
+if ( EXISTS \"${${package_name}_FDIR}/${package_name}Export.cmake\" )
+#To be able to access dependencies' built targets
+	include( \"${${package_name}_FDIR}/${package_name}Export.cmake\" )
+endif ( EXISTS \"${${package_name}_FDIR}/${package_name}Export.cmake\" )
+#otherwise ( for external dependencies ) the path is expected to be absolute in ${PROJECT_NAME}_LIBRARIES
 
 			")
 		endif ( ${package_name}_DIR )
 
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
-
-find_package( ${package_name} )
-#hiding depends variables from interface
-mark_as_advanced( ${package_var_name}_DIR )
-mark_as_advanced( ${package_var_name}_INCLUDE_DIRS )
-mark_as_advanced( ${package_var_name}_LIBRARIES )
-mark_as_advanced( ${package_var_name}_RUN_LIBRARIES )
 
 # Include directory might be needed by upper project if ${PROJECT_NAME} doesn totally encapsulate it.
 # NB : It shouldnt hurt if the upper project also define it as its own dependency

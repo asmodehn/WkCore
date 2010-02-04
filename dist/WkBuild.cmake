@@ -258,17 +258,14 @@ CMAKE_POLICY(VERSION 2.6)
 
 	if(${project_type} STREQUAL "LIBRARY")
 		add_library(${PROJECT_NAME} ${${PROJECT_NAME}_load_type} ${SOURCES})
-		#seems useless on windows at least...
-		#set( ${PROJECT_NAME}_LIBRARIES ${PROJECT_NAME})
 		if ( ${PROJECT_NAME}_load_type )
 		if(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
 			set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL "WK_SHAREDLIB_BUILD")
 			#if on windows we need to care about run libraries ( Dlls )
 			if ( WIN32 )
 				get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
-				#seems useless on windows at least...
 				set( ${PROJECT_NAME}_RUN_LIBRARIES "${${PROJECT_NAME}_LOCATION}")
-				message( "Project run lib WkBuild : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
+				#message( "Project run lib WkBuild : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
 			endif( WIN32 )
 		endif(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
 		endif (${PROJECT_NAME}_load_type)		
