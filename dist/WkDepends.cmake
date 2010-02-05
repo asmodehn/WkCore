@@ -88,9 +88,9 @@ CMAKE_POLICY(VERSION 2.6)
 
 		#Simple if structure to avoid oddities when setting ${PROJECT_NAME}_DEPENDS for the first time
 		if ( ${PROJECT_NAME}_DEPENDS)
-			set ( ${PROJECT_NAME}_DEPENDS "${PROJECT_NAME_DEPENDS}" "${package_var_name}" ) 
+			set ( ${PROJECT_NAME}_DEPENDS "${${PROJECT_NAME}_DEPENDS}" "${package_name}" ) 
 		else ( ${PROJECT_NAME}_DEPENDS)
-			set ( ${PROJECT_NAME}_DEPENDS "${package_var_name}" ) 
+			set ( ${PROJECT_NAME}_DEPENDS "${package_name}" ) 
 		endif ( ${PROJECT_NAME}_DEPENDS)
 		
 	else ( ${package_var_name}_FOUND )	
@@ -190,7 +190,18 @@ endif ( WIN32 )
 CMAKE_POLICY(POP)
 endmacro(WkLinkDepends package_name)
 
+macro (WkCopyDepends depend target)
+	SetPackageVarName( package_var_name ${depend} )
+	#message ( "${depend} -> ${package_var_name}" )
 
+	# we might have multiple libs in one dependency
+	foreach ( libarg ${${depend}_RUN_LIBRARIES} ) 
+		if ( NOT libarg )
+			message ( SEND_ERROR "Error with dependency, needed to run ${target} : ${libarg}" )
+		endif ( NOT libarg )
+		ADD_CUSTOM_COMMAND( TARGET ${target} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${libarg} ${${target}_PATH} COMMENT "Copying ${libarg} to ${${target}_PATH}" )
+	endforeach ( libarg ${${depend}_RUN_LIBRARIES} )
+endmacro(WkCopyDepends )
 
 
 

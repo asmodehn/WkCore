@@ -120,14 +120,7 @@ MACRO(WkTestBuild test_name)
 			if ( WIN32 )
 				#needed for each run library dependency as well
 				foreach ( looparg ${${PROJECT_NAME}_DEPENDS} )
-					# we might have multiplke libs in one dependency
-					foreach ( libarg ${${looparg}_RUN_LIBRARIES} ) 
-						if ( NOT libarg )
-							message ( SEND_ERROR "Error with dependency, needed to run test : ${libarg}" )
-						endif ( NOT libarg )
-						ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${libarg} ${${test_name}_PATH}
-															COMMENT "Copying ${libarg} to ${${test_name}_PATH}" )
-					endforeach ( libarg ${looparg} )
+					WkCopyDepends(${looparg} ${test_name} )
 				endforeach ( looparg ${${PROJECT_NAME}_DEPENDS} )
 			endif ( WIN32 )
 			
