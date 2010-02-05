@@ -33,7 +33,7 @@
 //including and hiding dependency header
 #include "ProjectB/header.h"
 
-#include <iostream>
+#include <cstdio>
 
 int A_display(std::string txt)
 {
