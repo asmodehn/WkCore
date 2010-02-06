@@ -158,15 +158,12 @@ CMAKE_POLICY(VERSION 2.6)
 
 		#If it s a custom Wk-dependency we need to use the Export from the dependency to be able to access built targets.
 		if ( ${package_name}_DIR )
-			file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+			file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Export.cmake "
 			
-#If it s a custom Wk-dependency we need to use the Export.cmake
-# from the dependency to be able to access built targets.
+#Propagating imported targets
 if ( EXISTS \"${${package_name}_FDIR}/${package_name}Export.cmake\" )
-#To be able to access dependencies' built targets
 	include( \"${${package_name}_FDIR}/${package_name}Export.cmake\" )
 endif ( EXISTS \"${${package_name}_FDIR}/${package_name}Export.cmake\" )
-#otherwise ( for external dependencies ) the path is expected to be absolute in ${PROJECT_NAME}_LIBRARIES
 
 			")
 		endif ( ${package_name}_DIR )
