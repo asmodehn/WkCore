@@ -40,6 +40,8 @@ WkLibDir ( "Custom Lib" )
 WkDataDir ( "Custom Data")
 WkTestDir ( "Custom Test" )
 WkDocDir ( "Custom Doc" )
+WkTestDataDir ( "Custom Test Data Src")
+WkTestDataBuildDir ( "Custom Test Data Build")
 
 #Project Declaration
 WkProject( ProjectB C )
@@ -53,4 +55,5 @@ WkSvn()
 
 #Testing
 WkTestBuild( maintestB )
+WkTestData( maintestB data.txt )
 WkTestRun( maintestB )

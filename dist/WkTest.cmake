@@ -41,6 +41,9 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6.3 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 
+#
+# Defining where Test should be found
+#
 set ( WKCMAKE_TEST_DIR "test" CACHE PATH "Test directory for WkCMake build products" )
 mark_as_advanced ( WKCMAKE_TEST_DIR )
 
@@ -49,7 +52,9 @@ macro(WkTestDir dir)
 	mark_as_advanced ( WKCMAKE_TEST_DIR )
 endmacro(WkTestDir dir)
 
+#
 #WkTestBuild( test_name [test_source [...] ] )
+#
 
 MACRO(WkTestBuild test_name)
 
@@ -129,6 +134,31 @@ MACRO(WkTestBuild test_name)
 
 ENDMACRO(WkTestBuild test_name)
 
+
+#
+# Defining where data used by tests should be found vs the source.
+# Default: "data" w root at ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}
+#
+set ( WKCMAKE_TEST_DATA_DIR "data" CACHE PATH "Data directory for WkCMake source tests products w root at ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}" )
+mark_as_advanced ( WKCMAKE_TEST_DATA_DIR )
+
+macro(WkTestDataDir dir)
+	set ( WKCMAKE_TEST_DATA_DIR ${dir} CACHE PATH "Data directory for WkCMake source tests products w root at ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}" FORCE )
+	mark_as_advanced ( WKCMAKE_TEST_DATA_DIR )
+endmacro(WkTestDataDir dir)
+
+#
+# Defining where data used by tests should be found when using the build exe.
+# Default: "${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}" w root at ${PROJECT_BINARY_DIR}
+#
+set ( WKCMAKE_TEST_DATA_BUILD_DIR "${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}" CACHE PATH "Data directory for WkCMake build tests products w root at ${PROJECT_BINARY_DIR}" FORCE )
+mark_as_advanced ( WKCMAKE_TEST_DATA_BUILD_DIR )
+
+macro(WkTestDataBuildDir dir)
+	set ( WKCMAKE_TEST_DATA_BUILD_DIR ${dir} CACHE PATH "Data directory for WkCMake build tests products w root at ${PROJECT_BINARY_DIR}" FORCE )
+	mark_as_advanced ( WKCMAKE_TEST_DATA_BUILD_DIR )
+endmacro(WkTestDataBuildDir dir)
+
 #
 # WkTestData( test_name [ datafile1 [ datafile2 [ ... ] ] ] )
 # Copy the data associated to test from the test directory in the source_path,
@@ -137,11 +167,13 @@ ENDMACRO(WkTestBuild test_name)
 MACRO (WkTestData test_name )
 
 	foreach ( test_data ${ARGN} )
-		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${test_data}" )
-#
-# Not this since in the IDE the tests is run from the project root...
-#
-#		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_data}" )
+		
+		# warning : tests are run from the project root...
+		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DATA_BUILD_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DATA_BUILD_DIR}/${test_data}" )
+		
+		#message ("test data src: ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}/${test_data}")
+		#message ("test data dest: ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DATA_BUILD_DIR}/${test_data}")
+	
 	endforeach ( test_data ${ARGN} )
 	
 ENDMACRO (WkTestData data_path)
