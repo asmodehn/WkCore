@@ -56,4 +56,4 @@ WkSvn()
 #Testing
 WkTestBuild( maintestB )
 WkTestData( maintestB data.txt )
-WkTestRun( maintestB )
+WkTestRun( ProjectB maintestB )

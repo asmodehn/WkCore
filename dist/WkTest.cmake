@@ -181,23 +181,14 @@ ENDMACRO (WkTestData data_path)
 #
 # Calls the same test executable multiple times, eachtime with 1 argument
 #
-# WkTestRun( test_name [ arguments [...] ] )
+# WkTestRun( test_display test_name [ arguments [...] ] )
 #
 
-MACRO(WkTestRun test_name )
+MACRO(WkTestRun test_display test_name )
 
 	IF(${PROJECT_NAME}_ENABLE_TESTS)
 		ENABLE_TESTING()
-	
-		#if test arguments
-		IF ( ${ARGC} GREATER 2 )
-			FOREACH ( looparg ${ARGN} )
-				ADD_TEST(${test_name}_${looparg} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_name} ${looparg})
-			ENDFOREACH ( looparg )
-		ELSE ( ${ARGC} GREATER 2  )
-			ADD_TEST(${test_name} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_name})
-		ENDIF ( ${ARGC} GREATER 2  )
-	
+		ADD_TEST(${test_display} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_name} ${ARGN})
 	ENDIF(${PROJECT_NAME}_ENABLE_TESTS)
 
 ENDMACRO(WkTestRun)

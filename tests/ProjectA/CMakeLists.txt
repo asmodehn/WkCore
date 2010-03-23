@@ -47,5 +47,5 @@ WkSvn()
 
 #Testing
 WkTestBuild( maintest )
-WkTestRun( maintest )
+WkTestRun( ProjectA maintest )
 

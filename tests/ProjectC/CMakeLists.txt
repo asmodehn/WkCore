@@ -43,6 +43,6 @@ WkSvn( )
 
 #Testing
 WkTestBuild( maintestC )
-WkTestRun( maintestC )
+WkTestRun( ProjectC maintestC )
 
 
