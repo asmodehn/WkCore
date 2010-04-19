@@ -201,7 +201,10 @@ CMAKE_POLICY(VERSION 2.6)
 		endif(CHECK_MEM_LEAKS)
 	endif (${${PROJECT_NAME}_BUILD_TYPE} STREQUAL Release)
 	endif ( ${PROJECT_NAME}_BUILD_TYPE )
-	
+
+	#generating configured Header for detected packages
+	PlatformCheck()
+
 	#Storing Main Include directory
 	#set( ${PROJECT_NAME}_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" CACHE PATH " Includes directories for ${PROJECT_NAME} blah ")
 	
@@ -211,7 +214,7 @@ CMAKE_POLICY(VERSION 2.6)
 	#VS workaround to display headers even if strictly not needd when building
 	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp ${WKCMAKE_SRC_DIR}/*.h ${WKCMAKE_SRC_DIR}/*.hh ${WKCMAKE_SRC_DIR}/*.hpp)
 	FILE(GLOB_RECURSE SOURCES RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
-	message ( STATUS "== Headers detected in ${WKCMAKE_INCLUDE_DIR} : ${HEADERS}" )
+	message ( STATUS "== Headers detected in ${WKCMAKE_INCLUDE_DIR} and ${WKCMAKE_SRC_DIR} : ${HEADERS}" )
 	message ( STATUS "== Sources detected in ${WKCMAKE_SRC_DIR} : ${SOURCES}" )
 
 	if ( NOT CMAKE_MODULE_PATH )
@@ -232,13 +235,11 @@ CMAKE_POLICY(VERSION 2.6)
 		ENDIF ( ${PROJECT_NAME}_CODE_FORMAT )
 	ENDIF ( ASTYLE_FOUND )
 
-	#generating configured Header for detected packages
-	PlatformCheck()
 
 	#Including configured headers (
-	#	-binary_dir/include for the configured header, 
+	#	-binary_dir/CMakeFiles for the configured header, 
 	#	-source_dir/include for the unmodified ones, 
-	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}")
+	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/CMakeFiles")
 
 	#internal headers ( non visible by outside project )
 	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_SRC_DIR}")
@@ -300,13 +301,14 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	if(${project_type} STREQUAL "LIBRARY") 
 		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" )
-		#TODO : add a command to remove .svn subdir if present...
+		#trying to remove .svn directory... pb : what about other directories everywhere ?
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/.svn" COMMENT "Removing ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/.svn" )
 	endif(${project_type} STREQUAL "LIBRARY") 
 	
 	#
 	# Copying data directory after build ( fo use by project later )
 	#
-	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" )
+	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" )
 
 	#
 	# Generating configuration cmake file
