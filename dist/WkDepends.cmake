@@ -80,7 +80,7 @@ CMAKE_POLICY(VERSION 2.6)
 #		include_directories(${${package_var_name}_INCLUDE_DIRS})
 #		message ( STATUS "== Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
 
-		set ( WK_${package_var_name}_FOUND ON )
+		set ( WK_${PROJECT_NAME}_FOUND_${package_var_name} ON )
 		#this is not necessary if WkPlatform does the job as it should
 		#add_definitions(-D WK_${package_var_name}_FOUND)
 

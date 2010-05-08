@@ -53,6 +53,7 @@ macro(WkProject project_name_arg)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 	project(${project_name_arg} ${ARGN})
+	WkPlatformCheck()
 	WkCompilerSetup()
 	#preparing and cleaning internal build variables
 	# We might not need that at all : simpler
@@ -203,7 +204,7 @@ CMAKE_POLICY(VERSION 2.6)
 	endif ( ${PROJECT_NAME}_BUILD_TYPE )
 
 	#generating configured Header for detected packages
-	PlatformCheck()
+	WkPlatformConfigure()
 
 	#Storing Main Include directory
 	#set( ${PROJECT_NAME}_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" CACHE PATH " Includes directories for ${PROJECT_NAME} blah ")
@@ -261,7 +262,7 @@ CMAKE_POLICY(VERSION 2.6)
 		add_library(${PROJECT_NAME} ${${PROJECT_NAME}_load_type} ${SOURCES})
 		if ( ${PROJECT_NAME}_load_type )
 		if(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
-			set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL "WK_SHAREDLIB_BUILD")
+			set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL "WK_${PROJECT_NAME}_SHAREDLIB_BUILD")
 			#if on windows we need to care about run libraries ( Dlls )
 			if ( WIN32 )
 				get_target_property(${PROJECT_NAME}_LOCATION ${PROJECT_NAME} LOCATION)
