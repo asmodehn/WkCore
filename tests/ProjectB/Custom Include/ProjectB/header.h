@@ -32,7 +32,7 @@
  */
 
 /* This should always be the first of your include statements */
-#include "WkPlatform.h"
+#include "WkPlatform_ProjectB.h"
 
 /*We are depending on projectC*/
 #include "ProjectC/header.h"
@@ -43,11 +43,11 @@ extern "C"
 {
 #endif
 
-    WK_DECLSPEC int B_display();
+    WK_ProjectB_API int B_display();
 
     /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PROJECTB */
+#endif /* PROJECTB_H */

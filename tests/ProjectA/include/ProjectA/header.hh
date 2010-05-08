@@ -31,7 +31,7 @@
  *
  */
 
-#include "WkPlatform.h"
+#include "WkPlatform_ProjectA.h"
 
 #include <string>
 
@@ -41,7 +41,7 @@ extern "C"
 {
 #endif
 
-    WK_DECLSPEC int A_display(std::string txt);
+    WK_ProjectA_API int A_display(std::string txt);
 
     /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
@@ -49,4 +49,4 @@ extern "C"
 #endif
 
 
-#endif
+#endif // HEADER_HH

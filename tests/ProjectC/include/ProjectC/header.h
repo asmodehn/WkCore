@@ -32,7 +32,7 @@
  */
 
 /* This should always be the first of your include statements */
-#include "WkPlatform.h"
+#include "WkPlatform_ProjectC.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -40,11 +40,11 @@ extern "C"
 {
 #endif
 
-    WK_DECLSPEC int C_display();
+    WK_ProjectC_API int C_display();
 
     /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PROJECTC */
+#endif /* PROJECTC_H */
