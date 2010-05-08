@@ -40,6 +40,8 @@ endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 ###########################################################################################
 macro(WkPlatformCheck)
 
+set( WK_${PROJECT_NAME}_PROJECT_NAME ${PROJECT_NAME} CACHE INTERNAL "Build System for ${PROJECT_NAME}" FORCE )
+
 if ( WIN32 )
 # is TRUE on Windows, including CygWin 
  set( WK_${PROJECT_NAME}_PLATFORM "WIN32" )
