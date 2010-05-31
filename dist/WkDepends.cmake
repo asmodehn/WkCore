@@ -140,8 +140,12 @@ CMAKE_POLICY(VERSION 2.6)
 			# then we need to add the run libraries of the dependency to the current project myrun libraries
 			#set( ${PROJECT_NAME}_RUN_LIBRARIES "${${PROJECT_NAME}_RUN_LIBRARIES}" "${${package_var_name}_RUN_LIBRARIES}" CACHE FILEPATH "blabla")
 			#message( "Project run lib WkDepends : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
-
-
+			
+			#TODO : here is the default case. We can assume if the variable RUN_LIBRARIES does not exist that
+			# either there is no dll needed OR
+			# the dll needed is delivered with the .lib file ( usual with windows dev environments, same as with SDL_* libs )
+			# that could be implemented
+			
 		ENDIF ( WIN32 )
 		
 		# Once the project is built with it, the dependency becomes mandatory
