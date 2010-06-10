@@ -67,22 +67,26 @@ CMAKE_POLICY(VERSION 2.6)
 	#
 	
 	if ( ${package_var_name}_FOUND )
-	
+
+		### INCLUDE DIRS MUST BE HANDLED HERE, BEFORE COMPILATION ###	
 		#hiding the original cmake Module variable, displaying the WkCMake later on
-		mark_as_advanced ( FORCE ${package_var_name}_INCLUDE_DIR )
+		mark_as_advanced ( FORCE ${package_var_name}_INCLUDE_DIR ) 
 
-#		# to handle cmake modules who dont have exactly the same standard as WkModules
-#		if ( NOT ${package_var_name}_INCLUDE_DIRS )
-#			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
-#		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
+		# to handle cmake modules who dont have exactly the same standard as WkModules
+		if ( NOT ${package_var_name}_INCLUDE_DIRS )
+			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
+		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
 
-#		#dependencies headers ( need to be included after project's own headers )
-#		include_directories(${${package_var_name}_INCLUDE_DIRS})
-#		message ( STATUS "== Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
+		#dependencies headers ( need to be included after project's own headers )
+		include_directories(${${package_var_name}_INCLUDE_DIRS})
+		message ( STATUS "== Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
+
+		#to make sure it s visible in teh interface
+		mark_as_advanced ( CLEAR ${package_var_name}_INCLUDE_DIRS ) 
 
 		set ( WK_${PROJECT_NAME}_FOUND_${package_var_name} ON )
 		#this is not necessary if WkPlatform does the job as it should
-		#add_definitions(-D WK_${package_var_name}_FOUND)
+		#add_definitions(-D WK_${PROJECT_NAME}_FOUND_${package_var_name})
 
 		message ( STATUS "== Binary Dependency ${package_name} : FOUND ! " )
 
@@ -113,15 +117,7 @@ CMAKE_POLICY(VERSION 2.6)
 
 	if ( ${package_var_name}_FOUND )
 
-		# to handle cmake modules who dont have exactly the same standard as WkModules
-		if ( NOT ${package_var_name}_INCLUDE_DIRS )
-			set ( ${package_var_name}_INCLUDE_DIRS ${${package_var_name}_INCLUDE_DIR} CACHE PATH "${package_name} Headers directories")
-		endif ( NOT ${package_var_name}_INCLUDE_DIRS )
-
-		#dependencies headers ( need to be included after project's own headers )
-		include_directories(${${package_var_name}_INCLUDE_DIRS})
-		message ( STATUS "== Binary Dependency ${package_name} include : ${${package_var_name}_INCLUDE_DIRS} OK !")
-
+		### LIBRARIES MUST BE HANDLED HERE, FOR LINKING ###
 		#hiding the original cmake Module variable, displaying the WkCMake later on
 		mark_as_advanced ( FORCE ${package_var_name}_LIBRARY ) 
 		
@@ -133,6 +129,8 @@ CMAKE_POLICY(VERSION 2.6)
 
 		target_link_libraries(${PROJECT_NAME} ${${package_var_name}_LIBRARIES})
 		message ( STATUS "== Binary Dependency ${package_name} libs : ${${package_var_name}_LIBRARIES} OK !")
+
+		mark_as_advanced ( CLEAR ${package_var_name}_LIBRARIES ) 
 		
 		IF ( WIN32 )
 			message ( STATUS "== Binary Dependency ${package_name} runlibs : ${${package_var_name}_RUN_LIBRARIES} OK !")

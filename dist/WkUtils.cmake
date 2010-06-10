@@ -87,6 +87,9 @@ macro(SetPackageVarName varname pkgname)
 	if ( ${${varname}} STREQUAL "Guichan" )
 		set ( ${varname} "GUICHAN")
 	endif ( ${${varname}} STREQUAL "Guichan" )
+	if ( ${${varname}} STREQUAL "STLPort" )
+		set ( ${varname} "STLPORT")
+	endif ( ${${varname}} STREQUAL "STLPort" )
 	#etc.
 	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
 
