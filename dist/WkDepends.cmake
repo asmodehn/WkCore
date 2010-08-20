@@ -172,12 +172,12 @@ endif ( EXISTS \"${${package_name}_FDIR}/${package_name}Export.cmake\" )
 
 		file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
 
-# Include directory might be needed by upper project if ${PROJECT_NAME} doesn totally encapsulate it.
+# Include directory might be needed by upper project if ${PROJECT_NAME} doesnt totally encapsulate it.
 # NB : It shouldnt hurt if the upper project also define it as its own dependency
-set(${PROJECT_NAME}_INCLUDE_DIRS \${${PROJECT_NAME}_INCLUDE_DIRS} \"${${package_var_name}_INCLUDE_DIRS}\" )
-set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} \"${${package_var_name}_LIBRARIES}\")
+set(${PROJECT_NAME}_INCLUDE_DIRS \"${${package_var_name}_INCLUDE_DIRS}\" \${${PROJECT_NAME}_INCLUDE_DIRS} )
+set(${PROJECT_NAME}_LIBRARIES \${${PROJECT_NAME}_LIBRARIES} \"${${package_var_name}_LIBRARIES}\" )
 if ( WIN32 )
-	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \"${${package_var_name}_RUN_LIBRARIES}\")
+	set(${PROJECT_NAME}_RUN_LIBRARIES \${${PROJECT_NAME}_RUN_LIBRARIES} \"${${package_var_name}_RUN_LIBRARIES}\" )
 endif ( WIN32 )	
 
 		")

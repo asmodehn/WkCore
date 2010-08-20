@@ -96,7 +96,7 @@ get_filename_component(SELF_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
 #all required target should be defined there... no need to specify all targets in ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
 include(\${SELF_DIR}/${PROJECT_NAME}Export.cmake)
 get_filename_component(${PROJECT_NAME}_INCLUDE_DIR \"\${SELF_DIR}/${WKCMAKE_INCLUDE_DIR}/\" ABSOLUTE)
-set(${PROJECT_NAME}_INCLUDE_DIRS \"\${${PROJECT_NAME}_INCLUDE_DIR}\" \"\${SELF_DIR}/CMakeFiles\")
+set(${PROJECT_NAME}_INCLUDE_DIRS \"\${SELF_DIR}/CMakeFiles\" )
 	")
 	
 	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
@@ -135,6 +135,8 @@ macro(WkFinConfig )
 	CMAKE_POLICY(VERSION 2.6)
 
 	file( APPEND ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake "
+#Includes for project after dependencies' includes
+set(${PROJECT_NAME}_INCLUDE_DIRS \"\${${PROJECT_NAME}_INCLUDE_DIRS}\" \"\${${PROJECT_NAME}_INCLUDE_DIR}\" )
 
 #Displaying detected dependencies in interface, and storing in cache
 set(${PROJECT_NAME}_INCLUDE_DIRS \"\${${PROJECT_NAME}_INCLUDE_DIRS}\" CACHE PATH \"${PROJECT_NAME} Headers\" )
@@ -240,7 +242,7 @@ CMAKE_POLICY(VERSION 2.6)
 	#Including configured headers (
 	#	-binary_dir/CMakeFiles for the configured header, 
 	#	-source_dir/include for the unmodified ones, 
-	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/CMakeFiles")
+	include_directories("${PROJECT_BINARY_DIR}/CMakeFiles" "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" )
 
 	#internal headers ( non visible by outside project )
 	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_SRC_DIR}")

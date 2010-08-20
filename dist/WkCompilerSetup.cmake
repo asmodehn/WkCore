@@ -235,10 +235,10 @@ macro ( WkCompilerSetup )
 			ENDIF(${PROJECT_NAME}_PROFILE)
 		#ENDIF ( COMMAND gprof )
 
-		WkSetCFlags ( All "${PROFILE_FLAG} -Wall " )
+		WkSetCFlags ( All "${PROFILE_FLAG} -Wall -std=c++98 " )
 		WkSetCFlags ( Debug "-g -D_DEBUG" )
 		WkSetCFLags ( Release "-O3 -DNDEBUG" )
-		WkSetCXXFlags ( All "${PROFILE_FLAG} -Wall -Wabi " )
+		WkSetCXXFlags ( All "${PROFILE_FLAG} -Wall -Wabi -std=c++98 " )
 		WkSetCXXFlags ( Debug "-g -D_DEBUG" )
 		WkSetCXXFLags ( Release "-O3 -DNDEBUG" )
 
