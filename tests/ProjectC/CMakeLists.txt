@@ -45,4 +45,7 @@ WkSvn( )
 WkTestBuild( maintestC )
 WkTestRun( ProjectC maintestC )
 
+WkInstall ( )
+
+WkPack ( )
 

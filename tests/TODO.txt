@@ -1,0 +1,3 @@
+- we need one test project per module, to make sure modules are found properly and can find and link system packages properly.
+- we need to review the codeblock project generated for A-B-C. There is a possibility to not have full path in C::B gui. We need to implement it
+- we need to review our compiler setup vs C++11
