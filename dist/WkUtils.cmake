@@ -90,6 +90,9 @@ macro(SetPackageVarName varname pkgname)
 	if ( ${${varname}} STREQUAL "STLPort" )
 		set ( ${varname} "STLPORT")
 	endif ( ${${varname}} STREQUAL "STLPort" )
+	if ( ${${varname}} STREQUAL "MySql" )
+		set ( ${varname} "MYSQL")
+	endif ( ${${varname}} STREQUAL "MySql" )
 	#etc.
 	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
 
