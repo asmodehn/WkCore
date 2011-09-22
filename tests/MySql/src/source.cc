@@ -28,11 +28,11 @@
  *
  */
 
-#include "MySql/header.hh"
+#include "MySqltest/header.hh"
 
 #include <cstdio>
 
-int MySql_display(std::string txt)
+int MySqltest_display(std::string txt)
 {
     WkDebug();
 

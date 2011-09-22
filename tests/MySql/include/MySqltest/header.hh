@@ -31,7 +31,7 @@
  *
  */
 
-#include "WkPlatform_MySql.h"
+#include "WkPlatform_MySqltest.h"
 
 #include <string>
 
@@ -41,7 +41,7 @@ extern "C"
 {
 #endif
 
-    WK_MySql_API int MySql_display(std::string txt);
+    WK_MySqltest_API int MySqltest_display(std::string txt);
 
     /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

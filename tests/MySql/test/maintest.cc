@@ -28,9 +28,9 @@
  *
  */
 
-#include "MySql/header.hh"
+#include "MySqltest/header.hh"
 
 int main ( int argc, char* argv[] )
 {
-    return MySql_display("test A");
+    return MySqltest_display("test A");
 }
