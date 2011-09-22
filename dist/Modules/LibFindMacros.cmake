@@ -13,7 +13,7 @@ macro (libfind_package PREFIX)
   find_package(${LIBFIND_PACKAGE_ARGS})
 endmacro (libfind_package)
 
-# Damn CMake developers made the UsePkgConfig system deprecated in the same release (2.6)
+# CMake developers made the UsePkgConfig system deprecated in the same release (2.6)
 # where they added pkg_check_modules. Consequently I need to support both in my scripts
 # to avoid those deprecated warnings. Here's a helper that does just that.
 # Works identically to pkg_check_modules, except that no checks are needed prior to use.
@@ -37,9 +37,18 @@ endmacro (libfind_pkg_check_modules)
 # Also handles errors in case library detection was required, etc.
 macro (libfind_process PREFIX)
   # Skip processing if already processed during this run
-  if (NOT ${PREFIX}_FOUND)
+  if (NOT DEFINED ${PREFIX}_FOUND)
     # Start with the assumption that the library was found
     set (${PREFIX}_FOUND TRUE)
+
+	if ( CMAKE_MAJOR_VERSION EQUAL 2 )
+	if ( CMAKE_MINOR_VERSION GREATER 6 )
+		#clear the variables ( in case they already have some values ) if possible
+		#avoids duplication in cache variables.
+		unset(${PREFIX}_INCLUDE_DIRS CACHE)
+		unset(${PREFIX}_LIBRARIES CACHE)
+	endif ( CMAKE_MINOR_VERSION GREATER 6 )
+	endif ( CMAKE_MAJOR_VERSION EQUAL 2 )
 
     # Process all includes and set _FOUND to false if any are missing
     foreach (i ${${PREFIX}_PROCESS_INCLUDES})
@@ -63,9 +72,18 @@ macro (libfind_process PREFIX)
 
     # Print message and/or exit on fatal error
     if (${PREFIX}_FOUND)
-      if (NOT ${PREFIX}_FIND_QUIETLY)
-        message (STATUS "Found ${PREFIX} ${${PREFIX}_VERSION}")
-      endif (NOT ${PREFIX}_FIND_QUIETLY)
+		set(${PREFIX}_INCLUDE_DIRS ${${PREFIX}_INCLUDE_DIRS} CACHE PATH "Include directories for ${PREFIX}. This is auto generated. To change a value here edit the ${PREFIX}_INCLUDE_DIR advanced variable.")
+		set(${PREFIX}_LIBRARIES ${${PREFIX}_LIBRARIES} CACHE FILEPATH "Libraries for ${PREFIX}. This is auto generated. To change a value here edit the ${PREFIX}_LIBRARY advanced variable.")
+	
+    	if (NOT ${PREFIX}_FIND_QUIETLY)
+    		message (STATUS "Found ${PREFIX} ${${PREFIX}_VERSION}")
+			if(${PREFIX}_FIND_REQUIRED)
+			else(${PREFIX}_FIND_REQUIRED)
+				set(${PREFIX}_FOUND ${${PREFIX}_FOUND} CACHE BOOL "Whether CMake found ${PREFIX} or not. Set to OFF to not use it in your CMakeLists.txt. Delete to try to find ${PREFIX} again.")
+			endif(${PREFIX}_FIND_REQUIRED)
+			message(STATUS "Headers in : ${${PREFIX}_INCLUDE_DIRS}")
+			message(STATUS "Libraries : ${${PREFIX}_LIBRARIES}")
+    	endif (NOT ${PREFIX}_FIND_QUIETLY)
     else (${PREFIX}_FOUND)
       if (${PREFIX}_FIND_REQUIRED)
         foreach (i ${${PREFIX}_PROCESS_INCLUDES} ${${PREFIX}_PROCESS_LIBS})
@@ -74,7 +92,7 @@ macro (libfind_process PREFIX)
         message (FATAL_ERROR "Required library ${PREFIX} NOT FOUND.\nInstall the library (dev version) and try again. If the library is already installed, use ccmake to set the missing variables manually.")
       endif (${PREFIX}_FIND_REQUIRED)
     endif (${PREFIX}_FOUND)
-  endif (NOT ${PREFIX}_FOUND)
+  endif (NOT DEFINED ${PREFIX}_FOUND)
 endmacro (libfind_process)
 
 macro(libfind_library PREFIX basename)
