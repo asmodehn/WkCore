@@ -90,10 +90,9 @@ macro(SetPackageVarName varname pkgname)
 	if ( ${${varname}} STREQUAL "STLPort" )
 		set ( ${varname} "STLPORT")
 	endif ( ${${varname}} STREQUAL "STLPort" )
-	if ( ${${varname}} STREQUAL "MySql" )
-		set ( ${varname} "MYSQL")
-	endif ( ${${varname}} STREQUAL "MySql" )
+	# NB : MySql doesnt require renaming here as it is our own module and variable name and package name are the same
 	#etc.
 	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
+	#
 
 endmacro(SetPackageVarName varname pkgname)
