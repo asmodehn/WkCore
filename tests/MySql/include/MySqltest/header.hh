@@ -33,6 +33,10 @@
 
 #include "WkPlatform_MySqltest.h"
 
+#ifdef WK_MySqltest_FOUND_MySql
+#include <mysql.h>
+#endif
+
 #include <string>
 
 /* Set up for C function definitions, even when using C++ */

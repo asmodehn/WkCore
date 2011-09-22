@@ -36,5 +36,19 @@ int MySqltest_display(std::string txt)
 {
     WkDebug();
 
+#ifdef WK_MySqltest_FOUND_MySql
+    if (mysql_library_init(0, NULL, NULL))
+    {
+        fprintf(stderr, "could not initialize MySQL library\n");
+        return(1);
+    }
+
+    /* Use any MySQL API functions here */
+    std::string str = mysql_get_client_info();
+    printf("MySQL detected Version : %s\n",str.c_str());
+
+    mysql_library_end();
+#endif
+
     return 0;
 }
