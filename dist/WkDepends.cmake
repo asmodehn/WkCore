@@ -44,8 +44,6 @@ include ( "${WKCMAKE_DIR}/WkUtils.cmake" )
 # WkDepends( dependency_name [QUIET / REQUIRED] )
 
 macro (WkDepends package_name)
-CMAKE_POLICY(PUSH)
-CMAKE_POLICY(VERSION 2.6)
 	
 	#
 	# First check if the package is installed already , quietly
@@ -101,7 +99,6 @@ CMAKE_POLICY(VERSION 2.6)
 		message ( STATUS "== Binary Dependency ${package_name} : NOT FOUND ! " )
 	endif ( ${package_var_name}_FOUND )
 
-CMAKE_POLICY(POP)
 endmacro (WkDepends package_name)
 
 #
@@ -109,8 +106,6 @@ endmacro (WkDepends package_name)
 # They will all be forwarded to client projects
 #
 macro(WkLinkDepends package_name)
-CMAKE_POLICY(PUSH)
-CMAKE_POLICY(VERSION 2.6)
 	
 	SetPackageVarName( package_var_name ${package_name} )
 	#message ( "${package_name} -> ${package_var_name}" )
@@ -186,7 +181,6 @@ endif ( WIN32 )
 		message ( STATUS "== Binary Dependency ${package_name} : FAILED ! " )
 	endif ( ${package_var_name}_FOUND )
 	
-CMAKE_POLICY(POP)
 endmacro(WkLinkDepends package_name)
 
 macro (WkCopyDepends depend target)
