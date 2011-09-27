@@ -94,6 +94,7 @@ macro(SetPackageVarName varname pkgname)
 	if ( ${${varname}} STREQUAL "MySQL++" )
 		set ( ${varname} "MySQLpp")
 	endif ( ${${varname}} STREQUAL "MySQL++" )
+	# NB : Bullet doesnt require renaming here as it is our own module and variable name and package name are the same
 	#etc.
 	# add whats needed for the projects we support, waiting for a standard way in cmake modules...
 	#
