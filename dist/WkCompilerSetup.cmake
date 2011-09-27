@@ -235,7 +235,7 @@ macro ( WkCompilerSetup )
 			ENDIF(${PROJECT_NAME}_PROFILE)
 		#ENDIF ( COMMAND gprof )
 
-		WkSetCFlags ( All "${PROFILE_FLAG} -Wall -std=c++98 " )
+		WkSetCFlags ( All "${PROFILE_FLAG} -Wall " )
 		WkSetCFlags ( Debug "-g -D_DEBUG" )
 		WkSetCFLags ( Release "-O3 -DNDEBUG" )
 		WkSetCXXFlags ( All "${PROFILE_FLAG} -Wall -Wabi -std=c++98 " )
