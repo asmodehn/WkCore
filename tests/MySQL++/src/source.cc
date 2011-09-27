@@ -28,26 +28,21 @@
  *
  */
 
-#include "MySqltest/header.hh"
+#include "MySQLpptest/header.hh"
 
 #include <cstdio>
 
-int MySqltest_display(std::string txt)
+int MySQLpptest_display(std::string txt)
 {
     WkDebug();
 
-#ifdef WK_MySqltest_FOUND_MySql
-    if (mysql_library_init(0, NULL, NULL))
-    {
-        fprintf(stderr, "could not initialize MySQL library\n");
-        return(1);
-    }
-
+#ifdef WK_MySqlpptest_FOUND_MySQLpp
     /* Use any MySQL API functions here */
-    std::string str = mysql_get_client_info();
-    printf("MySQL detected Version : %s\n",str.c_str());
+    unsigned int libv = mysqlpp::get_library_version();
+    unsigned int headv = MYSQLPP_HEADER_VERSION;
+    printf("MySQL++ detected header Version : %x\n",headv);
+    printf("MySQL++ detected lib Version : %x\n",libv);
 
-    mysql_library_end();
 #endif
 
     return 0;

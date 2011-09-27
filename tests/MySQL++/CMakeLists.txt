@@ -33,8 +33,8 @@ INCLUDE ( CMake/WkCMake.cmake )
 WkCMakeDir ( CMake )
 
 #Project declaration
-WkProject( MySqltest C )
-WkDepends( MySql REQUIRED )
+WkProject( MySQLpptest CXX )
+WkDepends( MySQL++ REQUIRED )
 #Build Rules
 WkBuild( LIBRARY SHARED)
 
@@ -42,5 +42,5 @@ WkBuild( LIBRARY SHARED)
 
 #Testing
 WkTestBuild( maintest )
-WkTestRun( MySqltest maintest )
+WkTestRun( MySQLpptest maintest )
 
