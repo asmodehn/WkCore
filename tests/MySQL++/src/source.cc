@@ -36,7 +36,7 @@ int MySQLpptest_display(std::string txt)
 {
     WkDebug();
 
-#ifdef WK_MySqlpptest_FOUND_MySQLpp
+#ifdef WK_MySQLpptest_FOUND_MySQLpp
     /* Use any MySQL API functions here */
     unsigned int libv = mysqlpp::get_library_version();
     unsigned int headv = MYSQLPP_HEADER_VERSION;
