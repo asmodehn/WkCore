@@ -10,6 +10,8 @@ Modules tests
 =============
 MySql is a test project for the detection of libmysqlclient-dev library
 MySQL++ is a test project for the detection of libmysql++-dev library
+Bullet is a test project for the detection of Bullet physics engine - TODO : fix it : At the moment bullet doesnt support being in a shared library on amd64 architectures
+LuaJIT is a test project for the detection of Bullet physics engine
 
 TODO
 ====
