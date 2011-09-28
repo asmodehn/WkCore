@@ -1,7 +1,11 @@
 #!/bin/sh
 
 BUILD_DIR="../MySql_build"
-SRC_DIR=`pwd`
+## always get the directory containing this script
+SRC_DIR="$( cd "$( dirname "$0" )" && pwd )"
+echo "Source Directory detected : " $SRC_DIR
+
+
 BUILD_TYPE=Release
 ENABLE_TESTS=ON
 
