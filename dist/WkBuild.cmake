@@ -1,5 +1,5 @@
 # 
-# Copyright (c) 2009, Asmodehn's Corp.
+# Copyright (c) 2009-2011, Asmodehn's Corp.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without 
@@ -281,9 +281,26 @@ CMAKE_POLICY(VERSION 2.6)
 		message( FATAL_ERROR " Project Type can only be EXECUTABLE or LIBRARY " )
 	endif()
 	
+	#code analysis by target introspection -> needs to be done after target definition ( as here )
+	FIND_PACKAGE(WKCMAKE_Cppcheck)
+	IF ( WKCMAKE_Cppcheck_FOUND)
+		option ( ${PROJECT_NAME}_CODE_ANALYSIS "Enable Code Analysis" OFF)
+		IF ( ${PROJECT_NAME}_CODE_ANALYSIS )
+			Add_WKCMAKE_Cppcheck_target(${PROJECT_NAME}_cppcheck ${PROJECT_NAME} "${PROJECT_NAME}-cppcheck.xml")
+		ENDIF ( ${PROJECT_NAME}_CODE_ANALYSIS )
+	ENDIF ( WKCMAKE_Cppcheck_FOUND)
+
 	if( WKCMAKE_AStyle_FOUND )
-		add_dependencies(${PROJECT_NAME} format)
+		add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_format)
+		if ( WKCMAKE_Cppcheck_FOUND)
+			add_dependencies(${PROJECT_NAME}_format ${PROJECT_NAME}_cppcheck)
+		endif ( WKCMAKE_Cppcheck_FOUND)
+	else( WKCMAKE_AStyle_FOUND )
+		if ( WKCMAKE_Cppcheck_FOUND)
+			add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_cppcheck)
+		endif ( WKCMAKE_Cppcheck_FOUND)
 	endif( WKCMAKE_AStyle_FOUND )
+	
 
 	#
 	# Defining where to put what has been built

@@ -16,7 +16,7 @@ FIND_PROGRAM(WKCMAKE_Cppcheck_EXECUTABLE
 
 IF (WKCMAKE_Cppcheck_EXECUTABLE)
   SET (WKCMAKE_Cppcheck_FOUND "YES")
-  MESSAGE(STATUS "Looking for cppcheck... - found ${Cppcheck_EXECUTABLE}")
+  MESSAGE(STATUS "Looking for cppcheck... - found ${WKCMAKE_Cppcheck_EXECUTABLE}")
 ELSE (WKCMAKE_Cppcheck_EXECUTABLE)
   IF (WKCMAKE_Cppcheck_FIND_REQUIRED)
     MESSAGE(FATAL_ERROR "Looking for cppcheck... - NOT found")
@@ -70,7 +70,9 @@ MACRO (Add_WKCMAKE_Cppcheck_target cppcheck_new_target original_target filename_
 	endif ( WKCMAKE_Cppcheck_SOURCES )
 	
 #combining all in one cppcheck command
-	set ( cmdline " ${WKCMAKE_Cppcheck_EXECUTABLE} ${WKCMAKE_Cppcheck_DEFINITIONS_Splitted} ${WKCMAKE_Cppcheck_INCLUDES_Splitted} -j6 --verbose --xml ${WKCMAKE_Cppcheck_SOURCES_Splitted} 2> ${PROJECT_BINARY_DIR}/${filename_results}" )
+	
+	set(${PROJECT_NAME}_CODE_ANALYSIS_OPTIONS "-j4 --verbose" CACHE STRING "Analysis Options for Cppcheck")
+	set ( cmdline " ${WKCMAKE_Cppcheck_EXECUTABLE} ${WKCMAKE_Cppcheck_DEFINITIONS_Splitted} ${WKCMAKE_Cppcheck_INCLUDES_Splitted} ${${PROJECT_NAME}_CODE_ANALYSIS_OPTIONS} --xml ${WKCMAKE_Cppcheck_SOURCES_Splitted} 2> ${PROJECT_BINARY_DIR}/${filename_results}" )
 	#message ( "CMD : ${cmdline} " )
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${PROJECT_BINARY_DIR}/${filename_results}
@@ -80,4 +82,4 @@ MACRO (Add_WKCMAKE_Cppcheck_target cppcheck_new_target original_target filename_
 		VERBATIM
 	)
 	ADD_CUSTOM_TARGET(${cppcheck_new_target} DEPENDS ${PROJECT_BINARY_DIR}/${filename_results})
-ENDMACRO (Add_WKCMAKE_Cppcheck_TARGET)
+ENDMACRO (Add_WKCMAKE_Cppcheck_target)

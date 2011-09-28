@@ -1,5 +1,5 @@
 # 
-# Copyright (c) 2009, Asmodehn's Corp.
+# Copyright (c) 2009-2011, Asmodehn's Corp.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without 
@@ -91,6 +91,7 @@ MACRO(WkTestBuild test_name)
 				ADD_CUSTOM_TARGET(${PROJECT_NAME}_${test_name}_format ALL sh -c ${cmdline} WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" VERBATIM )
 			ENDIF ( ${PROJECT_NAME}_CODE_FORMAT )
 
+
 			#Create output directories
 			IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
 				FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
@@ -106,6 +107,12 @@ MACRO(WkTestBuild test_name)
 			TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
 			ADD_DEPENDENCIES(${test_name} ${PROJECT_NAME})
 			
+			#Analyse test if analysing project
+			# done by target introspection -> needs to be declared after target definition
+			IF ( ${PROJECT_NAME}_CODE_ANALYSIS )
+				Add_WKCMAKE_Cppcheck_target(${PROJECT_NAME}_${test_name}_analysis ${PROJECT_NAME}_${test_name} "${WKCMAKE_TEST_DIR}/${test_name}-cppcheck.xml")
+			ENDIF ( ${PROJECT_NAME}_CODE_ANALYSIS )
+
 			#We need to move project libraries and dependencies to the test target location after build.
 			#We need to do that everytime to make sure we have the latest version
 			
