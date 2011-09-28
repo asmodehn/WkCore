@@ -225,18 +225,18 @@ CMAKE_POLICY(VERSION 2.6)
 	endif ( NOT CMAKE_MODULE_PATH )
 
 	FIND_PACKAGE(AStyle)
-	IF ( ASTYLE_FOUND )
+	IF ( AStyle_FOUND )
 		option (${PROJECT_NAME}_CODE_FORMAT "Enable Code Formatting" ON)
 		IF ( ${PROJECT_NAME}_CODE_FORMAT )
 			set(${PROJECT_NAME}_CODE_FORMAT_STYLE "ansi" CACHE STRING "Format Style for AStyle")
 			WkWhitespaceSplit( HEADERS HEADERS_PARAM )
 			WkWhitespaceSplit( SOURCES SOURCES_PARAM )
 			#message ( "Sources :  ${HEADERS_PARAM} ${SOURCES_PARAM}" )
-			set ( cmdline " ${ASTYLE_EXECUTABLE} --style=${${PROJECT_NAME}_CODE_FORMAT_STYLE} ${HEADERS_PARAM} ${SOURCES_PARAM}" )
+			set ( cmdline " ${AStyle_EXECUTABLE} --style=${${PROJECT_NAME}_CODE_FORMAT_STYLE} ${HEADERS_PARAM} ${SOURCES_PARAM}" )
 			#message ( "CMD : ${cmdline} " )
 			ADD_CUSTOM_TARGET(${PROJECT_NAME}_format ALL sh -c ${cmdline} WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" VERBATIM )
 		ENDIF ( ${PROJECT_NAME}_CODE_FORMAT )
-	ENDIF ( ASTYLE_FOUND )
+	ENDIF ( AStyle_FOUND )
 
 
 	#Including configured headers (
@@ -281,9 +281,9 @@ CMAKE_POLICY(VERSION 2.6)
 		message( FATAL_ERROR " Project Type can only be EXECUTABLE or LIBRARY " )
 	endif()
 	
-	if( ASTYLE_FOUND )
+	if( AStyle_FOUND )
 		add_dependencies(${PROJECT_NAME} format)
-	endif( ASTYLE_FOUND )
+	endif( AStyle_FOUND )
 
 	#
 	# Defining where to put what has been built
