@@ -65,6 +65,19 @@ macro(WkWhitespaceSplit source WSsplitted)
 	endforeach(arg ${${source}})
 endmacro(WkWhitespaceSplit source WSsplitted)
 
+macro(WkCustomSplit source delimiter Csplitted)
+#warning : Csplitted is erased here 
+	#message ( "Csplitted: ${${Csplitted}} ")
+	#message ( "source: ${${source}} ")
+	set ( Csplitted "")
+	foreach(arg ${${source}})
+		#message ( "Csplitted: ${${Csplitted}} ")
+		#message ( "arg: ${arg} " )
+		set(${Csplitted} "${${Csplitted}}${delimiter}\"${arg}\"")
+		#message ( "Csplitted: ${${Csplitted}} ")
+	endforeach(arg ${${source}})
+endmacro(WkCustomSplit source delimiter Csplitted)
+
 macro(SetPackageVarName varname pkgname)
 #Sometime the variable name is differnet from the package name... annoying
 	set ( ${varname} ${pkgname} )
