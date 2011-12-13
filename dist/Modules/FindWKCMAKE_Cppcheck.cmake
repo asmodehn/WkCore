@@ -11,6 +11,7 @@ MESSAGE(STATUS "Looking for cppcheck...")
 
 FIND_PROGRAM(WKCMAKE_Cppcheck_EXECUTABLE
   NAMES cppcheck
+  PATHS "[HKEY_LOCAL_MACHINE\\Software\\Cppcheck;InstallationPath]"
   DOC "Cppcheck Source Code Analysis tool (http://cppcheck.sourceforge.net)"
 )
 

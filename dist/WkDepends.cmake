@@ -49,9 +49,6 @@ macro (WkDepends package_name)
 	# First check if the package is installed already , quietly
 	#
 	
-	# regroup original CMAKE_MODULE_PATH and WkCmake Module path in order for the find_package to look inside both locations
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
-	
 	SetPackageVarName( package_var_name ${package_name} )
 	#message ( "${package_name} -> ${package_var_name}" )
 

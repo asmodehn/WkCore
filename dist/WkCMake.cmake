@@ -47,6 +47,10 @@ macro(WkCMakeDir dir)
 	set ( WKCMAKE_LIB_DIR "lib" CACHE PATH "Library directory for WkCMake build products" FORCE )
 	set ( WKCMAKE_DATA_DIR "data" CACHE PATH "Data directory for WkCMake build products" FORCE )
 	mark_as_advanced ( WKCMAKE_DIR WKCMAKE_INCLUDE_DIR WKCMAKE_SRC_DIR WKCMAKE_BIN_DIR WKCMAKE_LIB_DIR WKCMAKE_DATA_DIR)
+	
+	# regroup original CMAKE_MODULE_PATH and WkCmake Module path in order for the find_package to look inside both locations
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
+	
 #including other useful files
 	include ( "${WKCMAKE_DIR}/WkBuild.cmake" RESULT_VARIABLE WKCMAKEBUILD_FOUND )
 	IF ( NOT WKCMAKEBUILD_FOUND )
@@ -82,6 +86,13 @@ macro(WkIncludeDir dir)
 	set ( WKCMAKE_INCLUDE_DIR ${dir} CACHE PATH "Headers directory for autodetection by WkCMake" FORCE )
 	mark_as_advanced ( WKCMAKE_INCLUDE_DIR )
 endmacro(WkIncludeDir dir)
+
+macro(WkModulesDir dir)
+	set ( WKCMAKE_MODULES_DIR ${dir} CACHE PATH "Modules directory for package autodetection by WkCMake" FORCE )
+	#TODO : detect if absolute or relative...
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/${WKCMAKE_MODULES_DIR}")
+	mark_as_advanced ( WKCMAKE_MODULES_DIR )
+endmacro(WkModulesDir dir)
 
 macro(WkSrcDir dir)
 	set ( WKCMAKE_SRC_DIR ${dir} CACHE PATH "Sources directory for autodetection by WkCMake" FORCE )
