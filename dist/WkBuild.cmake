@@ -61,11 +61,6 @@ CMAKE_POLICY(VERSION 2.6)
 	
 	WkPlatformCheck()
 	WkCompilerSetup(${ARGN})
-	#preparing and cleaning internal build variables
-	# We might not need that at all : simpler
-	#set( ${PROJECT_NAME}_INCLUDE_DIRS CACHE PATH " Includes directories for ${PROJECT_NAME} ")
-	#set( ${project_name_arg}_LIBRARIES CACHE FILEPATH " Libraries needed for ${project_name_arg} " )
-	#set( ${project_name_arg}_RUN_LIBRARIES CACHE FILEPATH " libraries needed to run ${project_name_arg} " )
 
 	#TODO
 	#Quick test to make sure we build in different directory
@@ -162,7 +157,6 @@ endmacro(WkFinConfig )
 #
 # Configure and Build process based on well-known hierarchy
 # You need include and src in your hierarchy at least for this to work correctly
-# You also need MergeLists.txt 
 #
 
 #WkBuild( target_name EXECUTABLE | LIBRARY [ STATIC|SHARED|MODULE ]  )
