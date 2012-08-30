@@ -46,11 +46,11 @@ endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
 macro(WkSetCFlags Build)
 	IF (${Build} STREQUAL All )
-		SET(${PROJECT_NAME}_C_FLAGS "${ARGN}" CACHE STRING "${PROJECT_NAME} Flags for C Compiler.")
+		SET(${PROJECT_NAME}_C_FLAGS "${ARGN}" CACHE STRING "${PROJECT_NAME} Flags for C Compiler." )
 		MARK_AS_ADVANCED(FORCE ${PROJECT_NAME}_C_FLAGS )
 #		SET(CMAKE_C_FLAGS "${${PROJECT_NAME}_C_FLAGS}" CACHE INTERNAL "Internal CMake C Flags do not edit." FORCE)
 	ELSEIF (${Build} STREQUAL Debug )
-		SET(${PROJECT_NAME}_C_FLAGS_DEBUG "${ARGN}" CACHE STRING " ${PROJECT_NAME} Flags used by the C compiler during debug builds.")
+		SET(${PROJECT_NAME}_C_FLAGS_DEBUG "${ARGN}" CACHE STRING " ${PROJECT_NAME} Flags used by the C compiler during debug builds." )
 		MARK_AS_ADVANCED(FORCE ${PROJECT_NAME}_C_FLAGS_DEBUG )
 #		SET(CMAKE_C_FLAGS_DEBUG "${${PROJECT_NAME}_C_FLAGS_DEBUG}" CACHE INTERNAL "Internal CMake C flags for Debug mode do not edit." FORCE)
 	ELSEIF (${Build} STREQUAL Release )
@@ -169,7 +169,7 @@ ENDIF(${Build} STREQUAL Debug)
 endmacro ( WkDisableFlags )
   
 macro ( WkCompilerSetup )
-    #TODO : Accept list of languages here to setup only needed compiler settings
+    #TODO : setup only needed compiler settings, depending on loaded compilers
 
 	#Default : Multiple-Configuration Generator ( MSVC )
 	#Forcing configuration at build time
@@ -287,3 +287,39 @@ macro ( WkCompilerSetup )
 	ENDIF (CMAKE_BUILD_TYPE STREQUAL Debug)
 
 endmacro ( WkCompilerSetup )
+
+
+
+
+#setting target properties (replacing defaults from wkcmake - but not defaults from cmake )
+#WkTargetBuildOptions ( target_name build_type compile_flags [link_flags] )
+macro (WkTargetBuildOptions target_name build_type compile_flags )
+    string ( REGEX MATCH "${build_type}" BUILD_TYPE_MATCH "${CMAKE_CONFIGURATION_TYPES};All" )
+    #to get optional link_flags
+    if ( ${ARGC} GREATER 3 )
+        set(link_flags ${ARGV3})
+    endif ( ${ARGC} GREATER 3 )
+    #here we assume buildtype is correct
+
+	IF ( BUILD_TYPE_MATCH )
+        if ( ${PROJECT_NAME}_C_COMPILER_LOADED )
+            WkSetCFlags( ${build_type} ${compile_flags} )
+            #TODO : per target version of these. pb : defining option on target before target is defined ?
+        endif ()
+        if ( ${PROJECT_NAME}_CXX_COMPILER_LOADED )
+            WkSetCXXFlags( ${build_type} ${compile_flags} )
+        endif ()
+        if ( link_flags )
+	       	get_target_property(${PROJECT_NAME}_TYPE ${PROJECT_NAME} TYPE)
+   		    if ( ${PROJECT_NAME}_TYPE STREQUAL "EXECUTABLE" )
+		    	WkSetExeLinkerFlags( ${build_type} ${link_flags} )
+		    elseif ( ${PROJECT_NAME}_TYPE STREQUAL "SHARED_LIBRARY" )
+		    	WkSetSharedLinkerFlags( ${build_type} ${link_flags} )
+            elseif( ${PROJECT_NAME}_TYPE STREQUAL "MODULE_LIBRARY" )
+		    	WkSetModuleLinkerFlags( ${build_type} ${link_flags} )
+            endif()
+        endif ( link_flags )
+    ENDIF ( BUILD_TYPE_MATCH )
+endmacro (WkTargetBuildOptions)
+
+

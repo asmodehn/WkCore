@@ -54,13 +54,12 @@ CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 	project(${project_name_arg} ${ARGN})
 	
-	#TODO : differ loaded compiler and compiler used for each target
-	string(FIND "CXX" "${ARGN}" ${PROJECT_NAME}_CXX_COMPILER_LOADED )
+    #TODO : check what happens if we have hierarchy of subdirectories with wkcmake projects
+	SET(${PROJECT_NAME}_CXX_COMPILER_LOADED "${CMAKE_CXX_COMPILER_LOADED}" CACHE INTERNAL "Whether C++ compiler has been loaded for the project or not" FORCE)
 	#TODO : make sure this doesnt get the C of CXX
-	string(FIND "C" "${ARGN}" ${PROJECT_NAME}_C_COMPILER_LOADED )
-	
+	SET(${PROJECT_NAME}_C_COMPILER_LOADED "${CMAKE_C_COMPILER_LOADED}" CACHE INTERNAL "Whether C compiler has been loaded for the project or not" FORCE)
+		
 	WkPlatformCheck()
-	WkCompilerSetup(${ARGN})
 
 	#TODO
 	#Quick test to make sure we build in different directory
@@ -165,12 +164,16 @@ macro (WkBuild project_type)
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 
-
 	if ( ${ARGC} GREATER 1 )
 		set(${PROJECT_NAME}_load_type ${ARGV1} )
 	endif ( ${ARGC} GREATER 1 )
 
-    #adding usual BUIDL_SHARED_LIBS option
+    #Doing compiler setup in Build step, because :
+    # - it is related to target, not overall project ( even if environment is same for cmake, settings can be different for each target )
+    # - custom build options may have been defined before ( and will be used instead of defaults )
+	WkCompilerSetup()
+
+    #adding usual BUILD_SHARED_LIBS option
     option(BUILD_SHARED_LIBS "Set this to ON to build shared libraries by default" off)
 
 	if(${project_type} STREQUAL "LIBRARY")
@@ -228,7 +231,7 @@ CMAKE_POLICY(VERSION 2.6)
 	#Defining target
 	message ( STATUS "== Sources Files autodetection..." )	
 
-	#VS workaround to display headers even if strictly not needd when building
+	#VS workaround to display headers even if strictly not needed when building
 	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp ${WKCMAKE_SRC_DIR}/*.h ${WKCMAKE_SRC_DIR}/*.hh ${WKCMAKE_SRC_DIR}/*.hpp)
 	FILE(GLOB_RECURSE SOURCES RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
 	message ( STATUS "== Headers detected in ${WKCMAKE_INCLUDE_DIR} and ${WKCMAKE_SRC_DIR} : ${HEADERS}" )
@@ -414,24 +417,25 @@ CMAKE_POLICY(VERSION 2.6)
 CMAKE_POLICY(POP)
 endmacro (WkBuild)
 
-#TODO :
+#Sets specific compile and link flags the build ( override default target flags from wkcmake )
+#build_type can be either "Debug, "Release", or "All"
+#WkBuildOptions ( build_type compile_flags [link_flags] )
+macro (WkBuildOptions build_type compile_flags )
+    WkTargetBuildOptions( "${PROJECT_NAME}" "${build_type}" "${compile_flags}" "${ARGV2}")
+endmacro (WkBuildOptions)
+
 
 #macro (WkBuild project_type [load_type])
 #TODO for backward compat. must call :
 
 #WkTarget generates a target for the current project.
-#with same Language as Project and implicit dependency of main build target (check if always doable)
+#with same Language as Project and implicit dependency of main build target (to check if always doable)
 macro (WkTarget target_name include_dir source_dir project_type [load_type])
 CMAKE_POLICY(PUSH)
 CMAKE_POLICY(VERSION 2.6)
 #TODO
 CMAKE_POLICY(POP)
 endmacro(WkTarget)
-
-macro (WkTargetOptions target_name compile_flags link_flags)
-#TODO : setting specific flags for this target ( override default target flags from project )
-endmacro (WkTargetOptions)
-
 
 #
 # WkExtData( [ datafile1 [ datafile2 [ ... ] ] ] )
