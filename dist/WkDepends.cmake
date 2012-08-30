@@ -54,11 +54,12 @@ macro (WkDepends package_name)
 
 	#Here to avoid redefinition of library target if already found by a dependency using my dependency as well...
 	if ( NOT ${package_var_name}_FOUND )
+		#TODO : Fix if "REQUIRED" is passed to WkDepends
 		find_package( ${package_name} ${ARGN} )
 	endif ( NOT ${package_var_name}_FOUND )
 	
 	#
-	#here we should use the external package/project command to download not found package
+	#TODO: here we should use the external package/project command to download not found package
 	#
 	
 	if ( ${package_var_name}_FOUND )
