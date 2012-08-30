@@ -159,7 +159,7 @@ endmacro(WkFinConfig )
 # You need include and src in your hierarchy at least for this to work correctly
 #
 
-#WkBuild( target_name EXECUTABLE | LIBRARY [ STATIC|SHARED|MODULE ]  )
+#WkBuild( EXECUTABLE | LIBRARY [ STATIC|SHARED|MODULE ]  )
 
 macro (WkBuild project_type)
 CMAKE_POLICY(PUSH)
@@ -169,6 +169,20 @@ CMAKE_POLICY(VERSION 2.6)
 	if ( ${ARGC} GREATER 1 )
 		set(${PROJECT_NAME}_load_type ${ARGV1} )
 	endif ( ${ARGC} GREATER 1 )
+
+    #adding usual BUIDL_SHARED_LIBS option
+    option(BUILD_SHARED_LIBS "Set this to ON to build shared libraries by default" off)
+
+	if(${project_type} STREQUAL "LIBRARY")
+		#handling default load type
+		if ( NOT ${PROJECT_NAME}_load_type )
+		    if( BUILD_SHARED_LIBS )
+    		    set(${PROJECT_NAME}_load_type "SHARED")
+    		else( BUILD_SHARED_LIBS )
+        		set(${PROJECT_NAME}_load_type "STATIC")
+        	endif( BUILD_SHARED_LIBS )
+        endif ( NOT ${PROJECT_NAME}_load_type )
+	endif(${project_type} STREQUAL "LIBRARY")
 
 	message ( STATUS "== Configuring ${PROJECT_NAME} as ${project_type} ${${PROJECT_NAME}_load_type}" )	
 		
@@ -279,8 +293,7 @@ CMAKE_POLICY(VERSION 2.6)
 
 	if(${project_type} STREQUAL "LIBRARY")
 		add_library(${PROJECT_NAME} ${${PROJECT_NAME}_load_type} ${SOURCES})
-		if ( ${PROJECT_NAME}_load_type )
-		if(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
+		if ( ${${PROJECT_NAME}_load_type} STREQUAL "SHARED" )
 			set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL "WK_${PROJECT_NAME}_SHAREDLIB_BUILD")
 			#if on windows we need to care about run libraries ( Dlls )
 			if ( WIN32 )
@@ -288,8 +301,7 @@ CMAKE_POLICY(VERSION 2.6)
 				set( ${PROJECT_NAME}_RUN_LIBRARIES "${${PROJECT_NAME}_LOCATION}")
 				#message( "Project run lib WkBuild : ${${PROJECT_NAME}_RUN_LIBRARIES} " )
 			endif( WIN32 )
-		endif(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
-		endif (${PROJECT_NAME}_load_type)		
+		endif ( ${${PROJECT_NAME}_load_type} STREQUAL "SHARED" )
 	elseif (${project_type} STREQUAL "EXECUTABLE")
 		add_executable(${PROJECT_NAME} ${SOURCES})
 		#We also need to copy run libraries on windows
@@ -314,23 +326,22 @@ CMAKE_POLICY(VERSION 2.6)
             set_target_properties( ${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "${${PROJECT_NAME}_CXX_FLAGS} ${${PROJECT_NAME}_CXX_FLAGS_RELEASE}" )
         endif()
     endif()
- 	if(${project_type} STREQUAL "LIBRARY")
-     	if(${${PROJECT_NAME}_load_type} STREQUAL "SHARED")
-       	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS "${${PROJECT_NAME}_SHARED_LINKER_FLAGS}" )
- 	        if ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Debug" )
-         	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "${${PROJECT_NAME}_SHARED_LINKER_FLAGS_DEBUG}" )
-   	        elseif ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Release" )
-           	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "${${PROJECT_NAME}_SHARED_LINKER_FLAGS_RELEASE}" )
-            endif()
-        elseif(${${PROJECT_NAME}_load_type} STREQUAL "MODULE")
-       	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS "${${PROJECT_NAME}_MODULE_LINKER_FLAGS}" )
- 	        if ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Debug" )
-         	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "${${PROJECT_NAME}_MODULE_LINKER_FLAGS_DEBUG}" )
-   	        elseif ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Release" )
-           	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "${${PROJECT_NAME}_MODULE_LINKER_FLAGS_RELEASE}" )
-            endif()
+	get_target_property(${PROJECT_NAME}_TYPE ${PROJECT_NAME} TYPE)
+	if ( ${PROJECT_NAME}_TYPE STREQUAL "SHARED_LIBRARY" )
+        set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS "${${PROJECT_NAME}_SHARED_LINKER_FLAGS}" )
+ 	    if ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Debug" )
+     	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "${${PROJECT_NAME}_SHARED_LINKER_FLAGS_DEBUG}" )
+   	    elseif ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Release" )
+       	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "${${PROJECT_NAME}_SHARED_LINKER_FLAGS_RELEASE}" )
         endif()
-  	elseif(${project_type} STREQUAL "EXECUTABLE")
+    elseif( ${PROJECT_NAME}_TYPE STREQUAL "MODULE_LIBRARY" )
+   	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS "${${PROJECT_NAME}_MODULE_LINKER_FLAGS}" )
+        if ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Debug" )
+     	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "${${PROJECT_NAME}_MODULE_LINKER_FLAGS_DEBUG}" )
+        elseif ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Release" )
+       	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_RELEASE "${${PROJECT_NAME}_MODULE_LINKER_FLAGS_RELEASE}" )
+        endif()
+  	elseif( ${PROJECT_NAME}_TYPE STREQUAL "EXECUTABLE" )
   	    if ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Debug" )
      	    set_target_properties( ${PROJECT_NAME} PROPERTIES LINK_FLAGS_DEBUG "${${PROJECT_NAME}_EXE_LINKER_FLAGS} ${${PROJECT_NAME}_EXE_LINKER_FLAGS_DEBUG}" )
         elseif ( ${PROJECT_NAME}_BUILD_TYPE STREQUAL "Release" )
@@ -402,6 +413,25 @@ CMAKE_POLICY(VERSION 2.6)
 		
 CMAKE_POLICY(POP)
 endmacro (WkBuild)
+
+#TODO :
+
+#macro (WkBuild project_type [load_type])
+#TODO for backward compat. must call :
+
+#WkTarget generates a target for the current project.
+#with same Language as Project and implicit dependency of main build target (check if always doable)
+macro (WkTarget target_name include_dir source_dir project_type [load_type])
+CMAKE_POLICY(PUSH)
+CMAKE_POLICY(VERSION 2.6)
+#TODO
+CMAKE_POLICY(POP)
+endmacro(WkTarget)
+
+macro (WkTargetOptions target_name compile_flags link_flags)
+#TODO : setting specific flags for this target ( override default target flags from project )
+endmacro (WkTargetOptions)
+
 
 #
 # WkExtData( [ datafile1 [ datafile2 [ ... ] ] ] )
