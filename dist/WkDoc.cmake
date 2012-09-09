@@ -34,18 +34,17 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
-set ( WKCMAKE_DOC_DIR "doc" CACHE PATH "Documentation directory for WkCMake build products" )
-mark_as_advanced ( WKCMAKE_DOC_DIR )
-
 macro(WkDocDir dir)
-	set ( WKCMAKE_DOC_DIR ${dir} CACHE PATH "Documentation directory for WkCMake build products" FORCE )
-	mark_as_advanced ( WKCMAKE_DOC_DIR )
+	set ( ${PROJECT_NAME}_DOC_DIR ${dir} CACHE PATH "Documentation directory for ${PROJECT_NAME}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_DOC_DIR )
 endmacro(WkDocDir dir)
 
 macro( WKDoc )
 FIND_PACKAGE(Doxygen)
 
 IF (DOXYGEN_FOUND)
+
+  WkDocDir("doc")
 
   # click+jump in Emacs and Visual Studio (for doxy.config) (jw)
   IF    (CMAKE_BUILD_TOOL MATCHES "(msdev|devenv)")

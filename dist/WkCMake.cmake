@@ -40,13 +40,7 @@ mark_as_advanced ( WKCMAKE_DIR )
 
 macro(WkCMakeDir dir)
 	set ( WKCMAKE_DIR ${dir} CACHE PATH "WkCMake Scripts path" FORCE )
-#setting defaults for directories
-	set ( WKCMAKE_INCLUDE_DIR "include" CACHE PATH "Headers directory for autodetection by WkCMake" FORCE )
-	set ( WKCMAKE_SRC_DIR "src" CACHE PATH "Sources directory for autodetection by WkCMake" FORCE )
-	set ( WKCMAKE_BIN_DIR "bin" CACHE PATH "Binary directory for WkCMake build products" FORCE )
-	set ( WKCMAKE_LIB_DIR "lib" CACHE PATH "Library directory for WkCMake build products" FORCE )
-	set ( WKCMAKE_DATA_DIR "data" CACHE PATH "Data directory for WkCMake build products" FORCE )
-	mark_as_advanced ( WKCMAKE_DIR WKCMAKE_INCLUDE_DIR WKCMAKE_SRC_DIR WKCMAKE_BIN_DIR WKCMAKE_LIB_DIR WKCMAKE_DATA_DIR)
+	mark_as_advanced ( WKCMAKE_DIR )
 	
 	# regroup original CMAKE_MODULE_PATH and WkCmake Module path in order for the find_package to look inside both locations
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
@@ -82,11 +76,6 @@ macro(WkCMakeDir dir)
 	ENDIF ( NOT WKCMAKEPACK_FOUND )
 endmacro(WkCMakeDir dir)
 
-macro(WkIncludeDir dir)
-	set ( WKCMAKE_INCLUDE_DIR ${dir} CACHE PATH "Headers directory for autodetection by WkCMake" FORCE )
-	mark_as_advanced ( WKCMAKE_INCLUDE_DIR )
-endmacro(WkIncludeDir dir)
-
 macro(WkModulesDir dir)
 	set ( WKCMAKE_MODULES_DIR ${dir} CACHE PATH "Modules directory for package autodetection by WkCMake" FORCE )
 	#TODO : detect if absolute or relative...
@@ -94,23 +83,4 @@ macro(WkModulesDir dir)
 	mark_as_advanced ( WKCMAKE_MODULES_DIR )
 endmacro(WkModulesDir dir)
 
-macro(WkSrcDir dir)
-	set ( WKCMAKE_SRC_DIR ${dir} CACHE PATH "Sources directory for autodetection by WkCMake" FORCE )
-	mark_as_advanced ( WKCMAKE_SRC_DIR )
-endmacro(WkSrcDir dir)
-
-macro(WkBinDir dir)
-	set ( WKCMAKE_BIN_DIR ${dir} CACHE PATH "Binary directory for WkCMake build products" FORCE )
-	mark_as_advanced ( WKCMAKE_BIN_DIR )
-endmacro(WkBinDir dir)
-
-macro(WkLibDir dir)
-	set ( WKCMAKE_LIB_DIR ${dir} CACHE PATH "Library directory for WkCMake build products" FORCE )
-	mark_as_advanced ( WKCMAKE_LIB_DIR )
-endmacro(WkLibDir dir)
-
-macro(WkDataDir dir)
-	set ( WKCMAKE_DATA_DIR ${dir} CACHE PATH "Data directory for WkCMake build products" FORCE )
-	mark_as_advanced ( WKCMAKE_DATA_DIR )
-endmacro(WkDataDir dir)
 

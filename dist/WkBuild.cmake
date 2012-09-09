@@ -36,9 +36,9 @@ endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
 #test to make sure necessary variables have been set.
 
-if ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR ) 
+if ( NOT WKCMAKE_DIR ) 
 	message( FATAL_ERROR "You need to include WkCMake.cmake in your CMakeLists.txt, and call WkCMakeDir(<path_to WkCMake scripts> )" )
-endif ( NOT WKCMAKE_DIR OR NOT WKCMAKE_INCLUDE_DIR OR NOT WKCMAKE_SRC_DIR ) 
+endif ( NOT WKCMAKE_DIR ) 
 
 # using useful Macros
 include ( "${WKCMAKE_DIR}/WkUtils.cmake" )
@@ -48,6 +48,33 @@ include ( "${WKCMAKE_DIR}/WkPlatform.cmake")
 
 #To setup the compiler
 include ( "${WKCMAKE_DIR}/WkCompilerSetup.cmake" )
+
+
+macro(WkIncludeDir dir)
+	set ( ${PROJECT_NAME}_INCLUDE_DIR ${dir} CACHE PATH "Headers directory for autodetection by WkCMake for ${PROJECT_NAME}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_INCLUDE_DIR )
+endmacro(WkIncludeDir dir)
+
+macro(WkSrcDir dir)
+	set ( ${PROJECT_NAME}_SRC_DIR ${dir} CACHE PATH "Sources directory for autodetection by WkCMake for ${PROJECT_NAME}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_SRC_DIR )
+endmacro(WkSrcDir dir)
+
+macro(WkBinDir dir)
+	set ( ${PROJECT_NAME}_BIN_DIR ${dir} CACHE PATH "Binary directory for WkCMake build products for ${PROJECT_NAME}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_BIN_DIR )
+endmacro(WkBinDir dir)
+
+macro(WkLibDir dir)
+	set ( ${PROJECT_NAME}_LIB_DIR ${dir} CACHE PATH "Library directory for WkCMake build products for ${PROJECT_NAME}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_LIB_DIR )
+endmacro(WkLibDir dir)
+
+macro(WkDataDir dir)
+	set ( ${PROJECT_NAME}_DATA_DIR ${dir} CACHE PATH "Data directory for WkCMake build products for ${PROJECT_NAME}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_DATA_DIR )
+endmacro(WkDataDir dir)
+
 
 macro(WkProject project_name_arg)
 CMAKE_POLICY(PUSH)
@@ -61,6 +88,14 @@ CMAKE_POLICY(VERSION 2.6)
 		
 	WkPlatformCheck()
 
+    #Setting up project structure
+    #setting defaults for directories
+    WkIncludeDir("include")
+    WkSrcDir("src")
+    WkBinDir("bin")
+    WkLibDir("lib")
+    WkDataDir("data")
+
 	#TODO
 	#Quick test to make sure we build in different directory
 	#if ( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
@@ -68,6 +103,8 @@ CMAKE_POLICY(VERSION 2.6)
 	#endif ( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
 CMAKE_POLICY(POP)
 endmacro(WkProject PROJECT_NAME)
+
+
 
 #
 # Generate a config file for the project.
@@ -95,7 +132,7 @@ CMAKE_POLICY(VERSION 2.6)
 get_filename_component(SELF_DIR \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)
 #all required target should be defined there... no need to specify all targets in ${PROJECT_NAME}_LIBRARIES, they will be linked automatically
 include(\${SELF_DIR}/${PROJECT_NAME}Export.cmake)
-get_filename_component(${PROJECT_NAME}_INCLUDE_DIR \"\${SELF_DIR}/${WKCMAKE_INCLUDE_DIR}/\" ABSOLUTE)
+get_filename_component(${PROJECT_NAME}_INCLUDE_DIR \"\${SELF_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}/\" ABSOLUTE)
 set(${PROJECT_NAME}_INCLUDE_DIRS \"\${SELF_DIR}/CMakeFiles\" )
 	")
 	
@@ -226,19 +263,19 @@ CMAKE_POLICY(VERSION 2.6)
 	WkPlatformConfigure()
 
 	#Storing Main Include directory
-	#set( ${PROJECT_NAME}_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" CACHE PATH " Includes directories for ${PROJECT_NAME} blah ")
+	#set( ${PROJECT_NAME}_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}" CACHE PATH " Includes directories for ${PROJECT_NAME} blah ")
 	
 	#Defining target
 	message ( STATUS "== Sources Files autodetection..." )	
 
 	#VS workaround to display headers even if strictly not needed when building
-	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_INCLUDE_DIR}/*.h ${WKCMAKE_INCLUDE_DIR}/*.hh ${WKCMAKE_INCLUDE_DIR}/*.hpp ${WKCMAKE_SRC_DIR}/*.h ${WKCMAKE_SRC_DIR}/*.hh ${WKCMAKE_SRC_DIR}/*.hpp)
-	FILE(GLOB_RECURSE SOURCES RELATIVE "${PROJECT_SOURCE_DIR}" ${WKCMAKE_SRC_DIR}/*.c ${WKCMAKE_SRC_DIR}/*.cpp ${WKCMAKE_SRC_DIR}/*.cc)
-	message ( STATUS "== Headers detected in ${WKCMAKE_INCLUDE_DIR} and ${WKCMAKE_SRC_DIR} : ${HEADERS}" )
-	message ( STATUS "== Sources detected in ${WKCMAKE_SRC_DIR} : ${SOURCES}" )
+	FILE(GLOB_RECURSE HEADERS RELATIVE "${PROJECT_SOURCE_DIR}" ${${PROJECT_NAME}_INCLUDE_DIR}/*.h ${${PROJECT_NAME}_INCLUDE_DIR}/*.hh ${${PROJECT_NAME}_INCLUDE_DIR}/*.hpp ${${PROJECT_NAME}_SRC_DIR}/*.h ${${PROJECT_NAME}_SRC_DIR}/*.hh ${${PROJECT_NAME}_SRC_DIR}/*.hpp)
+	FILE(GLOB_RECURSE SOURCES RELATIVE "${PROJECT_SOURCE_DIR}" ${${PROJECT_NAME}_SRC_DIR}/*.c ${${PROJECT_NAME}_SRC_DIR}/*.cpp ${${PROJECT_NAME}_SRC_DIR}/*.cc)
+	message ( STATUS "== Headers detected in ${${PROJECT_NAME}_INCLUDE_DIR} and ${${PROJECT_NAME}_SRC_DIR} : ${HEADERS}" )
+	message ( STATUS "== Sources detected in ${${PROJECT_NAME}_SRC_DIR} : ${SOURCES}" )
 
 	if ( NOT CMAKE_MODULE_PATH )
-		set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
+		set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/${${PROJECT_NAME}_DIR}/Modules/")
 	endif ( NOT CMAKE_MODULE_PATH )
 
 	#TODO : automatic detectino on windows ( preinstalled with wkcmake... )
@@ -276,10 +313,10 @@ CMAKE_POLICY(VERSION 2.6)
 	#Including configured headers (
 	#	-binary_dir/CMakeFiles for the configured header, 
 	#	-source_dir/include for the unmodified ones, 
-	include_directories("${PROJECT_BINARY_DIR}/CMakeFiles" "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" )
+	include_directories("${PROJECT_BINARY_DIR}/CMakeFiles" "${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}" )
 
 	#internal headers ( non visible by outside project )
-	include_directories("${PROJECT_SOURCE_DIR}/${WKCMAKE_SRC_DIR}")
+	include_directories("${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_SRC_DIR}")
 
 	#TODO : find a simpler way than this complex merge...
 	MERGE("${HEADERS}" "${SOURCES}" SOURCES)
@@ -377,11 +414,11 @@ CMAKE_POLICY(VERSION 2.6)
 	# Defining where to put what has been built
 	#
 	
-	SET(${PROJECT_NAME}_LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${WKCMAKE_LIB_DIR} CACHE PATH "Ouput directory for ${Project} libraries." )
+	SET(${PROJECT_NAME}_LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_LIB_DIR} CACHE PATH "Ouput directory for ${Project} libraries." )
 	mark_as_advanced(FORCE ${PROJECT_NAME}_LIBRARY_OUTPUT_PATH)
 	SET(LIBRARY_OUTPUT_PATH "${${PROJECT_NAME}_LIBRARY_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake libraries output directory. Do not edit." FORCE)
 	
-	SET(${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${WKCMAKE_BIN_DIR} CACHE PATH "Ouput directory for ${Project} executables." )
+	SET(${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_BIN_DIR} CACHE PATH "Ouput directory for ${Project} executables." )
 	mark_as_advanced(FORCE ${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH)
 	SET(EXECUTABLE_OUTPUT_PATH "${${PROJECT_NAME}_EXECUTABLE_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake executables output directory. Do not edit." FORCE)
 
@@ -391,15 +428,15 @@ CMAKE_POLICY(VERSION 2.6)
 	#
 	
 	if(${project_type} STREQUAL "LIBRARY") 
-		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}" )
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}" "${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_INCLUDE_DIR} to ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}" )
 		#trying to remove .svn directory... pb : what about other directories everywhere ?
-		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/.svn" COMMENT "Removing ${PROJECT_BINARY_DIR}/${WKCMAKE_INCLUDE_DIR}/.svn" )
+		ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}/.svn" COMMENT "Removing ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_INCLUDE_DIR}/.svn" )
 	endif(${project_type} STREQUAL "LIBRARY") 
 	
 	#
 	# Copying data directory after build ( fo use by project later )
 	#
-	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR}" "${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_DATA_DIR} to ${PROJECT_BINARY_DIR}/${WKCMAKE_DATA_DIR}" )
+	ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory "${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_DATA_DIR}" "${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_DATA_DIR}" COMMENT "Copying ${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_DATA_DIR} to ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_DATA_DIR}" )
 
 	#
 	# Generating configuration cmake file

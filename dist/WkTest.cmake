@@ -41,36 +41,58 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6.3 !" )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6.3 )
 
-#
-# Defining where Test should be found
-#
-set ( WKCMAKE_TEST_DIR "test" CACHE PATH "Test directory for WkCMake build products" )
-mark_as_advanced ( WKCMAKE_TEST_DIR )
 
+#
+# Defining where Test should be found on WkTestBuild call.
+#
 macro(WkTestDir dir)
-	set ( WKCMAKE_TEST_DIR ${dir} CACHE PATH "Test directory for WkCMake build products" FORCE )
-	mark_as_advanced ( WKCMAKE_TEST_DIR )
+ 	set ( ${PROJECT_NAME}_TEST_DIR ${dir} CACHE PATH "Test directory for ${PROJECT_NAME}" )    
+  	mark_as_advanced ( ${PROJECT_NAME}_TEST_DIR )
 endmacro(WkTestDir dir)
+
+#
+# Defining where data used by tests should be found vs the source.
+#
+macro(WkTestDataDir dir)
+	set ( ${PROJECT_NAME}_TEST_DATA_DIR ${dir} CACHE PATH "Data directory for ${PROJECT_NAME} source tests with root at ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_TEST_DATA_DIR )
+endmacro(WkTestDataDir dir)
+
+#
+# Defining where data used by tests should be found when using the build exe.
+#
+macro(WkTestDataBuildDir dir)
+	set ( ${PROJECT_NAME}_TEST_DATA_BUILD_DIR ${dir} CACHE PATH "Data directory for ${PROJECT_NAME} build tests products with root at ${PROJECT_BINARY_DIR}" FORCE )
+	mark_as_advanced ( ${PROJECT_NAME}_TEST_DATA_BUILD_DIR )
+endmacro(WkTestDataBuildDir dir)
 
 #
 #WkTestBuild( test_name [test_source [...] ] )
 #
 
 MACRO(WkTestBuild test_name)
-
+    
+    #Defining default folders for tests
+    # Default: "test" w root at ${PROJECT_SOURCE_DIR} 
+    WkTestDir("test")
+    # Default: "data" w root at ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR}    
+    WkTestDataDir("data")
+    # Default: "${${PROJECT_NAME}_TEST_DIR}/${${PROJECT_NAME}_TEST_DATA_DIR}" w root at ${PROJECT_BINARY_DIR}
+    WkTestDataBuildDir("${${PROJECT_NAME}_TEST_DIR}/${${PROJECT_NAME}_TEST_DATA_DIR}" )
+    
 	option(${PROJECT_NAME}_ENABLE_TESTS "Wether or not you want the project to include the tests and enable automatic testing for ${PROJECT_NAME}" OFF)
 
 	IF(${PROJECT_NAME}_ENABLE_TESTS)
 		ENABLE_TESTING()
 		
 		IF ( ${ARGC} EQUAL 1 )
-			FILE(GLOB testsource RELATIVE ${PROJECT_SOURCE_DIR} ${WKCMAKE_TEST_DIR}/${test_name}.c ${WKCMAKE_TEST_DIR}/${test_name}.cc ${WKCMAKE_TEST_DIR}/${test_name}.cpp )
+			FILE(GLOB testsource RELATIVE ${PROJECT_SOURCE_DIR} ${${PROJECT_NAME}_TEST_DIR}/${test_name}.c ${${PROJECT_NAME}_TEST_DIR}/${test_name}.cc ${${PROJECT_NAME}_TEST_DIR}/${test_name}.cpp )
 			MESSAGE ( STATUS "== Detected ${test_name} Source : ${testsource}" )
 		ELSE ( ${ARGC} EQUAL 1 )
 			set( testsource "" )
 			#To make sure the sources file exists
 			foreach( testsrc ${ARGN} )
-				set ( testsrc ${WKCMAKE_TEST_DIR}/${testsrc} )
+				set ( testsrc ${${PROJECT_NAME}_TEST_DIR}/${testsrc} )
 				IF (NOT EXISTS ${PROJECT_SOURCE_DIR}/${testsrc})
 					MESSAGE ( FATAL_ERROR "${testsrc} Not Found !" )
 				ELSE ( NOT EXISTS ${PROJECT_SOURCE_DIR}/${testsrc})
@@ -93,12 +115,12 @@ MACRO(WkTestBuild test_name)
 
 
 			#Create output directories
-			IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
-				FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
-			ENDIF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} )
+			IF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR} )
+				FILE ( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR} )
+			ENDIF ( NOT EXISTS ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR} )
 		
 			#Set where test executables should be found
-			SET(${PROJECT_NAME}_TESTS_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR} CACHE PATH "Ouput directory for ${Project} tests.")
+			SET(${PROJECT_NAME}_TESTS_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR} CACHE PATH "Ouput directory for ${Project} tests.")
 			mark_as_advanced(FORCE ${PROJECT_NAME}_TESTS_OUTPUT_PATH)
 			SET(EXECUTABLE_OUTPUT_PATH "${${PROJECT_NAME}_TESTS_OUTPUT_PATH}" CACHE INTERNAL "Internal CMake executables output directory. Do not edit." FORCE)
 		
@@ -110,7 +132,7 @@ MACRO(WkTestBuild test_name)
 			#Analyse test if analysing project
 			# done by target introspection -> needs to be declared after target definition
 			IF ( ${PROJECT_NAME}_CODE_ANALYSIS )
-				Add_WKCMAKE_Cppcheck_target(${PROJECT_NAME}_${test_name}_analysis ${PROJECT_NAME}_${test_name} "${WKCMAKE_TEST_DIR}/${test_name}-cppcheck.xml")
+				Add_WKCMAKE_Cppcheck_target(${PROJECT_NAME}_${test_name}_analysis ${PROJECT_NAME}_${test_name} "${${PROJECT_NAME}_TEST_DIR}/${test_name}-cppcheck.xml")
 			ENDIF ( ${PROJECT_NAME}_CODE_ANALYSIS )
 
 			#We need to move project libraries and dependencies to the test target location after build.
@@ -142,29 +164,6 @@ MACRO(WkTestBuild test_name)
 ENDMACRO(WkTestBuild test_name)
 
 
-#
-# Defining where data used by tests should be found vs the source.
-# Default: "data" w root at ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}
-#
-set ( WKCMAKE_TEST_DATA_DIR "data" CACHE PATH "Data directory for WkCMake source tests products w root at ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}" )
-mark_as_advanced ( WKCMAKE_TEST_DATA_DIR )
-
-macro(WkTestDataDir dir)
-	set ( WKCMAKE_TEST_DATA_DIR ${dir} CACHE PATH "Data directory for WkCMake source tests products w root at ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}" FORCE )
-	mark_as_advanced ( WKCMAKE_TEST_DATA_DIR )
-endmacro(WkTestDataDir dir)
-
-#
-# Defining where data used by tests should be found when using the build exe.
-# Default: "${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}" w root at ${PROJECT_BINARY_DIR}
-#
-set ( WKCMAKE_TEST_DATA_BUILD_DIR "${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}" CACHE PATH "Data directory for WkCMake build tests products w root at ${PROJECT_BINARY_DIR}" FORCE )
-mark_as_advanced ( WKCMAKE_TEST_DATA_BUILD_DIR )
-
-macro(WkTestDataBuildDir dir)
-	set ( WKCMAKE_TEST_DATA_BUILD_DIR ${dir} CACHE PATH "Data directory for WkCMake build tests products w root at ${PROJECT_BINARY_DIR}" FORCE )
-	mark_as_advanced ( WKCMAKE_TEST_DATA_BUILD_DIR )
-endmacro(WkTestDataBuildDir dir)
 
 #
 # WkTestData( test_name [ datafile1 [ datafile2 [ ... ] ] ] )
@@ -176,10 +175,10 @@ MACRO (WkTestData test_name )
 	foreach ( test_data ${ARGN} )
 		
 		# warning : tests are run from the project root...
-		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DATA_BUILD_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DATA_BUILD_DIR}/${test_data}" )
+		ADD_CUSTOM_COMMAND( TARGET ${test_name} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_TEST_DIR}/${${PROJECT_NAME}_TEST_DATA_DIR}/${test_data} ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DATA_BUILD_DIR}/${test_data} COMMENT "Copying ${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_TEST_DIR}/${${PROJECT_NAME}_TEST_DATA_DIR}/${test_data} to ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DATA_BUILD_DIR}/${test_data}" )
 		
-		#message ("test data src: ${PROJECT_SOURCE_DIR}/${WKCMAKE_TEST_DIR}/${WKCMAKE_TEST_DATA_DIR}/${test_data}")
-		#message ("test data dest: ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DATA_BUILD_DIR}/${test_data}")
+		#message ("test data src: ${PROJECT_SOURCE_DIR}/${${PROJECT_NAME}_TEST_DIR}/${${PROJECT_NAME}_TEST_DATA_DIR}/${test_data}")
+		#message ("test data dest: ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DATA_BUILD_DIR}/${test_data}")
 	
 	endforeach ( test_data ${ARGN} )
 	
@@ -195,7 +194,7 @@ MACRO(WkTestRun test_display test_name )
 
 	IF(${PROJECT_NAME}_ENABLE_TESTS)
 		ENABLE_TESTING()
-		ADD_TEST(${test_display} ${PROJECT_BINARY_DIR}/${WKCMAKE_TEST_DIR}/${test_name} ${ARGN})
+		ADD_TEST(${test_display} ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR}/${test_name} ${ARGN})
 	ENDIF(${PROJECT_NAME}_ENABLE_TESTS)
 
 ENDMACRO(WkTestRun)
