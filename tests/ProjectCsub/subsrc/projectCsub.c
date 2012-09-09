@@ -28,11 +28,11 @@
  *
  */
 
-#include "ProjectC/header.h"
+#include "ProjectCsub/header.h"
 
 #include <stdio.h>
 
-int C_display()
+int Csub_display()
 {
     WkDebug();
     return 0;

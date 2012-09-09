@@ -1,3 +1,6 @@
+#ifndef PROJECTCSUB_H
+#define PROJECTCSUB_H
+
 /**
  *  Copyright (c) 2009, Asmodehn's Corp.
  *  All rights reserved.
@@ -28,9 +31,20 @@
  *
  */
 
-#include "ProjectC/header.h"
+/* This should always be the first of your include statements */
+#include "WkPlatform_ProjectCsub.h"
 
-int main ( int argc, char* argv[] )
+/* Set up for C function definitions, even when using C++ */
+#ifdef __cplusplus
+extern "C"
 {
-    return C_display("test C");
+#endif
+
+    WK_ProjectCsub_API int Csub_display();
+
+    /* Ends C function definitions when using C++ */
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* PROJECTC_H */

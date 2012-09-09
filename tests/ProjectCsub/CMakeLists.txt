@@ -29,11 +29,17 @@
 
 #Using WkCMake, mandatory calls
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR )
-INCLUDE ( CMake/WkCMake.cmake )
-WkCMakeDir ( CMake )
+INCLUDE ( subCMake/WkCMake.cmake )
+WkCMakeDir ( subCMake )
+
+WkIncludeDir (subinclude)
+WkSrcDir ( subsrc )
+WkTestDir ( subtest )
+WkDocDir (subdoc)
+WkDataDir (subdata)
 
 #declaring the project
-WkProject( ProjectC C )
+WkProject( ProjectCsub C )
 
 #build rules for the project
 WkBuild( LIBRARY SHARED )
@@ -42,8 +48,8 @@ WkDoc( )
 WkSvn( )
 
 #Testing
-WkTestBuild( maintestC )
-WkTestRun( ProjectC maintestC )
+WkTestBuild( maintestCsub )
+WkTestRun( ProjectCsub maintestCsub )
 
 WkInstall ( )
 
