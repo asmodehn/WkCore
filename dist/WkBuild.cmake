@@ -51,27 +51,27 @@ include ( "${WKCMAKE_DIR}/WkCompilerSetup.cmake" )
 
 
 macro(WkIncludeDir dir)
-	set ( ${PROJECT_NAME}_INCLUDE_DIR ${dir} CACHE PATH "Headers directory for autodetection by WkCMake for ${PROJECT_NAME}" FORCE )
+	set ( ${PROJECT_NAME}_INCLUDE_DIR ${dir} CACHE PATH "Headers directory for autodetection by WkCMake for ${PROJECT_NAME}" )
 	mark_as_advanced ( ${PROJECT_NAME}_INCLUDE_DIR )
 endmacro(WkIncludeDir dir)
 
 macro(WkSrcDir dir)
-	set ( ${PROJECT_NAME}_SRC_DIR ${dir} CACHE PATH "Sources directory for autodetection by WkCMake for ${PROJECT_NAME}" FORCE )
+	set ( ${PROJECT_NAME}_SRC_DIR ${dir} CACHE PATH "Sources directory for autodetection by WkCMake for ${PROJECT_NAME}" )
 	mark_as_advanced ( ${PROJECT_NAME}_SRC_DIR )
 endmacro(WkSrcDir dir)
 
 macro(WkBinDir dir)
-	set ( ${PROJECT_NAME}_BIN_DIR ${dir} CACHE PATH "Binary directory for WkCMake build products for ${PROJECT_NAME}" FORCE )
+	set ( ${PROJECT_NAME}_BIN_DIR ${dir} CACHE PATH "Binary directory for WkCMake build products for ${PROJECT_NAME}" )
 	mark_as_advanced ( ${PROJECT_NAME}_BIN_DIR )
 endmacro(WkBinDir dir)
 
 macro(WkLibDir dir)
-	set ( ${PROJECT_NAME}_LIB_DIR ${dir} CACHE PATH "Library directory for WkCMake build products for ${PROJECT_NAME}" FORCE )
+	set ( ${PROJECT_NAME}_LIB_DIR ${dir} CACHE PATH "Library directory for WkCMake build products for ${PROJECT_NAME}" )
 	mark_as_advanced ( ${PROJECT_NAME}_LIB_DIR )
 endmacro(WkLibDir dir)
 
 macro(WkDataDir dir)
-	set ( ${PROJECT_NAME}_DATA_DIR ${dir} CACHE PATH "Data directory for WkCMake build products for ${PROJECT_NAME}" FORCE )
+	set ( ${PROJECT_NAME}_DATA_DIR ${dir} CACHE PATH "Data directory for WkCMake build products for ${PROJECT_NAME}" )
 	mark_as_advanced ( ${PROJECT_NAME}_DATA_DIR )
 endmacro(WkDataDir dir)
 
@@ -87,14 +87,6 @@ CMAKE_POLICY(VERSION 2.6)
 	SET(${PROJECT_NAME}_C_COMPILER_LOADED "${CMAKE_C_COMPILER_LOADED}" CACHE INTERNAL "Whether C compiler has been loaded for the project or not" FORCE)
 		
 	WkPlatformCheck()
-
-    #Setting up project structure
-    #setting defaults for directories
-    WkIncludeDir("include")
-    WkSrcDir("src")
-    WkBinDir("bin")
-    WkLibDir("lib")
-    WkDataDir("data")
 
 	#TODO
 	#Quick test to make sure we build in different directory
@@ -204,6 +196,14 @@ CMAKE_POLICY(VERSION 2.6)
 	if ( ${ARGC} GREATER 1 )
 		set(${PROJECT_NAME}_load_type ${ARGV1} )
 	endif ( ${ARGC} GREATER 1 )
+
+    #Setting up project structure defaults for directories
+    # Note that if these have been already defined with the same macros, the calls here wont have any effect ( wont changed cached value )
+    WkIncludeDir("include")
+    WkSrcDir("src")
+    WkBinDir("bin")
+    WkLibDir("lib")
+    WkDataDir("data")
 
     #Doing compiler setup in Build step, because :
     # - it is related to target, not overall project ( even if environment is same for cmake, settings can be different for each target )

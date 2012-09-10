@@ -54,7 +54,7 @@ endmacro(WkTestDir dir)
 # Defining where data used by tests should be found vs the source.
 #
 macro(WkTestDataDir dir)
-	set ( ${PROJECT_NAME}_TEST_DATA_DIR ${dir} CACHE PATH "Data directory for ${PROJECT_NAME} source tests with root at ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR}" FORCE )
+	set ( ${PROJECT_NAME}_TEST_DATA_DIR ${dir} CACHE PATH "Data directory for ${PROJECT_NAME} source tests with root at ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR}" )
 	mark_as_advanced ( ${PROJECT_NAME}_TEST_DATA_DIR )
 endmacro(WkTestDataDir dir)
 
@@ -62,7 +62,7 @@ endmacro(WkTestDataDir dir)
 # Defining where data used by tests should be found when using the build exe.
 #
 macro(WkTestDataBuildDir dir)
-	set ( ${PROJECT_NAME}_TEST_DATA_BUILD_DIR ${dir} CACHE PATH "Data directory for ${PROJECT_NAME} build tests products with root at ${PROJECT_BINARY_DIR}" FORCE )
+	set ( ${PROJECT_NAME}_TEST_DATA_BUILD_DIR ${dir} CACHE PATH "Data directory for ${PROJECT_NAME} build tests products with root at ${PROJECT_BINARY_DIR}" )
 	mark_as_advanced ( ${PROJECT_NAME}_TEST_DATA_BUILD_DIR )
 endmacro(WkTestDataBuildDir dir)
 
@@ -73,6 +73,7 @@ endmacro(WkTestDataBuildDir dir)
 MACRO(WkTestBuild test_name)
     
     #Defining default folders for tests
+    # Note that if these have been already defined with the same macros, the calls here wont have any effect ( wont changed cached value )
     # Default: "test" w root at ${PROJECT_SOURCE_DIR} 
     WkTestDir("test")
     # Default: "data" w root at ${PROJECT_BINARY_DIR}/${${PROJECT_NAME}_TEST_DIR}    

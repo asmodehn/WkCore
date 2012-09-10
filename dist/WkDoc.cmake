@@ -35,7 +35,7 @@ if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
 
 macro(WkDocDir dir)
-	set ( ${PROJECT_NAME}_DOC_DIR ${dir} CACHE PATH "Documentation directory for ${PROJECT_NAME}" FORCE )
+	set ( ${PROJECT_NAME}_DOC_DIR ${dir} CACHE PATH "Documentation directory for ${PROJECT_NAME}" )
 	mark_as_advanced ( ${PROJECT_NAME}_DOC_DIR )
 endmacro(WkDocDir dir)
 
