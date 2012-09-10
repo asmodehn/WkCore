@@ -27,60 +27,69 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-#debug
-message ( STATUS "== Loading WkCMake.cmake ... ")
+if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.8.3 )
+	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.8.3 !" )
+endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.8.3 )
 
-if ( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
-	message ( FATAL_ERROR " CMAKE MINIMUM BACKWARD COMPATIBILITY REQUIRED : 2.6 !" )
-endif( CMAKE_BACKWARDS_COMPATIBILITY LESS 2.6 )
+message ( STATUS "== Loading WkCMake.cmake from ${CMAKE_CURRENT_LIST_DIR}... ")
 
-#Putting a useful default for backwards compatibility
-set ( WKCMAKE_DIR "CMake" CACHE PATH "WkCMake Scripts path" )
+set ( WKCMAKE_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE PATH "WkCMake Scripts path" )
 mark_as_advanced ( WKCMAKE_DIR )
 
+macro(WkCMakeInit)
+    if (NOT WKCMAKE_INIT_DONE) #to protect against add_subdirectory(). Only top WkCMake loads and inits.
+
+    	# regroup original CMAKE_MODULE_PATH and WkCmake Module path in order for the find_package to look inside both locations
+    	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${WKCMAKE_DIR}/Modules/")
+	
+        #including other useful files
+	    include ( "${WKCMAKE_DIR}/WkBuild.cmake" RESULT_VARIABLE WKCMAKEBUILD_FOUND )
+    	IF ( NOT WKCMAKEBUILD_FOUND )
+    		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkBuild.cmake Not Found !!!" )
+    	ENDIF ( NOT WKCMAKEBUILD_FOUND )
+    	include ( "${WKCMAKE_DIR}/WkDepends.cmake" RESULT_VARIABLE WKCMAKEDEPENDS_FOUND )
+    	IF ( NOT WKCMAKEDEPENDS_FOUND )
+    		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkDepends.cmake Not Found !!!" )
+    	ENDIF ( NOT WKCMAKEDEPENDS_FOUND )
+    	include ( "${WKCMAKE_DIR}/WkTest.cmake" RESULT_VARIABLE WKCMAKETEST_FOUND )
+    	IF ( NOT WKCMAKETEST_FOUND )
+    		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkTest.cmake Not Found !!!" )
+    	ENDIF ( NOT WKCMAKETEST_FOUND )
+    	include ( "${WKCMAKE_DIR}/WkDoc.cmake" RESULT_VARIABLE WKCMAKEDOC_FOUND )
+    	IF ( NOT WKCMAKEDOC_FOUND )
+    		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkDoc.cmake Not Found !!!" )
+    	ENDIF ( NOT WKCMAKEDOC_FOUND )
+    	include ( "${WKCMAKE_DIR}/WkSubversion.cmake" RESULT_VARIABLE WKCMAKESVN_FOUND )
+    	IF ( NOT WKCMAKESVN_FOUND )
+    		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkSubversion.cmake Not Found !!!" )
+    	ENDIF ( NOT WKCMAKESVN_FOUND )
+    	include ( "${WKCMAKE_DIR}/WkInstall.cmake" RESULT_VARIABLE WKCMAKEINSTALL_FOUND )
+	    IF ( NOT WKCMAKEINSTALL_FOUND )
+    		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkInstall.cmake Not Found !!!" )
+    	ENDIF ( NOT WKCMAKEINSTALL_FOUND )
+	    include ( "${WKCMAKE_DIR}/WkPack.cmake" RESULT_VARIABLE WKCMAKEPACK_FOUND )
+    	IF ( NOT WKCMAKEPACK_FOUND )
+    		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkPack.cmake Not Found !!!" )
+    	ENDIF ( NOT WKCMAKEPACK_FOUND )
+	
+	    set(WKCMAKE_INIT_DONE true)
+	    
+	endif(NOT WKCMAKE_INIT_DONE)
+endmacro(WkCMakeInit)
+
 macro(WkCMakeDir dir)
-	set ( WKCMAKE_DIR ${dir} CACHE PATH "WkCMake Scripts path" FORCE )
-	mark_as_advanced ( WKCMAKE_DIR )
-	
-	# regroup original CMAKE_MODULE_PATH and WkCmake Module path in order for the find_package to look inside both locations
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Modules/")
-	
-#including other useful files
-	include ( "${WKCMAKE_DIR}/WkBuild.cmake" RESULT_VARIABLE WKCMAKEBUILD_FOUND )
-	IF ( NOT WKCMAKEBUILD_FOUND )
-		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkBuild.cmake Not Found !!!" )
-	ENDIF ( NOT WKCMAKEBUILD_FOUND )
-	include ( "${WKCMAKE_DIR}/WkDepends.cmake" RESULT_VARIABLE WKCMAKEDEPENDS_FOUND )
-	IF ( NOT WKCMAKEDEPENDS_FOUND )
-		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkDepends.cmake Not Found !!!" )
-	ENDIF ( NOT WKCMAKEDEPENDS_FOUND )
-	include ( "${WKCMAKE_DIR}/WkTest.cmake" RESULT_VARIABLE WKCMAKETEST_FOUND )
-	IF ( NOT WKCMAKETEST_FOUND )
-		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkTest.cmake Not Found !!!" )
-	ENDIF ( NOT WKCMAKETEST_FOUND )
-	include ( "${WKCMAKE_DIR}/WkDoc.cmake" RESULT_VARIABLE WKCMAKEDOC_FOUND )
-	IF ( NOT WKCMAKEDOC_FOUND )
-		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkDoc.cmake Not Found !!!" )
-	ENDIF ( NOT WKCMAKEDOC_FOUND )
-	include ( "${WKCMAKE_DIR}/WkSubversion.cmake" RESULT_VARIABLE WKCMAKESVN_FOUND )
-	IF ( NOT WKCMAKESVN_FOUND )
-		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkSubversion.cmake Not Found !!!" )
-	ENDIF ( NOT WKCMAKESVN_FOUND )
-	include ( "${WKCMAKE_DIR}/WkInstall.cmake" RESULT_VARIABLE WKCMAKEINSTALL_FOUND )
-	IF ( NOT WKCMAKEINSTALL_FOUND )
-		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkInstall.cmake Not Found !!!" )
-	ENDIF ( NOT WKCMAKEINSTALL_FOUND )
-	include ( "${WKCMAKE_DIR}/WkPack.cmake" RESULT_VARIABLE WKCMAKEPACK_FOUND )
-	IF ( NOT WKCMAKEPACK_FOUND )
-		message ( FATAL_ERROR "${WKCMAKE_DIR}/WkPack.cmake Not Found !!!" )
-	ENDIF ( NOT WKCMAKEPACK_FOUND )
+    WkCMakeInit()
 endmacro(WkCMakeDir dir)
 
 macro(WkModulesDir dir)
-	set ( WKCMAKE_MODULES_DIR ${dir} CACHE PATH "Modules directory for package autodetection by WkCMake" FORCE )
-	#TODO : detect if absolute or relative...
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_MODULES_DIR}")
-	mark_as_advanced ( WKCMAKE_MODULES_DIR )
+    if (NOT WKCMAKE_MODULES_INIT_DONE) #to protect against add_subdirectory()
+	    set ( WKCMAKE_MODULES_DIR ${dir} CACHE PATH "Modules directory for package autodetection by WkCMake" FORCE )
+    	#TODO : detect if absolute or relative...
+    	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_MODULES_DIR}")
+    	mark_as_advanced ( WKCMAKE_MODULES_DIR )
+	    set(WKCMAKE_MODULES_INIT_DONE true)
+	    
+	endif(NOT WKCMAKE_MODULES_INIT_DONE)
 endmacro(WkModulesDir dir)
 
 

@@ -188,16 +188,16 @@ macro(WkPlatformConfigure)
 # We can afford to do that because the platform check is simple.
 # if it gets more complicated ( > 1 file), we need to make a custom library
 # and make the link to the project optional.
-	message ( STATUS "== Configuring WkPlatform : ${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.[h/c].config -> ${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.[h/c]" )
+	message ( STATUS "== Configuring WkPlatform : ${WKCMAKE_DIR}/WkPlatform.[h/c].config -> ${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.[h/c]" )
 	#message ( STATUS "== Platform : ${WK_${PROJECT_NAME}_PLATFORM}" )
 	#message ( STATUS "== System : ${WK_${PROJECT_NAME}_SYSTEM}" )
 	#message ( STATUS "== Compiler : ${WK_${PROJECT_NAME}_COMPILER}" )
 	set ( CMAKEDEFINE "#cmakedefine")
 	# This configure replaces all @PROJECT_NAME@ with the actual project name to make sure all defined macros are unique in the project tree
-	configure_file(${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.h.config ${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.h.in @ONLY)
+	configure_file(${WKCMAKE_DIR}/WkPlatform.h.config ${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.h.in @ONLY)
 	# This configure replaces all variables in the file with ${} with CMAKE ones, as usual in CMake...
 	configure_file(${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.h.in ${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.h )
-	configure_file(${PROJECT_SOURCE_DIR}/${WKCMAKE_DIR}/WkPlatform.c.config ${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.c )
+	configure_file(${WKCMAKE_DIR}/WkPlatform.c.config ${PROJECT_BINARY_DIR}/CMakeFiles/WkPlatform_${PROJECT_NAME}.c )
 endmacro(WkPlatformConfigure)
 
 macro(AddPlatformCheckSrc VAR )

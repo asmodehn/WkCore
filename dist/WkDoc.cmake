@@ -69,19 +69,19 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
 	message( STATUS "== Using existing ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
 	# use static hand-edited Doxyfile :
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile @ONLY )
-elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk" )
-	message( STATUS "== Configuring Template ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk --> ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
+elseif (EXISTS "${WKCMAKE_DIR}/Doxyfile.wk" )
+	message( STATUS "== Configuring Template ${WKCMAKE_DIR}/Doxyfile.wk --> ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
 	# use template to generate Doxyfile :
-	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile @ONLY )
+	CONFIGURE_FILE(${WKCMAKE_DIR}/Doxyfile.wk ${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile @ONLY )
 else (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
 	# failed completely...
-    message(SEND_ERROR "Please create ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile or check that ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DIR}/Doxyfile.wk template exists")
+    message(SEND_ERROR "Please create ${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile or check that ${WKCMAKE_DIR}/Doxyfile.wk template exists")
 endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
 	 
-  ADD_CUSTOM_TARGET(doc ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
+  ADD_CUSTOM_TARGET(${PROJECT_NAME}_doc ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/${WKCMAKE_DOC_DIR}/Doxyfile" )
   
   #forcing doc generation whenever main target is being built
-  #add_dependencies( ${PROJECT_NAME} doc )
+  #add_dependencies( ${PROJECT_NAME}  ${PROJECT_NAME}_doc )
   
 ENDIF(DOXYGEN_FOUND)
 
