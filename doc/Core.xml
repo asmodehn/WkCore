@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD Simplified DocBook XML V1.1//EN"
+"http://www.oasis-open.org/docbook/xml/simple/1.1/sdocbook.dtd">
+<article>
+  <articleinfo>
+    <title>Core Library Specifications</title>
+
+    <author>
+      <firstname>Alexandre</firstname>
+
+      <surname>Vincent</surname>
+
+      <affiliation>
+        <orgname>Asmodehn's Corp.</orgname>
+      </affiliation>
+    </author>
+
+    <pubdate>22/05/2010</pubdate>
+  </articleinfo>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>The Core Library aims at providing the basic functionality for
+    people writing C++ portable applications.</para>
+
+    <para>C++ is a language with a lot of possibilities, but basic things are
+    lacking.</para>
+
+    <para>This library aims at remaining as simple and basic as possible,
+    while provinding very useful portable features.</para>
+
+    <para>When the Next C++ strandard will be rolled out, some of these
+    features might be obsolete, and will be replaced by the new standard way
+    to do.</para>
+  </section>
+
+  <section>
+    <title>Current Features</title>
+
+    <para>Static Assertion</para>
+
+    <para>Extended STL Functor</para>
+
+    <para>Delegates</para>
+
+    <para>Error Handling</para>
+
+    <para>Logging</para>
+
+    <para>Memory</para>
+
+    <para>Threads</para>
+
+    <para>Extended Randomizer</para>
+
+    <para>Time - Date</para>
+
+    <para>Logger</para>
+  </section>
+
+  <section>
+    <title>Road Map</title>
+
+    <para> Even if the feature set is not completely closed yet, the goal must be 
+    quite simple to be able to achieve it with our current resources. Core aims at providing everything thats mandatory to develop a console based application, cross-platform, with C++, easily, and with distribution / messaging capabilities</para>
+
+    <para></para>
+  </section>
+</article>
