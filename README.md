@@ -13,4 +13,11 @@ WkCore library fills the missing space in C++ to use the old C calls in a new "C
 WkCore aim to be completely cross-platform and portable on any system, with any compiler.
 It can also sometime provide implementation of recent feature in old standard with old compilers.
 
+The goal is to have a very simple one line string input, and one line string output (log), yet using all possible functionalities on the system, the C++ way. Be ready for heavy OOD, templates, streams, threads, etc.
 
+However, to keep it maintainable, we should restrain ourselves to cover less features than [POCO](http://pocoproject.org/)
+More especially : 
+- No XML Support ( this should be a separated library )
+- No Zip Support ( this should be a separated library )
+- No Database Support ( this should be a separated library )
+- add more thing to NOT do here...

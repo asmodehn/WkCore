@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED ( VERSION 2.6)
 INCLUDE ( CMake/WkCMake.cmake )
 WkCMakeDir ( CMake )
 
-WkProject ( Core CXX)
+WkProject ( WkCore CXX)
 
 #Temporary : STLport doesnt have enough support yet to allow us to play around with it.
 #TODO : Optional loading of optional depends with check box in cmake-gui...
@@ -24,7 +24,7 @@ WkProject ( Core CXX)
 WkBuild ( LIBRARY STATIC )
 
 WkDoc()
-WkSvn()
+#WkSvn()
 
 WkInstall()
 
