@@ -12,6 +12,7 @@ WkCore library fills the missing space in C++ to use the old C calls in a new "C
 
 WkCore aim to be completely cross-platform and portable on any system, with any compiler.
 It can also sometime provide implementation of recent feature in old standard with old compilers.
+It is widely and shamelessly based on boost, gathering useful components.
 
 The goal is to have a very simple one line string input, and one line string output (log), yet using all possible functionalities on the system, the C++ way. Be ready for heavy OOD, templates, streams, threads, etc.
 
