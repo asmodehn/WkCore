@@ -14,6 +14,11 @@ WkCore aim to be completely cross-platform and portable on any system, with any 
 It can also sometime provide implementation of recent feature in old standard with old compilers.
 It is widely and shamelessly based on boost, gathering useful components.
 
+The main platform we aim to support are :
+- Win32, cygwin, ndk-build
+- Linux, ndk-build
+- MacOSX, ios-build
+
 The goal is to have a very simple one line string input, and one line string output (log), yet using all possible functionalities on the system, the C++ way. Be ready for heavy OOD, templates, streams, threads, etc.
 
 However, to keep it maintainable, we should restrain ourselves to cover less features than [POCO](http://pocoproject.org/)
