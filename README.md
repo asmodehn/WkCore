@@ -2,9 +2,9 @@ WkCore
 ======
 
 --------------------
-  C++  |   WkCore  |
+|  C++  |  WkCore  |
 --------------------
-         C         |
+|        C         |
 --------------------
 
 C is widely used and has a lots of different implementation on different platforms.
@@ -21,7 +21,9 @@ The main platform we aim to support are :
 
 The goal is to have a very simple one line string input, and one line string output (log), yet using all possible functionalities on the system, the C++ way. Be ready for heavy OOD, templates, streams, threads, etc.
 
-However, to keep it maintainable, we should restrain ourselves to cover less features than [POCO](http://pocoproject.org/)
+However what can be usable in ISO C and is doable in C ( like leveling all OSes system libraries ) should be done in C.
+
+Also, to keep it maintainable, we should restrain ourselves to cover less features than [POCO](http://pocoproject.org/)
 More especially : 
 - No XML Support ( this should be a separated library )
 - No Zip Support ( this should be a separated library )
