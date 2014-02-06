@@ -20,7 +20,7 @@ public:
             std::basic_ostream<cT, traits>(0),
             m_sbuf()
     {
-        init(&m_sbuf);
+        this->init(&m_sbuf);
     }
 
 private:

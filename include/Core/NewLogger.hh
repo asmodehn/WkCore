@@ -50,11 +50,6 @@ public:
 
     void setFilelogLevel(loglevel::Level lvl);
 
-protected :
-    //list of logstream. Each logstream has one output and only one
-    logstream* ptm_filelogstream;
-    //logstream ptm_syslogstream;
-    //logstream ptm_winlogstream;
 
 private :
     //list of logstreambuf. Each logstreambuf provide a different ouput to logstream
@@ -62,6 +57,11 @@ private :
     //logstreambuf pvm_syslsb;
     //logstreambuf pvm_winlsb;
 
+protected :
+    //list of logstream. Each logstream has one output and only one
+    logstream* ptm_filelogstream;
+    //logstream ptm_syslogstream;
+    //logstream ptm_winlogstream;
 };
 
 template<typename M>
