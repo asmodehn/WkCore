@@ -5,6 +5,14 @@
 
 #include <stdexcept>
 
+#if defined(__unix__) 
+# include <unistd.h>
+#elif defined(_WIN32) || defined(WIN32)
+# include <window.h>
+#else
+# error "Unknown System. Aborting compilation"
+#endif
+
 namespace Core
 {
 
@@ -77,7 +85,7 @@ void sleep (unsigned int sec)
     clock_t start, end;
 
     end = start = ::clock ();
-    if (start != -1)
+    if (start != (clock_t) -1)
     {
         while (static_cast<unsigned int>( (end - start) / CLOCKS_PER_SEC) < sec)
         {
@@ -102,7 +110,7 @@ void usleep (unsigned int usec)
     clock_t start, end;
 
     end = start = ::clock ();
-    if (start != -1)
+    if (start != (clock_t) -1)
     {
         while ( static_cast<unsigned int>( (end - start) / CLOCKS_PER_SEC * 1000000l ) < usec)
         {
@@ -122,7 +130,7 @@ unsigned long clock ()
     //0 is an error code here : information not availalbe
     unsigned long res = 0;
 
-    if ( clk != -1 )
+    if ( clk != (clock_t) -1 )
     {
         res = (unsigned long)clk;
     }
@@ -143,7 +151,7 @@ unsigned long clocksec ()
     //0 is an error code here : information not availalbe
     unsigned long res = 0;
 
-    if ( clk != -1 )
+    if ( clk != (clock_t) -1 )
     {
         res = (unsigned long)clk / ( CLOCKS_PER_SEC) ;
 
@@ -166,7 +174,7 @@ unsigned long clockusec ()
     //0 is an error code here : information not availalbe
     unsigned long res = 0;
 
-    if ( clk != -1 )
+    if ( clk != (clock_t) -1 )
     {
         //TODO : test long limits
         res = (unsigned long)clk / ( CLOCKS_PER_SEC ) * 1000000l ;

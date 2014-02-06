@@ -1,6 +1,7 @@
 #include "Core/Logging/logstreambuf.hh"
 
 #include <stdexcept>
+#include <cstring>
 
 namespace Core
 {
