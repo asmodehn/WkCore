@@ -59,10 +59,14 @@ static std::string unknown_err( "Unknown error" );
 		? std::string( c_str )
 		: unknown_err;
 #  else
-		//from boost 1.55.0
-		//result = strerror_r( ev, bp, sz );
+#   if defined(_WIN32)
 		//from older boost for VS2010
 		result = strerror_s( bp, sz, ev );
+#   else
+		//from boost 1.55.0
+		result = strerror_r( ev, bp, sz );
+#   endif
+		
 #  endif
 		if (result == 0 )
 			break;
