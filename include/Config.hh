@@ -35,16 +35,16 @@
 
 #ifdef WK_BUILD
 
-# include "WkPlatform_Core.h"
+# include "WkPlatform_WkCore.h"
 
-# if defined ( WK_Core_PLATFORM_IS_WIN32 )
+# if defined ( WK_WkCore_PLATFORM_IS_WIN32 )
 #  define CORE_PLATFORM_WIN32
-# elif defined ( WK_Core_PLATFORM_POSIX )
+# elif defined ( WK_WkCore_PLATFORM_POSIX )
 #  define CORE_PLATFORM_POSIX
 # endif
 
-# define CORE_API WK_Core_API
-# define CORE_LOCAL WK_Core_LOCAL
+# define CORE_API WK_WkCore_API
+# define CORE_LOCAL WK_WkCore_LOCAL
 
 #endif // WK_BUILD
 
