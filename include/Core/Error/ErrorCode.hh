@@ -24,7 +24,7 @@ namespace Error
  * Design from Boost/system 1.41
  *
  */
-
+	/*
 class ErrorCode
 {
 
@@ -127,7 +127,7 @@ inline std::size_t hash_value( const ErrorCode & ec )
 }
 
 
-
+*/
 
 } //Error
 

@@ -17,7 +17,7 @@ namespace Core
 {
 namespace Error
 {
-
+	/*
 const char * SystemErrorCategory::name() const
 {
     return "system";
@@ -435,6 +435,6 @@ CORE_API const ErrorCategory & getSystemCategory()
     static const SystemErrorCategory  SystemCategoryConst;
     return SystemCategoryConst;
 }
-
+*/
 } //namespace Error
 } // namespace Core

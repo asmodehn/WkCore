@@ -9,7 +9,7 @@ namespace Core
 namespace Error
 {
 
-
+	/*
 //  error_category default implementation  -------------------------------//
 
 ErrorCondition ErrorCategory::defaultErrorCondition( int ev ) const
@@ -27,7 +27,7 @@ bool ErrorCategory::equivalent( const ErrorCode & code, int condition ) const
     return *this == code.category() && code.value() == condition;
 }
 
-
+*/
 
 } // Error
 

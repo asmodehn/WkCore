@@ -11,6 +11,7 @@ namespace Core
 namespace Error
 {
 
+	/*
 //further references
 class ErrorCategory;
 class ErrorCondition;
@@ -186,7 +187,7 @@ inline Core::Error::ErrorCode & throws()
     return *internal::throws();
 }
 
-
+*/
 } // Error
 
 } // Core

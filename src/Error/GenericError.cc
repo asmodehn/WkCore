@@ -8,7 +8,7 @@ namespace Core
 
 namespace Error
 {
-
+	/*
 //  make_* functions for errcode::errcode_t  -----------------------------//
 namespace Generic
 {
@@ -58,7 +58,7 @@ bool operator!=( const ErrorCondition & lhs, const ErrorCode & rhs )
     return !(lhs == rhs);
 }
 
-
+*/
 
 
 } // Error

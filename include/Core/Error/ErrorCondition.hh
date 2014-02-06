@@ -13,7 +13,7 @@ namespace Error
  * ErrorCondition : portable Error class
  * design from Boost 1.41
  */
-
+	/*
 class ErrorCondition
 {
 public:
@@ -98,7 +98,7 @@ private:
 
 };
 
-
+*/
 }// Error
 
 } // Core

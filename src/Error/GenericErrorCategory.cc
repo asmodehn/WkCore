@@ -6,7 +6,7 @@ namespace Core
 {
 namespace Error
 {
-
+/*
 const char * GenericErrorCategory::name() const
 {
     return "generic";
@@ -106,7 +106,7 @@ CORE_API const ErrorCategory & getGenericCategory()
     static const GenericErrorCategory GenericCategoryConst;
     return GenericCategoryConst;
 }
-
+*/
 } //Error
 
 } // Core

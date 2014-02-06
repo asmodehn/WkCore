@@ -42,7 +42,8 @@ WkTestBuild ( TestRandomizer )
 WkTestRun ( Randomizer TestRandomizer )
 
 #others... to organise...
-WkTestBuild( TestError )
+#disabled : doesnt build on all target platforms yet.
+#WkTestBuild( TestError )
 WkTestBuild( TestDbgMem )
 WkTestRun( DbgMem TestDbgMem )
 WkTestBuild( TestStaticAssert )

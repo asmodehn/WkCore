@@ -26,7 +26,7 @@ namespace Error
  * A client can extend ErrorCategory to specify it s own errors.
  * It will be used in ErrorCode ( System specific ) and ErrorCondition ( portable )
  */
-
+/*
 class ErrorCategory
 {
     //to prevent copy
@@ -91,7 +91,7 @@ public:
     ErrorCondition      defaultErrorCondition( int ev ) const;
 };
 
-
+*/
 } // Error
 
 } // Core
