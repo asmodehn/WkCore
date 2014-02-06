@@ -1,11 +1,9 @@
 WkCore
 ======
 
---------------------
 |  C++  |  WkCore  |
---------------------
-|        C         |
---------------------
+|   C   |     C    |
+
 
 C is widely used and has a lots of different implementation on different platforms.
 WkCore library fills the missing space in C++ to use the old C calls in a new "C++" way.
@@ -15,6 +13,7 @@ It can also sometime provide implementation of recent feature in old standard wi
 It is widely and shamelessly based on boost, gathering useful components.
 
 The main platform we aim to support are :
+
 - Win32, cygwin, ndk-build
 - Linux, ndk-build
 - MacOSX, ios-build
@@ -25,6 +24,7 @@ However what can be usable in ISO C and is doable in C ( like leveling all OSes 
 
 Also, to keep it maintainable, we should restrain ourselves to cover less features than [POCO](http://pocoproject.org/)
 More especially : 
+
 - No XML Support ( this should be a separated library )
 - No Zip Support ( this should be a separated library )
 - No Database Support ( this should be a separated library )

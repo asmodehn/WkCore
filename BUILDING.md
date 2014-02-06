@@ -12,6 +12,8 @@ To build the doc you need :
 Build
 =====
 
+An online build is nicely provided by [Travis-CI](https://travis-ci.org/asmodehn/WkCore)
+
 As with every CMake build, you can use ccmake or CMakeSetup.exe to setup all your variables for your build.
 
 Once your build files have been generated, just build the software as you are used to do.
