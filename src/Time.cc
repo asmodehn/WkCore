@@ -7,10 +7,6 @@
 
 #if defined(__unix__) 
 # include <unistd.h>
-#elif defined(_WIN32) || defined(WIN32)
-# include <window.h>
-#else
-# error "Unknown System. Aborting compilation"
 #endif
 
 namespace Core
