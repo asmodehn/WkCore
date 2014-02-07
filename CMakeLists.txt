@@ -21,6 +21,9 @@ WkProject ( WkCore CXX)
 # TODO : Logger improve : Unable to find decent logging library.
 # Gather ideas, remake teh wheel, and roll out my own...
 
+# TODO : add a find module for unittest++ ( and cppunit ) so they are easy to integrate, even from source (WkCMake style )
+add_subdirectory (depends/UnitTest++)
+
 WkBuild ( LIBRARY STATIC )
 
 WkDoc()
