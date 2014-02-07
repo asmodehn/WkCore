@@ -46,7 +46,12 @@
 # define CORE_API WK_WkCore_API
 # define CORE_LOCAL WK_WkCore_LOCAL
 
+#else // WK_BUILD
+//using another build system
+
 #endif // WK_BUILD
 
+# define CORE_API
+# define CORE_LOCAL
 
 #endif // CONFIG _HH
