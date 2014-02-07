@@ -9,6 +9,11 @@
 #	define min(a,b) ((a) < (b)) ? (a) : (b)
 #endif
 
+//define strdup if it is not part of the underlying lib
+#ifndef strdup
+
+#endif
+
 
 /* re-ordered parameters!  for varargs, format string always come before varargs, so to avoid confusion,
 let's keep it that way.
@@ -286,13 +291,14 @@ void * dbgmem_realloc( void *ptr, size_t size, const char* filename, int line)
     return newptr;
 }
 
+#ifdef strdup
 char* dbgmem_strdup( const char* str, const char* filename, int line )
 {
     int size;
     char* ptr;
     assert( str );
 
-    if ( no_dbgmem ) return _strdup( str );
+    if ( no_dbgmem ) return strdup( str );
 
     size = strlen( str ) + 1;
     ptr = (char*)dbgmem_store(size, filename, line);
@@ -309,6 +315,7 @@ char* dbgmem_strdup( const char* str, const char* filename, int line )
 
     return ptr;
 }
+#endif
 
 void dbgmem_free(void *ptr, const char* filename, int line)
 {
