@@ -49,9 +49,10 @@
 #else // WK_BUILD
 //using another build system
 
-#endif // WK_BUILD
-
 # define CORE_API
 # define CORE_LOCAL
+
+#endif // WK_BUILD
+
 
 #endif // CONFIG _HH
