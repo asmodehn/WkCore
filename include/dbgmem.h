@@ -13,26 +13,20 @@
 
 #ifdef DEBUG_MEMORY
 
-#	undef calloc
+#   undef calloc
+#   define calloc(n,s) dbgmem_calloc ((n),(s), __FILE__, __LINE__);
 #	undef malloc
+#   define malloc(s) dbgmem_malloc ((s), __FILE__, __LINE__);
 #	undef realloc
+#   define realloc(p,s) dbgmem_realloc ((p), (s), __FILE__, __LINE__);
 #	undef free
-#ifdef strdup
-#	undef strdup
-#endif
-
-
-#define calloc(n,s) dbgmem_calloc ((n),(s), __FILE__, __LINE__);
-#define malloc(s) dbgmem_malloc ((s), __FILE__, __LINE__);
-#define realloc(p,s) dbgmem_realloc ((p), (s), __FILE__, __LINE__);
-#define free(p) dbgmem_free((p), __FILE__, __LINE__)
-/*Windows : error C2181: illegal else without matching if	-> dbgmem.c	316; -> xlocale	1815 */
-
-
+#   define free(p) dbgmem_free((p), __FILE__, __LINE__)
 #ifdef strdup
 #	undef strdup
 #	define strdup(s) dbgmem_strdup((p), __FILE__, __LINE__);
 #endif
+
+/*Windows : error C2181: illegal else without matching if	-> dbgmem.c	316; -> xlocale	1815 */
 
 #endif
 

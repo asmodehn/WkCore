@@ -16,7 +16,7 @@ namespace Core
  * \brief logstream provide filtering based on loglevel.
  *
  */
-
+///@TODO : Design should be changed as we cannot access stringbuf inside an ostringstream in a standard / portable way...
 class logstream : public std::ostringstream
 {
     //streambuff

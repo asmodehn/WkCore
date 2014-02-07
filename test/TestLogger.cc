@@ -53,6 +53,9 @@ int testlogstream(logstream & ls)
 
 int main(int argc, char *argv[])
 {
+    //this should not go anywhere or do anything
+    cnull << "NullStream should not be visible !" << std::endl;
+
     int res = 0;
 
     clogstreambuf clsb;
@@ -66,8 +69,7 @@ int main(int argc, char *argv[])
     res += testlogstream(fls);
 
 
-    //this should not go anywhere or do anything
-    cnull << "BLABLAALALAHAHAHA" << std::endl;
+
 
 
     //Test NewLogger
