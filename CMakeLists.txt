@@ -23,6 +23,7 @@ WkProject ( WkCore CXX)
 
 # TODO : add a find module for unittest++ ( and cppunit ) so they are easy to integrate, even from source (WkCMake style )
 add_subdirectory (depends/UnitTest++)
+include_directories(depends/UnitTest++)
 
 WkBuild ( LIBRARY STATIC )
 
@@ -43,6 +44,10 @@ WkTestRun( Time TestTime )
 # Randomizer
 WkTestBuild ( TestRandomizer )
 WkTestRun ( Randomizer TestRandomizer )
+# Memory
+WkTestBuild( TestSharedPtr )
+target_link_libraries( TestSharedPtr UnitTest++)
+WkTestRun( SharedPtr TestSharedPtr)
 
 #others... to organise...
 #disabled : doesnt build on all target platforms yet.
