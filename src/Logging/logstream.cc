@@ -4,7 +4,7 @@ namespace Core
 {
 
 logstream::logstream ()
-        : std::ostringstream(0)
+        : std::ostringstream()
 {
     //to hook up to usual stream design
     pvm_lsb = new clogstreambuf();
@@ -19,7 +19,7 @@ logstream::logstream ()
 }
 
 logstream::logstream (logstreambuf* lsb)
-        : std::ostringstream(0)
+        : std::ostringstream()
 {
     //to hook up to usual stream design
     pvm_lsb = lsb;
