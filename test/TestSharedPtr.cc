@@ -1330,7 +1330,7 @@ int main(int argc, char * argv [])
 	}
 	else if ( strcmp(argv[1],"-xml") == 0 )
 	{
-		std::ofstream f("UnitTest-Util-result.xml");
+		std::ofstream f("UnitTest-SharedPtr-result.xml");
 		UnitTest::XmlTestReporter reporter(f);
 		UnitTest::TestRunner runner(reporter);
 		return runner.RunTestsIf(UnitTest::Test::GetTestList(),NULL,UnitTest::True(),0);
