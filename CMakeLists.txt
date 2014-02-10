@@ -8,6 +8,8 @@ WkProject ( WkCore CXX)
 #TODO : Optional loading of optional depends with check box in cmake-gui...
 #WkDepends (STLPort )
 
+WkDepends(Threads)
+
 #TODO :
 # remove sigC++ dependency because
 # - delegate mecanism already implemented and working.
@@ -29,6 +31,9 @@ add_subdirectory (depends/tinythreadpp)
 include_directories(depends)
 
 WkBuild ( LIBRARY STATIC )
+
+#TMP Workaround limitation : Threads depends doesnt follow standard depends and is not supporte in wkcmake at the moment.
+target_link_libraries (${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
 WkDoc()
 #WkSvn()

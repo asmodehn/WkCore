@@ -13,6 +13,7 @@
 //includes needed to run the test and write xml report
 #include <iostream>
 #include <fstream>
+#include <cstring>
 #include <list>
 #include "UnitTest++/XmlTestReporter.h"
 
