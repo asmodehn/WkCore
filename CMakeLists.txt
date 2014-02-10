@@ -25,6 +25,9 @@ WkProject ( WkCore CXX)
 add_subdirectory (depends/UnitTest++)
 include_directories(depends/UnitTest++)
 
+add_subdirectory (depends/tinythreadpp)
+include_directories(depends)
+
 WkBuild ( LIBRARY STATIC )
 
 WkDoc()
@@ -44,10 +47,24 @@ WkTestRun( Time TestTime )
 # Randomizer
 WkTestBuild ( TestRandomizer )
 WkTestRun ( Randomizer TestRandomizer )
+
 # Memory
 WkTestBuild( TestSharedPtr )
+#check if we have enabled tests
+#TODO : improve WkTestBuild, or add more functions to support automatically external unit testing libs
+if ( TARGET TestSharedPtr )
 target_link_libraries( TestSharedPtr UnitTest++)
+endif ( TARGET TestSharedPtr )
 WkTestRun( SharedPtr TestSharedPtr)
+
+#Thread
+WkTestBuild( TestThread )
+#check if we have enabled tests
+#TODO : improve WkTestBuild, or add more functions to support automatically external unit testing libs
+if ( TARGET TestThread )
+target_link_libraries( TestThread UnitTest++ TinyThread++)
+endif ( TARGET TestThread )
+WkTestRun( Thread TestThread)
 
 #others... to organise...
 #disabled : doesnt build on all target platforms yet.
