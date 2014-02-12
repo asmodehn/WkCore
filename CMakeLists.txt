@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.1)
 project(TinyThread++)
 
+find_package (Threads)
+
 if(MSVC10)
   set(tthread_SUFFIX _vc10)
 elseif(MSVC11)
@@ -97,8 +99,6 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt /NODEFAULTLIB:msvcrtd")
   endif()
 endif()
-
-
 
 # create the lib
 add_library(TinyThread++ STATIC "source/fast_mutex.h" "source/tinythread.h" "source/tinythread.cpp")
