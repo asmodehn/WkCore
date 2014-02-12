@@ -101,7 +101,13 @@ if(MSVC)
 endif()
 
 # create the lib
-add_library(TinyThread++ STATIC "source/fast_mutex.h" "source/tinythread.h" "source/tinythread.cpp")
+add_library(TinyThread++ STATIC 
+	"source/fast_mutex.h"
+	"source/tinythread.h" 
+	"source/tinythread.cpp"
+	"source/tinythread_t.h"
+)
+
 include_directories(source)
 
 option(ENABLE_TESTS "Build unit tests" FALSE)
@@ -109,41 +115,31 @@ option(ENABLE_TESTS "Build unit tests" FALSE)
 if(ENABLE_TESTS)
 	include_directories(.)
 
-	#add_executable(test    tests/test.cpp)
-	#target_link_libraries(test ${TTHREAD_LIBS})
-
-	#add_executable(hello   tests/hello.cpp)
-	#target_link_libraries(hello ${TTHREAD_LIBS})
-
-	#add_executable(fractal tests/fractal.cpp)
-	#target_link_libraries(fractal ${TTHREAD_LIBS})
-
-	#add_executable(future tests/future.cpp)
-	#target_link_libraries(future ${TTHREAD_LIBS})
-
-	#add_executable(pool tests/pool.cpp)
-	#target_link_libraries(pool ${TTHREAD_LIBS})
-
 	# build the test runner
 	add_executable(tt_TestFractal "test/fractal.cpp")
-	target_link_libraries(tt_TestFractal TinyThread++)
+	target_link_libraries(tt_TestFractal TinyThread++ ${CMAKE_THREAD_LIBS_INIT})
 
 	add_executable(tt_TestHello "test/hello.cpp")
-	target_link_libraries(tt_TestHello TinyThread++)
+	target_link_libraries(tt_TestHello TinyThread++ ${CMAKE_THREAD_LIBS_INIT})
 	
 	add_executable(tt_Test "test/test.cpp")
-	target_link_libraries(tt_Test TinyThread++)
+	target_link_libraries(tt_Test TinyThread++ ${CMAKE_THREAD_LIBS_INIT})
 
+	add_executable(tt_TestT "test/test_t.cpp")
+	target_link_libraries(tt_TestT TinyThread++ ${CMAKE_THREAD_LIBS_INIT})
+	
 	# turn on testing
 	enable_testing()
 	add_custom_target(tt_check COMMAND ${CMAKE_CTEST_COMMAND} -V)
 	
 	# add the test runner as a test
 	add_test(NAME tt_Test COMMAND Test)
+	add_test(NAME tt_TestT COMMAND TestT)
 	add_test(NAME tt_TestHello COMMAND TestHello)
 	add_test(NAME tt_TestFractal COMMAND TestFractal)
 	add_dependencies(tt_check Test)
-	add_dependencies(tt_check Test)
-	add_dependencies(tt_check Test)
+	add_dependencies(tt_check TestT)
+	add_dependencies(tt_check TestHello)
+	add_dependencies(tt_check TestFractal)
 
 endif(ENABLE_TESTS)

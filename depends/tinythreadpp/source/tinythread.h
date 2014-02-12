@@ -876,7 +876,7 @@ class thread {
     /// @note If the thread is joinable upon destruction, @c std::terminate()
     /// will be called, which terminates the process. It is always wise to do
     /// @c join() before deleting a thread object.
-    ~thread();
+    virtual ~thread();
 
     /// Wait for the thread to finish (join execution flows).
     /// After calling @c join(), the thread object is no longer associated with
@@ -915,7 +915,7 @@ class thread {
 
     _TTHREAD_DISABLE_ASSIGNMENT(thread)
 
-  private:
+  protected:
     native_handle_type mHandle;   ///< Thread handle.
     void * mWrapper;              ///< Thread wrapper info.
 #if defined(_TTHREAD_WIN32_)
@@ -1071,8 +1071,5 @@ namespace this_thread {
 }
 
 }
-
-// Define/macro cleanup
-#undef _TTHREAD_DISABLE_ASSIGNMENT
 
 #endif // _TINYTHREAD_H_
