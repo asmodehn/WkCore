@@ -34,8 +34,8 @@ After a build some directories are present in the binary folder :
 
 Therefore by hand the test should be run from test :
 
-> cd test
-> ../bin/myTest.exe
+	cd test
+	../bin/myTest.exe
 
 This scheme has been chosen because it works well also in Visual studio which has its own way...
 
