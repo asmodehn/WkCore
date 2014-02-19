@@ -32,7 +32,17 @@
 #ifndef __CORE_DATETIME_CHRONODURATION_HH
 #define __CORE_DATETIME_CHRONODURATION_HH
 
-#include "tinythreadpp/source/tinythread.h"
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_CHRONO_PACKAGE tthread::chrono
+# define CORE_RATIO_PACKAGE tthread::ratio
+#else
+# include <chrono>
+# define CORE_CHRONO_PACKAGE std::chrono
+//required for chrono and ratio package to match
+# include <ratio>
+# define CORE_RATIO_PACKAGE std::ratio
+#endif
 
 #include "Core/Numerics/Ratio.hh"
 
@@ -44,12 +54,14 @@ namespace Core
 		{
 			/// Duration template class. This class provides enough functionality to
 			/// implement @c this_thread::sleep_for().
-			template <class _Rep, class _Period = Core::Numerics::ratio<1, 1> > class duration : public tthread::chrono::duration<_Rep,_Period>
+			template <class _Rep, class _Period = Core::Numerics::ratio<1, 1> > class duration : public CORE_CHRONO_PACKAGE::duration<_Rep,_Period>
 			{
 			public:
 				/// Construct a duration object with the given duration.
 				template <class _Rep2>
-				explicit duration(const _Rep2& r) : tthread::chrono::duration<_Rep,_Period>(r) {};
+				explicit duration(const _Rep2& r) : CORE_CHRONO_PACKAGE::duration<_Rep,_Period>(r) {};
+
+
 
 				virtual ~duration() {};
 
@@ -68,5 +80,9 @@ namespace Core
 	}; //namespace DateTime
 
 }; //namespace Core
+
+//cleanups
+#undef CORE_CHRONO_PACKAGE
+#undef CORE_RATIO_PACKAGE
 
 #endif // __CORE_DATETIME_CHRONODURATION_HH

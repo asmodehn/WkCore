@@ -2,15 +2,20 @@
 #include "UnitTest++/UnitTest++.h"
 #include "Core/Thread/Thread.hh"
 #include "Core/Thread/Mutex.hh"
-#include "Core/Thread/FastMutex.hh"
 #include "Core/Thread/AtomicFlag.hh"
 #include "Core/Thread/Atomic.hh"
 #include "Core/Thread/ConditionVariable.hh"
 #include "Core/Thread/LockGuard.hh"
 
+#include "Core/Utils/ValueInit.hh"
 #include "Core/DateTime/ChronoDuration.hh"
 
 //includes needed to run the test and write xml report
+#if defined(_WIN32)
+//for SystemInfo
+#include <windows.h>
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -37,8 +42,7 @@ thread_local int gLocalVar;
 
 // Mutex + global count variable
 Mutex gMutex;
-FastMutex gFastMutex;
-AtomicFlag gFlag(ATOMIC_FLAG_INIT);
+AtomicFlag gFlag(0);
 int gCount;
 Atomic<int> gAtomicCount;
 
@@ -67,16 +71,6 @@ void ThreadLock(void * aArg)
   for(int i = 0; i < 10000; ++ i)
   {
     LockGuard<Mutex> lock(gMutex);
-    ++ gCount;
-  }
-}
-
-// Thread function: Fast mutex locking
-void ThreadLock2(void * aArg)
-{
-  for(int i = 0; i < 10000; ++ i)
-  {
-    LockGuard<FastMutex> lock(gFastMutex);
     ++ gCount;
   }
 }
@@ -203,7 +197,7 @@ TEST(Thread_LocalStorage)
 #else
 	//TODO : implement TLS...
 	std::cout << " TLS is not supported on this platform..." << std::endl;
-	CHECK(false && "NOT SUPPORTED")
+	CHECK(false && "NOT SUPPORTED");
 #endif
 }
 
@@ -230,31 +224,6 @@ TEST(Thread_MutexLocking)
     // Check the global count
     CHECK( 1000000 == gCount );
 }
-
-// Test 5: fast_mutex locking
-TEST(Thread_FastMutexLocking)
-{
-	// Clear the global counter.
-    gCount = 0;
-
-    // Start a bunch of child threads
-    std::list<Thread *> threadList;
-    for(int i = 0; i < 100; ++ i)
-      threadList.push_back(new Thread(ThreadLock2, 0));
-
-    // Wait for the threads to finish
-    std::list<Thread *>::iterator it;
-    for(it = threadList.begin(); it != threadList.end(); ++ it)
-    {
-      Thread * t = *it;
-      t->join();
-      delete t;
-    }
-
-    // Check the global count
-    CHECK( 1000000 == gCount );
-}
-
 
 // Test 6: Atomic lock
 TEST(Thread_AtomicLock)
@@ -381,10 +350,110 @@ TEST(Thread_Detach)
 }
 
 
-/*SUITE(ThreadedCommand)
+SUITE(ThreadCallback)
 {
+	
+	class Called
+	{
+
+		int m_testval;
+	public:
+		Called() : m_testval(1)
+		{}
+	public:
+
+		int fadapt1 (  void* v )
+		{
+			return m_testval;
+		}
+		int fadapt2 ( int a, void* v)
+		{
+			return m_testval+a;
+		}
+		int fadapt3 ( int a, int b, void* v )
+		{
+			return m_testval+a+b;
+		}
+		int fadapt4 ( int a, int b, int c,void* v )
+		{
+			return m_testval+a+b+c;
+		}
+		int fadapt5 ( int a, int b, int c,int d,void* v )
+		{
+			return m_testval+a+b+c+d;
+		}
+		int fadapt6 ( int a, int b, int c,int d,int e,void* v )
+		{
+			return m_testval+a+b+c+d+e;
+		}
+	};
+	
+	
+	TEST(Callback1_int_stored)
+	{
+		SuiteThreadCallback::Called calledinstance;
+
+		std::thread t( &SuiteThreadCallback::Called::fadapt1, calledinstance );
+		t.join();
+
+		//CHECK( 1 == ad1.getResult());
+		//called instance, cb1 and ad1 should all still exist
+	}
+	/*
+	TEST(Callback2_int_stored)
+	{
+		Called calledinstance;
+		Core::Callback2<Called,int,void*,int> cb2(calledinstance,&Called::fadapt2);
+		Core::Adapter2<int,int> ad2(&cb2);
+
+		Thread t(&ad2,1);
+		t.join();
+
+		CHECK( 1 == ad2.getResult());
+		//called instance, cb1 and ad1 should all still exist
+	}*/
+	/*
+	TEST(Callback1_int_stored)
+	{
+		Called calledinstance;
+		Core::Callback1<Called,void*,int> cb0(calledinstance,&Called::fadapt1);
+		Core::Adapter1<int> ad1(&cb0);
+
+		Thread t( &ad1 );
+		t.join();
+
+		CHECK( 1 == ad1.getResult());
+		//called instance, cb1 and ad1 should all still exist
+	}
+
+				TEST(Callback1_int_stored)
+	{
+		Called calledinstance;
+		Core::Callback1<Called,void*,int> cb0(calledinstance,&Called::fadapt1);
+		Core::Adapter1<int> ad1(&cb0);
+
+		Thread t( &ad1 );
+		t.join();
+
+		CHECK( 1 == ad1.getResult());
+		//called instance, cb1 and ad1 should all still exist
+	}
+
+					TEST(Callback1_int_stored)
+	{
+		Called calledinstance;
+		Core::Callback1<Called,void*,int> cb0(calledinstance,&Called::fadapt1);
+		Core::Adapter1<int> ad1(&cb0);
+
+		Thread t( &ad1 );
+		t.join();
+
+		CHECK( 1 == ad1.getResult());
+		//called instance, cb1 and ad1 should all still exist
+	}
+	*/
 }
-*/
+
 
 int main(int argc, char * argv [])
 {

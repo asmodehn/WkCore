@@ -50,12 +50,24 @@ class Adapter1
 {
     Callback1Base<void*,Result> * m_cb;
     std::pair< Adapter1<Result>*,void*> arguments;
+	Result m_r;
 
 public:
     Adapter1( Callback1Base<void*,Result> * cb )
         : m_cb(cb)
     {}
 
+	Adapter1(const Adapter1<Result> & ad)
+		: m_cb(ad.m_cb)
+	{}
+
+	virtual ~Adapter1()
+	{}
+
+	//TODO : check this
+	//as per http://stackoverflow.com/questions/2068022/in-c-is-it-safe-portable-to-use-static-member-function-pointer-for-c-api-call
+	//extern "C"
+	//{
     static Result adapt( void * v )
     {
         Result r;
@@ -63,8 +75,8 @@ public:
         {
             std::pair< Adapter1<Result>*,void*>* vpair = static_cast< std::pair< Adapter1<Result>*,void*>*> (v);
             Adapter1<Result>* pad = reinterpret_cast<Adapter1<Result>*>(vpair->first);
-            r=pad->m_cb->call(vpair->second);
-
+			pad->m_r = pad->m_cb->call(vpair->second);
+			r = pad->m_r;
         }
         catch ( std::exception & e)
         {
@@ -73,12 +85,18 @@ public:
         }
         return r;
     }
+	//}
 
     void* build_voidP_args(void* vp)
     {
         arguments = std::make_pair(this,vp);
         return static_cast<void*>( &arguments);
     }
+
+	Result getResult()
+	{
+		return m_r;
+	}
 };
 
 template<class Result=void>
@@ -86,11 +104,19 @@ class Adapter1const
 {
     Callback1constBase<void*,Result> * m_cb;
     std::pair< Adapter1const<Result>*,void*> arguments;
+	Result m_r;
 
 public:
     Adapter1const( Callback1constBase<void*,Result> * cb )
         : m_cb(cb)
     {}
+
+	Adapter1const(const Adapter1const<Result> & ad)
+		: m_cb(ad.m_cb)
+	{}
+
+	virtual ~Adapter1const()
+	{}
 
     static Result adapt( void * v )
     {
@@ -99,8 +125,8 @@ public:
         {
             std::pair< Adapter1const<Result>*,void*>* vpair = static_cast< std::pair< Adapter1const<Result>*,void*>*> (v);
             Adapter1const<Result>* pad = reinterpret_cast<Adapter1const<Result>*>(vpair->first);
-            r=pad->m_cb->call(vpair->second);
-
+            pad->m_r = pad->m_cb->call(vpair->second);
+			r = pad->m_r;
         }
         catch ( std::exception & e)
         {
@@ -115,6 +141,11 @@ public:
         arguments = std::make_pair(this,vp);
         return static_cast<void*>( &arguments);
     }
+	
+	Result getResult()
+	{
+		return m_r;
+	}
 };
 
 /// 2 arguments
@@ -123,11 +154,19 @@ class Adapter2
 {
     Callback2Base<Arg1,void*,Result> * m_cb;
     std::pair< Adapter2<Arg1,Result>*,void*> arguments;
+	Result m_r;
 
 public:
     Adapter2( Callback2Base<Arg1,void*,Result> * cb )
         : m_cb (cb)
     {}
+
+	Adapter2(const Adapter2<Arg1,Result> & ad)
+		: m_cb(ad.m_cb)
+	{}
+
+	virtual ~Adapter2()
+	{}
 
     static Result adapt(Arg1 a, void * v )
     {
@@ -136,8 +175,8 @@ public:
         {
             std::pair< Adapter2<Arg1,Result>*,void*>* vpair = static_cast< std::pair< Adapter2<Arg1,Result>*,void*>*> (v);
             Adapter2<Arg1,Result>* pad = reinterpret_cast<Adapter2<Arg1,Result>*>(vpair->first);
-            r=pad->m_cb->call(a,vpair->second);
-
+            pad->m_r = pad->m_cb->call(a,vpair->second);
+			r = pad->m_r;
         }
         catch ( std::exception & e)
         {
@@ -152,6 +191,11 @@ public:
         arguments = std::make_pair(this,vp);
         return static_cast<void*>( &arguments);
     }
+
+	Result getResult()
+	{
+		return m_r;
+	}
 };
 
 
@@ -160,11 +204,19 @@ class Adapter2const
 {
     Callback2constBase<Arg1,void*,Result> * m_cb;
     std::pair< Adapter2const<Arg1,Result>*,void*> arguments;
+	Result m_r;
 
 public:
     Adapter2const( Callback2constBase<Arg1,void*,Result> * cb )
         : m_cb(cb)
     {}
+
+	Adapter2const(const Adapter2const<Arg1,Result> & ad)
+		: m_cb(ad.m_cb)
+	{}
+
+	virtual ~Adapter2const()
+	{}
 
     static Result adapt( Arg1 a, void * v )
     {
@@ -173,7 +225,8 @@ public:
         {
             std::pair< Adapter2const<Arg1,Result>*,void*>* vpair = static_cast< std::pair< Adapter2const<Arg1,Result>*,void*>*> (v);
             Adapter2const<Arg1,Result>* pad = reinterpret_cast<Adapter2const<Arg1,Result>*>(vpair->first);
-            r=pad->m_cb->call(a,vpair->second);
+            pad->m_r = pad->m_cb->call(a,vpair->second);
+			r = pad->m_r;
         }
         catch ( std::exception & e)
         {
@@ -188,6 +241,11 @@ public:
         arguments = std::make_pair(this,vp);
         return static_cast<void*>( &arguments);
     }
+
+	Result getResult()
+	{
+		return m_r;
+	}
 };
 
 

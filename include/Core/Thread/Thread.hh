@@ -32,9 +32,24 @@
 #ifndef __CORE_THREAD_THREAD_HH
 #define __CORE_THREAD_THREAD_HH
 
-#include "tinythreadpp/source/tinythread.h"
 
 #include "Core/DateTime/ChronoDuration.hh"
+
+//TODO : add an actual check for this
+#define NO_TLS
+
+//TODO : Check if we need tinythread or not ( if no <thread> )
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_THREAD_PACKAGE tthread
+#else
+# include <thread>
+# define CORE_THREAD_PACKAGE std
+#endif
+
+//to allow callback usage in threads call
+#include "Callback.hh"
+#include "Adapter.hh"
 
 namespace Core
 {
@@ -42,48 +57,110 @@ namespace Core
 	{
 
 		/// Thread class.
-		/// This is only a wrapper over TinyThread class.
-		/// For Advanced Thread Pattern using Core callbacks, see ThreadedCommand.
-		class Thread : public tthread::thread
+		/// This is only a wrapper over TinyThread class or std::thread (if available).
+		/// It integrates with callback and adaptors from Core or std <functional> ( if available )
+		class Thread : public CORE_THREAD_PACKAGE::thread
 		{
 		  public:
-			Thread() :  tthread::thread()
-    {}
+			Thread() :  CORE_THREAD_PACKAGE::thread()
+			{}
 
-			//This constructor doesnt exactly match C++11 constructor.
-			Thread(void (*aFunction)(void *), void * aArg) :  tthread::thread(aFunction,aArg)
-    {}
+			//template<class Fn>
+			//explicit Thread(Fn&& f)
+			//	: CORE_THREAD_PACKAGE::thread(f)
+			//{}
+
+			template<class Fn>
+			explicit Thread(Fn f)
+				: CORE_THREAD_PACKAGE::thread(std::move(f))
+			{}
+
+///TODO Check for variadics template
+#ifdef VARIADICS
+			template<class Fn, class... Args>
+			explicit Thread(Fn&& f, Args&&... a)
+				: CORE_THREAD_PACKAGE::thread(f,a)
+			{}
+
+			//in case of buggy move arguments (vs2012)
+			template<class Fn, class... Args>
+			explicit Thread(Fn f, Args... a)
+				: CORE_THREAD_PACKAGE::thread(std::move(f),std::move(a))
+			{}
+#else
+			//official per standard definition
+			//template<class Fn, class Arg1>
+			//explicit Thread(Fn&& f, Arg1&& a)
+			//	: CORE_THREAD_PACKAGE::thread(f,a)
+			//{}
+
+			//for compilers that dont handle move arguments properly (vs2012)
+			template<class Fn, class Arg1>
+			explicit Thread(Fn f, Arg1 a)
+				: CORE_THREAD_PACKAGE::thread(std::move(f),std::move(a))
+			{}
+
+			//template<class Fn, class Arg1, class Arg2>
+			//explicit Thread(Fn&& f, Arg1&& a1, Arg2&& a2)
+			//	: CORE_THREAD_PACKAGE::thread(f,a1,a2)
+			//{}
+
+			template<class Fn, class Arg1, class Arg2>
+			explicit Thread(Fn f, Arg1 a1, Arg2 a2)
+				: CORE_THREAD_PACKAGE::thread(std::move(f),std::move(a1),std::move(a2))
+			{}
+
+			template<class Fn, class Arg1, class Arg2, class Arg3>
+			explicit Thread(Fn&& f, Arg1&& a1, Arg2&& a2, Arg3&& a3)
+				: CORE_THREAD_PACKAGE::thread(f,a1,a2,a3)
+			{}
+
+			template<class Fn, class Arg1, class Arg2, class Arg3, class Arg4>
+			explicit Thread(Fn&& f, Arg1&& a1, Arg2&& a2, Arg3&& a3, Arg4&& a4)
+				: CORE_THREAD_PACKAGE::thread(f,a1,a2,a3,a4)
+			{}
+
+			template<class Fn, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
+			explicit Thread(Fn&& f, Arg1&& a1, Arg2&& a2, Arg3&& a3, Arg4&& a4, Arg5&& a5)
+				: CORE_THREAD_PACKAGE::thread(f,a1,a2,a3,a4,a5)
+			{}
+
+			template<class Fn, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6>
+			explicit Thread(Fn&& f, Arg1&& a1, Arg2&& a2, Arg3&& a3, Arg4&& a4, Arg5&& a5, Arg6&& a6)
+				: CORE_THREAD_PACKAGE::thread(f,a1,a2,a3,a4,a5,a6)
+			{}
+#endif
+
+			//TODO : check if move constructors are available
+			Thread(Thread&& other) : CORE_THREAD_PACKAGE::thread(std::move(other))
+			{ }
+
+			Thread& operator=(Thread&& other)
+			{ 
+				swap(std::move(other)); 
+				return *this;
+			}
 
 			virtual ~Thread()
-	{}
+			{}
 
-			class Id : public tthread::thread::id
-			{
-			public:
-				    Id() : id() {};
-					Id(unsigned long int aId) : id(aId) {};
-					Id(const Id& aId) : id(aId) {};
-					//downward conversion constructor
-					Id(const id& aId) : id(aId) {};
-					virtual ~Id(){};
-			};
-
+			typedef CORE_THREAD_PACKAGE::thread::id Id;
+			
 			/// Determine the number of threads which can possibly execute concurrently.
 			/// This function is useful for determining the optimal number of threads to
 			/// use for a task.
 			/// @return The number of hardware thread contexts in the system.
 			/// @note If this value is not defined, the function returns zero (0).
 			static unsigned hardwareConcurrency() 
-	{
-		return tthread::thread::hardware_concurrency();
-	}
+			{
+				return CORE_THREAD_PACKAGE::thread::hardware_concurrency();
+			}
 
-		  private:
+		private:
 			//forbidding copy
 			Thread(const Thread&);
 			Thread& operator=(const Thread&);
 
-	
 		}; //class Thread
 		
 
@@ -92,7 +169,7 @@ namespace Core
 			/// Return the thread ID of the calling thread.
 			inline Thread::Id get_id()
 			{
-				return tthread::this_thread::get_id();
+				return CORE_THREAD_PACKAGE::this_thread::get_id();
 			}
 
 			/// Yield execution to another thread.
@@ -100,7 +177,7 @@ namespace Core
 			/// that is ready to run on the current processor.
 			inline void yield()
 			{
-				tthread::this_thread::yield();
+				CORE_THREAD_PACKAGE::this_thread::yield();
 			}
 
 			/// Blocks the calling thread for a period of time.
@@ -114,7 +191,7 @@ namespace Core
 			/// milliseconds, seconds, minutes and hours.
 			template <class _Rep, class _Period> void sleep_for(const Core::DateTime::chrono::duration<_Rep, _Period>& aTime)
 			{
-				tthread::this_thread::sleep_for(aTime);
+				CORE_THREAD_PACKAGE::this_thread::sleep_for(aTime);
 			}
 		}; //namespace ThisThread
 	

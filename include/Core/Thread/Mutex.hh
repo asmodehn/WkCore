@@ -32,7 +32,14 @@
 #ifndef __CORE_THREAD_MUTEX_HH
 #define __CORE_THREAD_MUTEX_HH
 
-#include "tinythreadpp/source/tinythread.h"
+//TODO : Check if we need tinythread or not ( if no <thread> )
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_THREAD_PACKAGE tthread
+#else
+# include <mutex>
+# define CORE_THREAD_PACKAGE std
+#endif
 
 namespace Core
 {
@@ -45,10 +52,10 @@ namespace Core
 /// program may deadlock if the thread that owns a mutex object calls lock()
 /// on that object).
 /// @see recursive_mutex
-class Mutex : public tthread::mutex
+class Mutex : public CORE_THREAD_PACKAGE::mutex
 {
   public:
-    Mutex() :  tthread::mutex()
+    Mutex() :  CORE_THREAD_PACKAGE::mutex()
     {}
 
 	virtual ~Mutex()
@@ -65,5 +72,7 @@ class Mutex : public tthread::mutex
 	}; //namespace Thread
 
 }; //namespace Core
+
+#undef CORE_THREAD_PACKAGE
 
 #endif // __CORE_THREAD_MUTEX_HH

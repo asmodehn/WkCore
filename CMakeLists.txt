@@ -27,12 +27,14 @@ WkDepends(Threads)
 add_subdirectory (depends/UnitTest++)
 include_directories(depends/UnitTest++)
 
-add_subdirectory (depends/tinythreadpp)
-include_directories(depends)
+#TODO : Check if we need it or not ( since C++11 we do not need it )
+# This means improve wkcmake
+#add_subdirectory (depends/tinythreadpp)
+#include_directories(depends)
 
 WkBuild ( LIBRARY STATIC )
 
-#TMP Workaround limitation : Threads depends doesnt follow standard depends and is not supporte in wkcmake at the moment.
+#TMP Workaround limitation : Threads depends doesnt follow standard depends and is not supported in wkcmake at the moment.
 target_link_libraries (${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
 WkDoc()
@@ -67,7 +69,10 @@ WkTestBuild( TestThread )
 #check if we have enabled tests
 #TODO : improve WkTestBuild, or add more functions to support automatically external unit testing libs
 if ( TARGET TestThread )
-target_link_libraries( TestThread UnitTest++ TinyThread++)
+
+#NOT NEEDED since VS2012
+#target_link_libraries( TestThread UnitTest++ TinyThread++)
+
 endif ( TARGET TestThread )
 WkTestRun( Thread TestThread)
 

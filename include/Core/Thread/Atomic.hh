@@ -32,7 +32,13 @@
 #ifndef __CORE_THREAD_ATOMIC_HH
 #define __CORE_THREAD_ATOMIC_HH
 
-#include "tinythreadpp/source/tinythread.h"
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_THREAD_PACKAGE tthread
+#else
+# include <atomic>
+# define CORE_THREAD_PACKAGE std
+#endif
 
 namespace Core
 {
@@ -43,13 +49,13 @@ namespace Core
 /// An atomic object provides atomic access to an underlying data element of
 /// the template type T.
 template<class T>
-class Atomic : public tthread::atomic<T>
+class Atomic : public CORE_THREAD_PACKAGE::atomic<T>
 {
   public:
-    Atomic() :  tthread::atomic<T>()
+    Atomic() :  CORE_THREAD_PACKAGE::atomic<T>()
     {}
 
-    Atomic(T desired) :  tthread::atomic<T>(desired)
+    Atomic(T desired) :  CORE_THREAD_PACKAGE::atomic<T>(desired)
     {}
 
 	virtual ~Atomic()

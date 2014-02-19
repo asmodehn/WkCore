@@ -83,6 +83,8 @@ std::auto_ptr<Core::Callback5constBase<int,int,int,int,void*,int> > adtest5c;
 std::auto_ptr<Core::Callback6Base<int,int,int,int,int,void*,int> > adtest6;
 std::auto_ptr<Core::Callback6constBase<int,int,int,int,int,void*,int> > adtest6c;
 
+std::auto_ptr<Core::Callback1Base<void*,int> > adtestcopy;
+
 
 //assumed legacy invoker always have a ending void* parameter, to be able to pass any argument number to the callback
 int legacy1invoker( int (*func) ( void*), void* v)
@@ -179,7 +181,14 @@ int main( int argc, char * argv [] )
     Adapter6const<int,int,int,int,int,int> ad6c(adtest6c.get());
     TEST(legacy6invoker(Adapter6const<int,int,int,int,int,int>::adapt,1,2,3,4,5,ad6c.build_voidP_args(NULL)) ==16 );
 
-
+///Testing that Adapter survives copy (useful when used in threads)
+	///DOES NOT WORK 
+	//adtestcopy.reset(new Callback1<Called,void*, int>(cobj,&Called::fadapt1) );
+    //Adapter1<int>* adptr = new Adapter1<int>(adtestcopy.get());
+	//void* args = adptr->build_voidP_args(NULL);
+	//delete adptr,adptr=0;
+    //TEST(legacy1invoker(Adapter1<int>::adapt,args) == 1 );
+	
     return 0;
 }
 

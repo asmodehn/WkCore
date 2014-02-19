@@ -32,7 +32,13 @@
 #ifndef __CORE_THREAD_LOCKGUARD_HH
 #define __CORE_THREAD_LOCKGUARD_HH
 
-#include "tinythreadpp/source/tinythread.h"
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_THREAD_PACKAGE tthread
+#else
+# include <condition_variable>
+# define CORE_THREAD_PACKAGE std
+#endif
 
 namespace Core
 {
@@ -54,13 +60,13 @@ namespace Core
 /// }
 /// @endcode
 template<class MutexType>
-class LockGuard : public tthread::lock_guard<MutexType>
+class LockGuard : public CORE_THREAD_PACKAGE::lock_guard<MutexType>
 {
   public:
-    LockGuard() :  tthread::lock_guard<MutexType>()
+    LockGuard() :  CORE_THREAD_PACKAGE::lock_guard<MutexType>()
     {}
 
-    explicit LockGuard(MutexType& mtx) : tthread::lock_guard<MutexType>(mtx)
+    explicit LockGuard(MutexType& mtx) : CORE_THREAD_PACKAGE::lock_guard<MutexType>(mtx)
     {}
 
 	virtual ~LockGuard()

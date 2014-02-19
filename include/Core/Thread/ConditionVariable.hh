@@ -32,7 +32,13 @@
 #ifndef __CORE_THREAD_CONDITIONVARIABLE_HH
 #define __CORE_THREAD_CONDITIONVARIABLE_HH
 
-#include "tinythreadpp/source/tinythread.h"
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_THREAD_PACKAGE tthread
+#else
+# include <condition_variable>
+# define CORE_THREAD_PACKAGE std
+#endif
 
 namespace Core
 {
@@ -64,14 +70,25 @@ namespace Core
 ///   cond.notify_all();
 /// }
 /// @endcode
-class ConditionVariable : public tthread::condition_variable
+class ConditionVariable : public CORE_THREAD_PACKAGE::condition_variable
 {
   public:
-    ConditionVariable() :  tthread::condition_variable()
+    ConditionVariable() :  CORE_THREAD_PACKAGE::condition_variable()
     {}
 
     virtual ~ConditionVariable()
     {}
+
+	void wait( Mutex& lock)
+	{
+		CORE_THREAD_PACKAGE::condition_variable::wait( std::unique_lock<CORE_THREAD_PACKAGE::mutex>(lock) );
+	}
+
+	template< class Predicate >
+	void wait( Mutex& lock, Predicate pred )
+	{
+		CORE_THREAD_PACKAGE::condition_variable::wait( std::unique_lock<CORE_THREAD_PACKAGE::mutex>(lock),pred);
+	}
 
   private:
 	//forbidding copy
@@ -84,5 +101,8 @@ class ConditionVariable : public tthread::condition_variable
 	}; //namespace Thread
 
 }; //namespace Core
+
+//cleanup
+#undef CORE_THREAD_PACKAGE
 
 #endif // __CORE_THREAD_CONDITIONVARIABLE_HH

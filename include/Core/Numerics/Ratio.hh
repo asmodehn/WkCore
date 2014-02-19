@@ -32,9 +32,13 @@
 #ifndef __CORE_NUMERICS_RATIO_HH
 #define __CORE_NUMERICS_RATIO_HH
 
-#include "tinythreadpp/source/tinythread.h"
-
-#include "Core/Numerics/Ratio.hh"
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_RATIO_PACKAGE tthread::ratio
+#else
+# include <ratio>
+# define CORE_RATIO_PACKAGE std::ratio
+#endif
 
 namespace Core
 {
@@ -45,11 +49,14 @@ namespace Core
 
 		/// Minimal implementation of the @c ratio class. This class provides enough
 		/// functionality to implement some basic @c chrono classes.
-		template <__intmax_t N, __intmax_t D = 1> class ratio: public tthread::ratio<N,D>
+		template <__intmax_t N, __intmax_t D = 1> class ratio: public CORE_RATIO_PACKAGE<N,D>
 		{}; //class ratio
 
 	}; //namespace Numerics
 
 }; //namespace Core
+
+//cleanup
+#undef CORE_RATIO_PACKAGE
 
 #endif // __CORE_NUMERICS_RATIO_HH

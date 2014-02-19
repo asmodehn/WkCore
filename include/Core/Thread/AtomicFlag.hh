@@ -32,31 +32,43 @@
 #ifndef __CORE_THREAD_ATOMICFLAG_HH
 #define __CORE_THREAD_ATOMICFLAG_HH
 
-#include "tinythreadpp/source/tinythread.h"
+#ifdef TINYTHREAD_REQUIRED
+# include "tinythreadpp/source/tinythread.h"
+# define CORE_THREAD_PACKAGE tthread
+#else
+# include <atomic>
+# define CORE_THREAD_PACKAGE std
+#endif
 
 namespace Core
 {
 	namespace Thread
 	{
 
+#define CORE_ATOMIC_FLAG_INIT 0
+
 /// Atomic flag class.
 /// This is an atomic boolean object that provides methods for atmically
 /// testing, setting and clearing the state of the object. It can be used
 /// for implementing user space spin-locks, for instance.
-class AtomicFlag : public tthread::atomic_flag
+class AtomicFlag : public CORE_THREAD_PACKAGE::atomic_flag
 {
   public:
-    AtomicFlag() :  tthread::atomic_flag()
-    {}
 
-    AtomicFlag(int value) :  tthread::atomic_flag(value)
-    {}
-
+	//constructor to simulate value construction via flag init
+	//also default constructor because of default arguments
+	AtomicFlag( int atomic_flag_init = CORE_ATOMIC_FLAG_INIT) :  CORE_THREAD_PACKAGE::atomic_flag()
+	{
+		_My_flag = atomic_flag_init;
+	}
+	
 	virtual ~AtomicFlag()
 	{}
 
   private:
 	//forbidding copy
+
+//TODO : check if C++ 11
 	AtomicFlag(const AtomicFlag&);
     AtomicFlag& operator=(const AtomicFlag&);
 	
