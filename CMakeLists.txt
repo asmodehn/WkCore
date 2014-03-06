@@ -13,6 +13,7 @@ WkDepends(Threads)
 #TODO :
 # remove sigC++ dependency because
 # - delegate mecanism already implemented and working.
+# For simpler signal slots, check http://code.google.com/p/nano-signal-slot/source/browse/nano_signal_slot.hpp
 # - for more complex communication pattern : use 0mq
 
 # TODO : Add Ncurses dependency for UNIX type platform
